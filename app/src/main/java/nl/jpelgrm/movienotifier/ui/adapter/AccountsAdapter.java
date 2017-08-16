@@ -128,6 +128,9 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
                                 if(response.code() == 200 || response.code() == 401) {
                                     // 200: OK
                                     // 401: Unauthorized, but because API keys don't change it seems the user was already deleted
+                                    if(user.getUuid().equals(settings.getString("userID", ""))) {
+                                        settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
+                                    }
                                     DBHelper.getInstance(getContext()).deleteUser(user.getUuid());
 
                                     tryLoggingInNextUser(holder, "");
