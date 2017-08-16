@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Movie Notifier</string>
+
+    <string name="account_start_title">Hi there!</string>
+    <string name="account_start_subtitle">Welcome to Movie Notifier</string>
+    <string name="account_start_login_text">Have you used the app before? Log in using your Movie Notifier account to manage your watchers.</string>
+    <string name="account_start_signup_text">New here? No problem, signing up is super quick and you\'ll be able to start using the app in less than a minute.</string>
+    <string name="account_login_title">Log in using your Movie Notifier account</string>
+    <string name="account_login_subtitle">Good to see you again!</string>
+    <string name="account_signup_title">Create a new account</string>
+    <string name="account_signup_subtitle">You\'re already almost done</string>
+
+    <string name="log_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="get_started">Get started</string>
+    <string name="add">Add</string>
+
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="watchers_empty_title">No watchers found</string>
+    <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
+    <string name="watchers_empty_account">Sorry, you need an account to do that.</string>
+
+    <string name="users_title">Users</string>
+    <string name="user_active">Active</string>
+    <string name="user_add_title">Add an user</string>
+    <string name="user_add_subtitle">Log in or sign up</string>
+    <string name="user_input_name">Name</string>
+    <string name="user_input_email">Email address</string>
+    <string name="user_input_phone">Phone number</string>
+    <string name="user_input_password">Password</string>
+    <string name="user_validate_name_length">A name must be 4–16 characters long</string>
+    <string name="user_validate_name_regex">Names can only contain a–z, 0–9, and only a–z in the first 4 characters</string>
+    <string name="user_validate_email">Please enter a valid email address</string>
+    <string name="user_validate_phone">Please enter a valid phone number in the format +[country code][phone number]</string>
+    <string name="user_validate_password">Passwords need to be at least 8 characters long</string>
+    <string name="user_list_logout">Log out</string>
+    <string name="user_list_switch">Switch</string>
+    <string name="user_list_delete_title">Delete account</string>
+    <string name="user_list_delete_confirm">Are you absolutely sure that you want to delete your account? All your watchers will be permanently deleted.</string>
+
+    <string name="error_login_401">Your name and/or password is incorrect.</string>
+    <string name="error_watchers_400">Sorry, please try again.</string>
+    <string name="error_watchers_500">Oops! The server didn\'t like that. Please try again later.</string>
+    <string name="error_general_401">Please log in to an account or register.</string>
+    <string name="error_general_exception">Oops! We encountered an error. Please make sure you have a working network connection and try again.</string>
+    <string name="error_general_message">Oops! We encountered an issue. Please try again. You may find this information useful:\n%1$s</string>
+    <string name="error_general_server">Oops! The server encountered an error. Please try again. You may find this information useful:\n%1$s</string>
+</resources>
