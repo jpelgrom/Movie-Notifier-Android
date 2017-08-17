@@ -18,6 +18,7 @@ public class AccountListDiffCallback extends DiffUtil.Callback {
         this.oldActive = oldActive;
         this.newActive = newActive;
     }
+
     @Override
     public int getOldListSize() {
         return oldList.size();

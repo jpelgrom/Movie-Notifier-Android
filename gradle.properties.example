@@ -1,3 +1,8 @@
 org.gradle.jvmargs=-Xmx4096m
 
 SERVER_BASE_URL=""
+
+# Should be the same as the URL above, but only [subdomain...].[domain name].[tld]
+SERVER_HOST=""
+
+CINEMA_HOST=""

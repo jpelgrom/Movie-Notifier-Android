@@ -14,7 +14,7 @@
             android:minHeight="?listPreferredItemHeightSmall"
             android:text="@string/users_title"
             android:textStyle="bold"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorPrimary"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:paddingStart="?listPreferredItemPaddingLeft"
             android:paddingEnd="?listPreferredItemPaddingRight"

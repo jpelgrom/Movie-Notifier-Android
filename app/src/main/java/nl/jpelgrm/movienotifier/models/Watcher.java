@@ -2,7 +2,7 @@ package nl.jpelgrm.movienotifier.models;
 
 import com.google.gson.annotations.Expose;
 
-public class Watcher {
+public class Watcher implements Cloneable {
     @Expose(serialize = false)
     private String uuid;
 
@@ -91,4 +91,8 @@ public class Watcher {
         this.props = props;
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException{
+        return super.clone();
+    }
 }

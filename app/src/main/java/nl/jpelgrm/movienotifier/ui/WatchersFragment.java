@@ -9,6 +9,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -23,6 +26,7 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.models.Watcher;
+import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +44,9 @@ public class WatchersFragment extends Fragment {
     @BindView(R.id.listRecycler) RecyclerView listRecycler;
 
     @BindView(R.id.fab) FloatingActionButton fab;
+
+    private ArrayList<Watcher> watchers = new ArrayList<>();
+    private WatchersAdapter adapter;
 
     private SharedPreferences settings;
     private String previousUUID;
@@ -65,12 +72,16 @@ public class WatchersFragment extends Fragment {
                 refreshList(true);
             }
         });
-        // TODO List setup
+        adapter = new WatchersAdapter(getContext(), watchers);
+        listRecycler.setAdapter(adapter);
+        listRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listRecycler.getContext(), LinearLayoutManager.VERTICAL);
+        listRecycler.addItemDecoration(dividerItemDecoration);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO
+                startActivity(new Intent(getContext(), WatcherActivity.class));
             }
         });
     }
@@ -90,7 +101,7 @@ public class WatchersFragment extends Fragment {
 
     private void checkUser() {
         if(previousUUID != null && !settings.getString("userID", "").equals(previousUUID) && !settings.getString("userID", "").equals("")) {
-            Snackbar.make(coordinator, "Welcome!", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(coordinator, R.string.account_welcome, Snackbar.LENGTH_LONG).show();
         }
         previousUUID = settings.getString("userID", "");
     }
@@ -110,7 +121,8 @@ public class WatchersFragment extends Fragment {
                             if(response.code() == 200) {
                                 if(response.body().size() > 0) {
                                     emptyView.setVisibility(View.GONE);
-                                    // TODO
+                                    listRecycler.setVisibility(View.VISIBLE);
+                                    adapter.swapItems(response.body());
                                 } else {
                                     showEmptyView();
                                 }

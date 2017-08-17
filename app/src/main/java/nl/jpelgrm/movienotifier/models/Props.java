@@ -1,6 +1,7 @@
 package nl.jpelgrm.movienotifier.models;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Props {
     @Expose
@@ -12,12 +13,14 @@ public class Props {
     @Expose
     private Boolean imax;
 
+    @SerializedName("3d")
     @Expose
     private Boolean _3d;
 
     @Expose
     private Boolean hfr;
 
+    @SerializedName("4k")
     @Expose
     private Boolean _4k;
 

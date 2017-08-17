@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="?attr/listPreferredItemHeightLarge"
+    android:background="?selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+    android:paddingTop="8dp">
+
+    <TextView
+        android:id="@+id/watcherName"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="It 🤡🎈"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        tools:ignore="hardcodedText" />
+
+    <TextView
+        android:id="@+id/watcherSubtext"
+        style="@style/TextAppearance.AppCompat.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:text="7 sep. 2017 09:00 – 20 sep. 2017 23:00"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        tools:ignore="hardcodedText"/>
+
+</LinearLayout>
