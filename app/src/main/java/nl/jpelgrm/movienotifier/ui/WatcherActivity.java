@@ -273,6 +273,9 @@ public class WatcherActivity extends AppCompatActivity {
                     InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
                 } else {
                     InterfaceUtil.hideKeyboard(WatcherActivity.this);
+                    if(snackbar != null && snackbar.isShown()) {
+                        snackbar.dismiss();
+                    }
 
                     if(!settings.getString("userID", "").equals("")) {
                         saveWatcher();
@@ -445,7 +448,8 @@ public class WatcherActivity extends AppCompatActivity {
         // Buttons
         if(toolbar != null && toolbar.getMenu() != null && watcher != null && settings != null) {
             for(int i = 0; i < toolbar.getMenu().size(); i++) {
-                if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare) {
+                if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare
+                        || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
                     toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING);
                 } else if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
                     toolbar.getMenu().getItem(i).setVisible(uuid != null && !uuid.equals("") && watcher.getUser() != null
@@ -661,6 +665,8 @@ public class WatcherActivity extends AppCompatActivity {
                             watcherError.setText(getString(R.string.error_general_server, "H" + response.code()));
                         }
                         watcherError.setVisibility(View.VISIBLE);
+
+                        main.smoothScrollTo(0, 0);
                     }
                 }
 
@@ -670,9 +676,12 @@ public class WatcherActivity extends AppCompatActivity {
 
                     fab.setEnabled(true);
                     progress.setVisibility(View.GONE);
+                    setFieldsEnabled(true);
+
                     watcherError.setText(R.string.error_general_exception);
                     watcherError.setVisibility(View.VISIBLE);
-                    setFieldsEnabled(true);
+
+                    main.smoothScrollTo(0, 0);
                 }
             });
         }
@@ -726,6 +735,25 @@ public class WatcherActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + uuid);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
+    }
+
+    private void duplicateWatcher() {
+        progress.setVisibility(View.VISIBLE);
+        watcherError.setVisibility(View.GONE);
+
+        snackbar = Snackbar.make(coordinator, R.string.watcher_duplicate, Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+
+        watcher.setName(getString(R.string.watcher_copy, watcher.getName()));
+
+        uuid = null;
+        mode = Mode.EDITING;
+        main.smoothScrollTo(0, 0);
+        doneLoading();
+        updateViews();
+
+        watcherName.requestFocus();
+        InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
     }
 
     private void setOnPropClickListener(final View click, final PropResultListener callback) {
@@ -798,6 +826,9 @@ public class WatcherActivity extends AppCompatActivity {
                 return true;
             case R.id.watcherMenuShare:
                 shareWatcher();
+                return true;
+            case R.id.watcherMenuDuplicate:
+                duplicateWatcher();
                 return true;
             case R.id.watcherMenuDelete:
                 new AlertDialog.Builder(this).setMessage(R.string.watcher_delete).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
