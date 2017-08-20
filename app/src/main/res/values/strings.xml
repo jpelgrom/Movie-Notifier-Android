@@ -28,17 +28,17 @@
     <string name="watchers_empty_title">No watchers found</string>
     <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
     <string name="watchers_empty_account">Sorry, you need an account to do that.</string>
-    <string name="watchers_list_subtitle_date">%s Screenings %s – %s</string>
+    <string name="watchers_list_subtitle_date">%s Showings %s – %s</string>
 
     <string name="watcher_basics_title">Basics</string>
     <string name="watcher_basics_name">Name</string>
     <string name="watcher_basics_movieid">Movie number</string>
     <string name="watcher_basics_cinemaid">Location</string>
     <string name="watcher_date_title">When?</string>
-    <string name="watcher_date_title_begin">Start checking for screenings</string>
-    <string name="watcher_date_title_end">Stop checking for screenings</string>
-    <string name="watcher_filter_title_startafter">Search for screenings that start after</string>
-    <string name="watcher_filter_title_startbefore">Search for screenings that start before</string>
+    <string name="watcher_date_title_begin">Start checking for showings</string>
+    <string name="watcher_date_title_end">Stop checking for showings</string>
+    <string name="watcher_filter_title_startafter">Search for showings that start after</string>
+    <string name="watcher_filter_title_startbefore">Search for showings that start before</string>
     <string name="watcher_filter_heading_experience">Experience</string>
     <string name="watcher_filter_title_imax">IMAX</string>
     <string name="watcher_filter_title_dolbycinema">Dolby Cinema</string>
