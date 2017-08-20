@@ -1,8 +1,5 @@
 package nl.jpelgrm.movienotifier.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.util.StethoUtil;
 import retrofit2.Retrofit;
@@ -13,12 +10,10 @@ public class APIHelper {
 
     public static APIClient getInstance() {
         if(instance == null) {
-            Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
-
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BuildConfig.SERVER_BASE_URL)
                     .client(StethoUtil.getOkHttpClient())
-                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
             instance = retrofit.create(APIClient.class);

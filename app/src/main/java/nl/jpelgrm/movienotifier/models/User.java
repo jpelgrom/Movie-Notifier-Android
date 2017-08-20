@@ -10,8 +10,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class User {
-    @Expose
-    private String uuid;
+    @Expose(serialize = false)
+    private String id;
 
     @Expose
     private String name;
@@ -23,17 +23,31 @@ public class User {
     private String phonenumber;
 
     @Expose
+    private String password;
+
+    @Expose
     private List<String> notifications = null;
 
     @Expose(serialize = false)
     private String apikey;
 
-    public String getUuid() {
-        return uuid;
+    public User() {
+        // Default constructor
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public User(String name, String email, String phonenumber, String password) {
+        this.name = name;
+        this.email = email;
+        this.phonenumber = phonenumber;
+        this.password = password;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public void setID(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -60,6 +74,10 @@ public class User {
         this.phonenumber = phonenumber;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public List<String> getNotifications() {
         return notifications;
     }
@@ -78,7 +96,7 @@ public class User {
 
     public ContentValues toContentValues() {
         ContentValues cv = new ContentValues();
-        cv.put("UUID", uuid);
+        cv.put("ID", id);
         cv.put("Name", name);
         cv.put("Email", email);
         cv.put("Phone", phonenumber);
@@ -89,7 +107,7 @@ public class User {
     }
 
     public void setContent(ContentValues cv) {
-        uuid = cv.getAsString("UUID");
+        id = cv.getAsString("ID");
         name = cv.getAsString("Name");
         email = cv.getAsString("Email");
         phonenumber = cv.getAsString("Phone");

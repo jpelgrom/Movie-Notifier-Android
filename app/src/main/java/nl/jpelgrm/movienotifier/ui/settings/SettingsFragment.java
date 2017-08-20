@@ -73,7 +73,7 @@ public class SettingsFragment extends Fragment {
         final List<User> active = db.getUsers();
 
         for(final User user : active) {
-            Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getUuid());
+            Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
@@ -83,10 +83,10 @@ public class SettingsFragment extends Fragment {
                         }
                     } else if(response.code() == 401) {
                         // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
-                        db.deleteUser(user.getUuid());
+                        db.deleteUser(user.getID());
 
                         SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                        if(settings.getString("userID", "").equals(user.getUuid())) {
+                        if(settings.getString("userID", "").equals(user.getID())) {
                             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                         }
                     } // else: failed with user facing error, but do nothing because it is a background task

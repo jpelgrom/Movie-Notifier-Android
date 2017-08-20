@@ -4,7 +4,6 @@ import java.util.List;
 
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.models.UserCreation;
 import nl.jpelgrm.movienotifier.models.UserLogin;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import okhttp3.ResponseBody;
@@ -20,7 +19,7 @@ import retrofit2.http.Path;
 public interface APIClient {
     // User
     @PUT("/user")
-    Call<User> addUser(@Body UserCreation user);
+    Call<User> addUser(@Body User user);
 
     @POST("/login")
     Call<User> login(@Body UserLogin user);

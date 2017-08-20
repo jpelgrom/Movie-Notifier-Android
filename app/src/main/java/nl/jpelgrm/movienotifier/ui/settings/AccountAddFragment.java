@@ -24,6 +24,8 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -32,7 +34,6 @@ import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.models.UserCreation;
 import nl.jpelgrm.movienotifier.models.error.Errors;
 import nl.jpelgrm.movienotifier.models.error.Message;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
@@ -167,7 +168,11 @@ public class AccountAddFragment extends Fragment {
                 InterfaceUtil.hideKeyboard(getActivity());
 
                 if(validateName() && validateEmail() && validatePhone() && validatePassword()) {
-                    UserCreation toCreate = new UserCreation(name.getText().toString(), email.getText().toString(), getRFCPhoneNumber(), password.getText().toString());
+                    User toCreate = new User(name.getText().toString(), email.getText().toString(), getRFCPhoneNumber(), password.getText().toString());
+
+                    // TODO?
+                    toCreate.setNotifications(new ArrayList<>(Collections.singletonList("FBM")));
+
                     register(toCreate);
                 }
             }
@@ -231,7 +236,7 @@ public class AccountAddFragment extends Fragment {
         return util.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
     }
 
-    private void register(UserCreation user) {
+    private void register(User user) {
         setFieldsEnabled(false);
         setProgressVisible(true);
 
@@ -242,7 +247,7 @@ public class AccountAddFragment extends Fragment {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     DBHelper.getInstance(getActivity()).addUser(received);
-                    settings.edit().putString("userID", received.getUuid()).putString("userAPIKey", received.getApikey()).apply();
+                    settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
                     getActivity().finish();
                 } else {
                     setFieldsEnabled(true);

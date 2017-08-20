@@ -31,7 +31,7 @@ public class AccountListDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition).getUuid().equals(newList.get(newItemPosition).getUuid());
+        return oldList.get(oldItemPosition).getID().equals(newList.get(newItemPosition).getID());
     }
 
     @Override
@@ -39,8 +39,8 @@ public class AccountListDiffCallback extends DiffUtil.Callback {
         User oldUser = oldList.get(oldItemPosition);
         User newUser = newList.get(newItemPosition);
 
-        return oldUser != null && newUser != null && oldUser.getUuid().equals(newUser.getUuid()) && oldUser.getName().equals(newUser.getName())
+        return oldUser != null && newUser != null && oldUser.getID().equals(newUser.getID()) && oldUser.getName().equals(newUser.getName())
                 && oldUser.getEmail().equals(newUser.getEmail()) && oldUser.getNotifications().equals(newUser.getNotifications())
-                && oldUser.getApikey().equals(newUser.getApikey()) && (oldActive.equals(newActive) && (oldActive.equals(oldUser.getUuid()) || newActive.equals(newUser.getUuid())));
+                && oldUser.getApikey().equals(newUser.getApikey()) && (oldActive.equals(newActive) && (oldActive.equals(oldUser.getID()) || newActive.equals(newUser.getID())));
     }
 }

@@ -14,9 +14,9 @@ import nl.jpelgrm.movienotifier.models.User;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "notifierlocalstore";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
-    private static final String CREATE_USERS_TABLE = "CREATE TABLE Users (UUID TEXT PRIMARY KEY, Name TEXT, Email TEXT, Phone TEXT, Notifications TEXT, APIKey TEXT)";
+    private static final String CREATE_USERS_TABLE = "CREATE TABLE Users (ID TEXT PRIMARY KEY, Name TEXT, Email TEXT, Phone TEXT, Notifications TEXT, APIKey TEXT)";
 
     private static DBHelper instance;
 
@@ -45,7 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void addUser(User user) {
-        if(getUserByUUID(user.getUuid()) != null) {
+        if(getUserByID(user.getID()) != null) {
             updateUser(user);
         } else {
             SQLiteDatabase db = getWritableDatabase();
@@ -72,8 +72,8 @@ public class DBHelper extends SQLiteOpenHelper {
         return ret;
     }
 
-    public User getUserByUUID(String UUID) {
-        List<ContentValues> rows = performSelect("SELECT * FROM Users WHERE UUID=?", new String[] { UUID });
+    public User getUserByID(String ID) {
+        List<ContentValues> rows = performSelect("SELECT * FROM Users WHERE ID=?", new String[] { ID });
         if (rows.size() == 0) {
             return null;
         }
@@ -96,15 +96,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public int updateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.update("Users", user.toContentValues(), "UUID=?", new String[] { user.getUuid() });
+        return db.update("Users", user.toContentValues(), "ID=?", new String[] { user.getID() });
     }
 
-    public void deleteUser(String UUID) {
+    public void deleteUser(String ID) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
             // Order of deletions is important when foreign key relationships exist.
-            db.delete("Users", "UUID=?", new String[] { UUID });
+            db.delete("Users", "ID=?", new String[] { ID });
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

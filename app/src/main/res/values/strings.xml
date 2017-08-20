@@ -67,12 +67,12 @@
     <string name="user_active">Active</string>
     <string name="user_add_title">Add an user</string>
     <string name="user_add_subtitle">Log in or sign up</string>
-    <string name="user_input_name">Name</string>
+    <string name="user_input_name">Username</string>
     <string name="user_input_email">Email address</string>
     <string name="user_input_phone">Phone number</string>
     <string name="user_input_password">Password</string>
-    <string name="user_validate_name_length">A name must be 4–16 characters long</string>
-    <string name="user_validate_name_regex">Names can only contain a–z, 0–9, and only a–z in the first 4 characters</string>
+    <string name="user_validate_name_length">A username must be 4–16 characters long</string>
+    <string name="user_validate_name_regex">Usernames can only contain a–z, 0–9, and only a–z in the first 4 characters</string>
     <string name="user_validate_email">Please enter a valid email address</string>
     <string name="user_validate_phone">Please enter a valid phone number in the format +[country code][phone number]</string>
     <string name="user_validate_password">Passwords need to be at least 8 characters long</string>

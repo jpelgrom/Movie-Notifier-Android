@@ -156,7 +156,7 @@ public class AccountLoginFragment extends Fragment {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     DBHelper.getInstance(getActivity()).addUser(received);
-                    settings.edit().putString("userID", received.getUuid()).putString("userAPIKey", received.getApikey()).apply();
+                    settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
                     getActivity().finish();
                 } else {
                     setFieldsEnabled(true);

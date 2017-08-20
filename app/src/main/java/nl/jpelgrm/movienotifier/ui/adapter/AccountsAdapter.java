@@ -60,7 +60,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final User user = users.get(position);
         final SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        final boolean isCurrentUser = settings.getString("userID", "").equals(user.getUuid());
+        final boolean isCurrentUser = settings.getString("userID", "").equals(user.getID());
 
         holder.name.setText(user.getName());
         holder.status.setVisibility(isCurrentUser ? View.VISIBLE : View.GONE);
@@ -74,11 +74,11 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
                     String current = settings.getString("userID", "");
 
                     settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
-                    DBHelper.getInstance(getContext()).deleteUser(user.getUuid());
+                    DBHelper.getInstance(getContext()).deleteUser(user.getID());
 
                     tryLoggingInNextUser(holder, current);
                 } else { // Switch
-                    Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getUuid());
+                    Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
                     call.enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response) {
@@ -87,7 +87,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
                                 User received = response.body();
                                 if(received != null) {
                                     DBHelper.getInstance(getContext()).updateUser(received);
-                                    settings.edit().putString("userID", received.getUuid()).putString("userAPIKey", received.getApikey()).apply();
+                                    settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
 
                                     swapItems(DBHelper.getInstance(getContext()).getUsers());
                                 } else {
@@ -128,10 +128,10 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
                                 if(response.code() == 200 || response.code() == 401) {
                                     // 200: OK
                                     // 401: Unauthorized, but because API keys don't change it seems the user was already deleted
-                                    if(user.getUuid().equals(settings.getString("userID", ""))) {
+                                    if(user.getID().equals(settings.getString("userID", ""))) {
                                         settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                                     }
-                                    DBHelper.getInstance(getContext()).deleteUser(user.getUuid());
+                                    DBHelper.getInstance(getContext()).deleteUser(user.getID());
 
                                     tryLoggingInNextUser(holder, "");
                                 } else {
@@ -178,7 +178,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
     private User getNextInactiveUser(String exclude) {
         SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
         for(User user : users) {
-            if(!user.getUuid().equals(settings.getString("userID", "")) && !user.getUuid().equals(exclude)) {
+            if(!user.getID().equals(settings.getString("userID", "")) && !user.getID().equals(exclude)) {
                 return user;
             }
         }
@@ -190,7 +190,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
         final SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
         if(switchTo != null) {
-            Call<User> call = APIHelper.getInstance().getUser(switchTo.getApikey(), switchTo.getUuid());
+            Call<User> call = APIHelper.getInstance().getUser(switchTo.getApikey(), switchTo.getID());
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
@@ -199,7 +199,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
                         User received = response.body();
                         if(received != null) {
                             DBHelper.getInstance(getContext()).updateUser(received);
-                            settings.edit().putString("userID", received.getUuid()).putString("userAPIKey", received.getApikey()).apply();
+                            settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
                         }
                     }
 
