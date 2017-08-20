@@ -468,9 +468,8 @@ public class WatcherActivity extends AppCompatActivity {
         // Buttons
         if(toolbar != null && toolbar.getMenu() != null && watcher != null && settings != null) {
             for(int i = 0; i < toolbar.getMenu().size(); i++) {
-                if((toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare
-                        || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) && id != null) {
-                    toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING);
+                if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
+                    toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING && id != null);
                 } else if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
                     toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserID() != null
                         && watcher.getUserID().equals(settings.getString("userID", "")));

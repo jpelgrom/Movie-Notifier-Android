@@ -88,7 +88,7 @@
     <string name="user_list_delete_title">Delete account</string>
     <string name="user_list_delete_confirm">Are you absolutely sure that you want to delete your account? All your watchers will be permanently deleted.</string>
 
-    <string name="error_login_401">Your name and/or password is incorrect.</string>
+    <string name="error_login_401">Your username and/or password is incorrect.</string>
     <string name="error_watchers_400">Sorry, please try again.</string>
     <string name="error_watchers_500">Oops! The server didn\'t like that. Please try again later.</string>
     <string name="error_watcher_400">Sorry, we couldn\'t find that watcher.</string>
