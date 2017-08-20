@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/prop_true"
+        android:id="@+id/filter_yes"
         android:orderInCategory="100"
-        android:title="@string/watcher_prop_value_true" />
+        android:title="@string/watcher_filter_value_yes" />
     <item
-        android:id="@+id/prop_null"
+        android:id="@+id/filter_nopreference"
         android:orderInCategory="200"
-        android:title="@string/watcher_prop_value_null" />
+        android:title="@string/watcher_filter_value_nopreference" />
     <item
-        android:id="@+id/prop_false"
+        android:id="@+id/filter_no"
         android:orderInCategory="300"
-        android:title="@string/watcher_prop_value_false" />
+        android:title="@string/watcher_filter_value_no" />
 </menu>

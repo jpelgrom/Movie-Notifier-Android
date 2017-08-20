@@ -4,10 +4,10 @@ import com.google.gson.annotations.Expose;
 
 public class Watcher implements Cloneable {
     @Expose(serialize = false)
-    private String uuid;
+    private String id;
 
     @Expose
-    private String user;
+    private String userid;
 
     @Expose
     private String name;
@@ -16,31 +16,28 @@ public class Watcher implements Cloneable {
     private Integer movieid;
 
     @Expose
-    private String cinemaid;
+    private Long begin;
 
     @Expose
-    private String startAfter;
+    private Long end;
 
     @Expose
-    private String startBefore;
+    private WatcherFilters filters;
 
-    @Expose
-    private Props props;
-
-    public String getUuid() {
-        return uuid;
+    public String getID() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setID(String id) {
+        this.id = id;
     }
 
-    public String getUser() {
-        return user;
+    public String getUserID() {
+        return userid;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUserID(String userid) {
+        this.userid = userid;
     }
 
     public String getName() {
@@ -51,48 +48,35 @@ public class Watcher implements Cloneable {
         this.name = name;
     }
 
-    public Integer getMovieid() {
+    public Integer getMovieID() {
         return movieid;
     }
 
-    public void setMovieid(Integer movieid) {
+    public void setMovieID(Integer movieid) {
         this.movieid = movieid;
     }
 
-    public String getCinemaid() {
-        return cinemaid;
+    public Long getBegin() {
+        return begin;
     }
 
-    public void setCinemaid(String cinemaid) {
-        this.cinemaid = cinemaid;
+    public void setBegin(Long begin) {
+        this.begin = begin;
     }
 
-    public String getStartAfter() {
-        return startAfter;
+    public Long getEnd() {
+        return end;
     }
 
-    public void setStartAfter(String startAfter) {
-        this.startAfter = startAfter;
+    public void setEnd(Long end) {
+        this.end = end;
     }
 
-    public String getStartBefore() {
-        return startBefore;
+    public WatcherFilters getFilters() {
+        return filters;
     }
 
-    public void setStartBefore(String startBefore) {
-        this.startBefore = startBefore;
-    }
-
-    public Props getProps() {
-        return props;
-    }
-
-    public void setProps(Props props) {
-        this.props = props;
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException{
-        return super.clone();
+    public void setFilters(WatcherFilters filters) {
+        this.filters = filters;
     }
 }

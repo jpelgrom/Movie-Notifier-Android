@@ -48,8 +48,8 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.models.Props;
 import nl.jpelgrm.movienotifier.models.Watcher;
+import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.models.error.Errors;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.WatcherDetailView;
@@ -83,19 +83,21 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
     @BindView(R.id.watcherCinemaID) AppCompatEditText watcherCinemaID;
 
-    @BindView(R.id.startAfter) WatcherDetailView startAfter;
-    @BindView(R.id.startBefore) WatcherDetailView startBefore;
+    @BindView(R.id.begin) WatcherDetailView begin;
+    @BindView(R.id.end) WatcherDetailView end;
+    @BindView(R.id.filterStartAfter) WatcherDetailView filterStartAfter;
+    @BindView(R.id.filterStartBefore) WatcherDetailView filterStartBefore;
 
-    @BindView(R.id.propIMAX) WatcherDetailView propIMAX;
-    @BindView(R.id.propDolbyCinema) WatcherDetailView propDolbyCinema;
-    @BindView(R.id.prop3D) WatcherDetailView prop3D;
-    @BindView(R.id.prop4K) WatcherDetailView prop4K;
-    @BindView(R.id.propLaser) WatcherDetailView propLaser;
-    @BindView(R.id.propHFR) WatcherDetailView propHFR;
-    @BindView(R.id.propDolbyAtmos) WatcherDetailView propAtmos;
-    @BindView(R.id.propOV) WatcherDetailView propOV;
-    @BindView(R.id.propNL) WatcherDetailView propNL;
-    @BindView(R.id.propDBOX) WatcherDetailView propDBOX;
+    @BindView(R.id.filterIMAX) WatcherDetailView filterIMAX;
+    @BindView(R.id.filterDolbyCinema) WatcherDetailView filterDolbyCinema;
+    @BindView(R.id.filter3D) WatcherDetailView filter3D;
+    @BindView(R.id.filter4K) WatcherDetailView filter4K;
+    @BindView(R.id.filterLaser) WatcherDetailView filterLaser;
+    @BindView(R.id.filterHFR) WatcherDetailView filterHFR;
+    @BindView(R.id.filterDolbyAtmos) WatcherDetailView filterAtmos;
+    @BindView(R.id.filterOV) WatcherDetailView filterOV;
+    @BindView(R.id.filterNL) WatcherDetailView filterNL;
+    @BindView(R.id.filterDBOX) WatcherDetailView filterDBOX;
 
     @BindView(R.id.fab) FloatingActionButton fab;
 
@@ -104,11 +106,13 @@ public class WatcherActivity extends AppCompatActivity {
     private SharedPreferences settings;
 
     private Watcher watcher;
-    private String uuid;
+    private String id;
 
     private String sharedTitle;
     private Integer sharedMovieID;
-    private static Long oneWeek = 60 * 60 * 24 * 7 * 1000L;
+    private static Long oneMinute = 60 * 1000L;
+    private static Long oneWeek = oneMinute * 60 * 24 * 7;
+    private static Long oneMonth = 2629746000L;
 
     private Mode mode = Mode.VIEWING;
 
@@ -155,7 +159,7 @@ public class WatcherActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 validateMovieID(false);
                 if(watcher != null && !editable.toString().equals("")) {
-                    watcher.setMovieid(Integer.parseInt(editable.toString()));
+                    watcher.setMovieID(Integer.parseInt(editable.toString()));
                 }
             }
         });
@@ -169,84 +173,99 @@ public class WatcherActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 if(watcher != null) {
-                    watcher.setCinemaid(editable.toString());
+                    watcher.getFilters().setCinemaID(editable.toString());
                 }
             }
         });
 
-        startAfter.setOnClickListener(new View.OnClickListener() {
+        begin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(true, watcher.getStartAfter() != null && !watcher.getStartAfter().equals("") ? Long.parseLong(watcher.getStartAfter()) : System.currentTimeMillis());
+                showDateTimePicker(true, true, watcher.getBegin());
             }
         });
-        startBefore.setOnClickListener(new View.OnClickListener() {
+        end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(false, watcher.getStartBefore() != null && !watcher.getStartBefore().equals("") ? Long.parseLong(watcher.getStartBefore()) : System.currentTimeMillis());
+                showDateTimePicker(true, false, watcher.getEnd());
             }
         });
 
-        setOnPropClickListener(propIMAX, new PropResultListener() {
+        filterStartAfter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setIMAX(value);
+            public void onClick(View view) {
+                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+                showDateTimePicker(false, true, watcher.getFilters().getStartAfter());
             }
         });
-        setOnPropClickListener(propDolbyCinema, new PropResultListener() {
+        filterStartBefore.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setDolbyCinema(value);
+            public void onClick(View view) {
+                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+                showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
             }
         });
-        setOnPropClickListener(prop3D, new PropResultListener() {
+
+        setOnPropClickListener(filterIMAX, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().set3D(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setIMAX(value);
             }
         });
-        setOnPropClickListener(prop4K, new PropResultListener() {
+        setOnPropClickListener(filterDolbyCinema, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().set4K(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setDolbyCinema(value);
             }
         });
-        setOnPropClickListener(propLaser, new PropResultListener() {
+        setOnPropClickListener(filter3D, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setLaser(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().set3D(value);
             }
         });
-        setOnPropClickListener(propHFR, new PropResultListener() {
+        setOnPropClickListener(filter4K, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setHFR(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().set4K(value);
             }
         });
-        setOnPropClickListener(propAtmos, new PropResultListener() {
+        setOnPropClickListener(filterLaser, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setDolbyAtmos(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setLaser(value);
             }
         });
-        setOnPropClickListener(propOV, new PropResultListener() {
+        setOnPropClickListener(filterHFR, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setIsOriginalVersion(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setHFR(value);
             }
         });
-        setOnPropClickListener(propNL, new PropResultListener() {
+        setOnPropClickListener(filterAtmos, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setIsDutchVersion(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setDolbyAtmos(value);
             }
         });
-        setOnPropClickListener(propDBOX, new PropResultListener() {
+        setOnPropClickListener(filterOV, new PropResultListener() {
             @Override
-            public void gotResult(Boolean value) {
-                watcher.getProps().setDBOX(value);
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setOriginalVersion(value);
+            }
+        });
+        setOnPropClickListener(filterNL, new PropResultListener() {
+            @Override
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setDutchVersion(value);
+            }
+        });
+        setOnPropClickListener(filterDBOX, new PropResultListener() {
+            @Override
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().setDBOX(value);
             }
         });
 
@@ -318,7 +337,7 @@ public class WatcherActivity extends AppCompatActivity {
 
                 if(received.getHost().equals(instance.getHost())) {
                     if(received.getPathSegments().size() == 2 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
-                        uuid = received.getPathSegments().get(1);
+                        id = received.getPathSegments().get(1);
                     }
                 } else if(received.getHost().equals(getString(R.string.CINEMA_HOST))) {
                     if(received.getPathSegments().size() == 3 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")
@@ -332,25 +351,27 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void setupWatcher() {
-        if(getIntent().getExtras() != null && !getIntent().getExtras().getString("uuid", "").equals("")) {
-            uuid = getIntent().getExtras().getString("uuid");
+        if(getIntent().getExtras() != null && !getIntent().getExtras().getString("id", "").equals("")) {
+            id = getIntent().getExtras().getString("id");
             getWatcher();
-        } else if(uuid != null) {
-            // UUID is already set
+        } else if(id != null) {
+            // ID is already set
             getWatcher();
         } else {
-            uuid = null;
+            id = null;
             watcher = new Watcher();
-            watcher.setProps(new Props());
+            watcher.setFilters(new WatcherFilters());
 
             if(sharedTitle != null && !sharedTitle.equals("")) {
                 watcher.setName(sharedTitle);
             }
             if(sharedMovieID != null && sharedMovieID > 0) {
-                watcher.setMovieid(sharedMovieID);
+                watcher.setMovieID(sharedMovieID);
             }
-            watcher.setStartAfter(String.valueOf(System.currentTimeMillis() + oneWeek));
-            watcher.setStartBefore(String.valueOf(System.currentTimeMillis() + oneWeek + oneWeek));
+            watcher.setBegin(System.currentTimeMillis());
+            watcher.setEnd(System.currentTimeMillis() + oneWeek);
+            watcher.getFilters().setStartAfter(System.currentTimeMillis() + oneWeek);
+            watcher.getFilters().setStartBefore(System.currentTimeMillis() + oneWeek + oneWeek);
 
             mode = Mode.EDITING;
 
@@ -370,15 +391,15 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void getWatcher() {
-        Call<Watcher> call = APIHelper.getInstance().getWatcher(settings.getString("userAPIKey", ""), uuid);
+        Call<Watcher> call = APIHelper.getInstance().getWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<Watcher>() {
             @Override
             public void onResponse(Call<Watcher> call, Response<Watcher> response) {
                 if(response.code() == 200) {
                     watcher = response.body();
-                    uuid = watcher.getUuid();
+                    id = watcher.getID();
 
-                    if(watcher.getUser().equals(settings.getString("userID", ""))) {
+                    if(watcher.getUserID().equals(settings.getString("userID", ""))) {
                         mode = Mode.VIEWING;
                     } else {
                         mode = Mode.EDITING;
@@ -433,24 +454,26 @@ public class WatcherActivity extends AppCompatActivity {
 
         // Input values
         watcherName.setText(watcher.getName());
-        watcherMovieID.setText(watcher.getMovieid() == null ? "" : String.valueOf(watcher.getMovieid()));
-        watcherCinemaID.setText(watcher.getCinemaid());
+        watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
+        watcherCinemaID.setText(watcher.getFilters().getCinemaID());
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
-        startAfter.setValue(format.format(new Date(Long.parseLong(watcher.getStartAfter()))));
-        startBefore.setValue(format.format(new Date(Long.parseLong(watcher.getStartBefore()))));
+        begin.setValue(format.format(new Date(watcher.getBegin())));
+        end.setValue(format.format(new Date(watcher.getEnd())));
+        filterStartAfter.setValue(format.format(new Date(watcher.getFilters().getStartAfter())));
+        filterStartBefore.setValue(format.format(new Date(watcher.getFilters().getStartBefore())));
 
-        updateViewsProps();
+        updateViewsFilters();
 
         // Buttons
         if(toolbar != null && toolbar.getMenu() != null && watcher != null && settings != null) {
             for(int i = 0; i < toolbar.getMenu().size(); i++) {
-                if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare
-                        || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
+                if((toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare
+                        || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) && id != null) {
                     toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING);
                 } else if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
-                    toolbar.getMenu().getItem(i).setVisible(uuid != null && !uuid.equals("") && watcher.getUser() != null
-                        && watcher.getUser().equals(settings.getString("userID", "")));
+                    toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserID() != null
+                        && watcher.getUserID().equals(settings.getString("userID", "")));
                 }
             }
         }
@@ -458,29 +481,39 @@ public class WatcherActivity extends AppCompatActivity {
         fab.setImageResource(mode == Mode.EDITING ? R.drawable.ic_save : R.drawable.ic_edit);
     }
 
-    private void updateViewsProps() {
-        if(watcher.getProps() != null) {
-            propIMAX.setValue(watcher.getProps().isIMAX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isIMAX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propDolbyCinema.setValue(watcher.getProps().isDolbyCinema() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyCinema() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            prop3D.setValue(watcher.getProps().is3D() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is3D() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            prop4K.setValue(watcher.getProps().is4K() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is4K() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propLaser.setValue(watcher.getProps().isLaser() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isLaser() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propHFR.setValue(watcher.getProps().isHFR() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isHFR() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propAtmos.setValue(watcher.getProps().isDolbyAtmos() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyAtmos() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propOV.setValue(watcher.getProps().isOriginalVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isOriginalVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propNL.setValue(watcher.getProps().isDutchVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDutchVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propDBOX.setValue(watcher.getProps().isDBOX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDBOX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+    private void updateViewsFilters() {
+        if(watcher.getFilters() != null) {
+            filterIMAX.setValue(watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterDolbyCinema.setValue(watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filter3D.setValue(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filter4K.setValue(watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterLaser.setValue(watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterHFR.setValue(watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterAtmos.setValue(watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterOV.setValue(watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filterDBOX.setValue(watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
-            propIMAX.setValue(R.string.watcher_prop_value_null);
-            propDolbyCinema.setValue(R.string.watcher_prop_value_null);
-            prop3D.setValue(R.string.watcher_prop_value_null);
-            prop4K.setValue(R.string.watcher_prop_value_null);
-            propLaser.setValue(R.string.watcher_prop_value_null);
-            propHFR.setValue(R.string.watcher_prop_value_null);
-            propAtmos.setValue(R.string.watcher_prop_value_null);
-            propOV.setValue(R.string.watcher_prop_value_null);
-            propNL.setValue(R.string.watcher_prop_value_null);
-            propDBOX.setValue(R.string.watcher_prop_value_null);
+            filterIMAX.setValue(R.string.watcher_filter_value_nopreference);
+            filterDolbyCinema.setValue(R.string.watcher_filter_value_nopreference);
+            filter3D.setValue(R.string.watcher_filter_value_nopreference);
+            filter4K.setValue(R.string.watcher_filter_value_nopreference);
+            filterLaser.setValue(R.string.watcher_filter_value_nopreference);
+            filterHFR.setValue(R.string.watcher_filter_value_nopreference);
+            filterAtmos.setValue(R.string.watcher_filter_value_nopreference);
+            filterOV.setValue(R.string.watcher_filter_value_nopreference);
+            filterNL.setValue(R.string.watcher_filter_value_nopreference);
+            filterDBOX.setValue(R.string.watcher_filter_value_nopreference);
         }
     }
 
@@ -501,19 +534,21 @@ public class WatcherActivity extends AppCompatActivity {
         watcherCinemaID.setFocusableInTouchMode(editable);
         watcherCinemaID.setCursorVisible(editable);
 
-        startAfter.setClickable(editable);
-        startBefore.setClickable(editable);
+        begin.setClickable(editable);
+        end.setClickable(editable);
+        filterStartAfter.setClickable(editable);
+        filterStartBefore.setClickable(editable);
 
-        propIMAX.setClickable(editable);
-        propDolbyCinema.setClickable(editable);
-        prop3D.setClickable(editable);
-        prop4K.setClickable(editable);
-        propLaser.setClickable(editable);
-        propHFR.setClickable(editable);
-        propAtmos.setClickable(editable);
-        propOV.setClickable(editable);
-        propNL.setClickable(editable);
-        propDBOX.setClickable(editable);
+        filterIMAX.setClickable(editable);
+        filterDolbyCinema.setClickable(editable);
+        filter3D.setClickable(editable);
+        filter4K.setClickable(editable);
+        filterLaser.setClickable(editable);
+        filterHFR.setClickable(editable);
+        filterAtmos.setClickable(editable);
+        filterOV.setClickable(editable);
+        filterNL.setClickable(editable);
+        filterDBOX.setClickable(editable);
     }
 
     private void doneLoading() {
@@ -525,7 +560,7 @@ public class WatcherActivity extends AppCompatActivity {
         fab.setVisibility(View.VISIBLE);
     }
 
-    private void showDateTimePicker(final boolean startAfterValue, long currentValue) {
+    private void showDateTimePicker(final boolean checkingValue, final boolean beginValue, long currentValue) {
         final Calendar current = Calendar.getInstance();
         current.setTimeInMillis(currentValue);
 
@@ -540,10 +575,22 @@ public class WatcherActivity extends AppCompatActivity {
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                         Calendar setTo = Calendar.getInstance();
                         setTo.set(mYear, mMonth, mDay, hour, minute, 0);
-                        if(startAfterValue) {
-                            watcher.setStartAfter(String.valueOf(setTo.getTimeInMillis()));
+                        if(checkingValue) {
+                            if(beginValue) {
+                                watcher.setBegin(setTo.getTimeInMillis());
+                                validateAndFixEnd();
+                            } else {
+                                watcher.setEnd(setTo.getTimeInMillis());
+                                validateAndFixBegin();
+                            }
                         } else {
-                            watcher.setStartBefore(String.valueOf(setTo.getTimeInMillis()));
+                            if(beginValue) {
+                                watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
+                                validateAndFixStartBefore();
+                            } else {
+                                watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
+                                validateAndFixStartAfter();
+                            }
                         }
 
                         updateViews();
@@ -552,11 +599,12 @@ public class WatcherActivity extends AppCompatActivity {
                 timePickerDialog.show();
             }
         }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
         datePickerDialog.show();
     }
 
     private boolean validateName(boolean forced) {
-        if(watcherName.getText().toString().length() > 0) {
+        if(watcherName.getText().toString().length() >= 3 && watcherName.getText().toString().length() <= 50) {
             watcherNameWrapper.setErrorEnabled(false);
             return true;
         } else {
@@ -591,8 +639,93 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
+    private boolean validateCinemaID(boolean forced) {
+        if(watcherCinemaID.getText().toString().length() > 0) { // TODO Proper validation, list
+            watcherCinemaIDWrapper.setErrorEnabled(false);
+            return true;
+        } else {
+            if(forced) {
+                watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
+                watcherCinemaIDWrapper.setErrorEnabled(true);
+            }
+            return false;
+        }
+    }
+
+    private void validateAndFixBegin() {
+        boolean updatedOther = false;
+
+        if(watcher.getBegin() >= watcher.getEnd()) {
+            watcher.setBegin(watcher.getEnd() - oneMinute);
+            updatedOther = true;
+        } else if(watcher.getEnd() - watcher.getBegin() > oneMonth) {
+            watcher.setBegin(watcher.getEnd() - oneMonth + oneMinute);
+            updatedOther = true;
+        }
+
+        if(updatedOther) {
+            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_begin, Snackbar.LENGTH_LONG);
+            snackbar.show();
+            updateViews();
+        }
+    }
+
+    private void validateAndFixEnd() {
+        boolean updated = false;
+
+        if(watcher.getEnd() <= watcher.getBegin()) {
+            watcher.setEnd(watcher.getBegin() + oneMinute);
+            updated = true;
+        } else if(watcher.getEnd() - watcher.getBegin() > oneMonth) {
+            watcher.setEnd(watcher.getBegin() + oneMonth - oneMinute);
+            updated = true;
+        }
+
+        if(updated) {
+            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_end, Snackbar.LENGTH_LONG);
+            snackbar.show();
+            updateViews();
+        }
+    }
+
+    private void validateAndFixStartAfter() {
+        boolean updated = false;
+
+        if(watcher.getFilters().getStartAfter() >= watcher.getFilters().getStartBefore()) {
+            watcher.getFilters().setStartAfter(watcher.getFilters().getStartBefore() - oneMinute);
+            updated = true;
+        } else if(watcher.getFilters().getStartBefore() - watcher.getFilters().getStartAfter() > (oneWeek + oneWeek)) {
+            watcher.getFilters().setStartAfter(watcher.getFilters().getStartBefore() - oneWeek - oneWeek + oneMinute);
+            updated = true;
+        }
+
+        if(updated) {
+            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_startafter, Snackbar.LENGTH_LONG);
+            snackbar.show();
+            updateViews();
+        }
+    }
+
+    private void validateAndFixStartBefore() {
+        boolean updated = false;
+
+        if(watcher.getFilters().getStartBefore() <= watcher.getFilters().getStartAfter()) {
+            watcher.getFilters().setStartBefore(watcher.getFilters().getStartAfter() + oneMinute);
+            updated = true;
+        } else if(watcher.getFilters().getStartBefore() - watcher.getFilters().getStartAfter() > (oneWeek + oneWeek)) {
+            watcher.getFilters().setStartBefore(watcher.getFilters().getStartAfter() + oneWeek + oneWeek - oneMinute);
+            updated = true;
+        }
+
+        if(updated) {
+            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_startbefore, Snackbar.LENGTH_LONG);
+            snackbar.show();
+            updateViews();
+        }
+    }
+
     private void saveWatcher() {
-        if(validateName(true) && validateMovieID(true)) {
+        if(validateName(true) && validateMovieID(true) && validateCinemaID(true)) {
             fab.setEnabled(false);
             progress.setVisibility(View.VISIBLE);
             watcherError.setVisibility(View.GONE);
@@ -600,21 +733,19 @@ public class WatcherActivity extends AppCompatActivity {
 
             Watcher toSave = new Watcher();
             toSave.setName(watcherName.getText().toString());
-            toSave.setMovieid(Integer.parseInt(watcherMovieID.getText().toString()));
-            toSave.setCinemaid(watcherCinemaID.getText().toString());
+            toSave.setMovieID(Integer.parseInt(watcherMovieID.getText().toString()));
+            toSave.setBegin(watcher.getBegin());
+            toSave.setEnd(watcher.getEnd());
 
-            toSave.setStartAfter(watcher.getStartAfter());
-            toSave.setStartBefore(watcher.getStartBefore());
-
-            toSave.setProps(watcher.getProps() != null ? watcher.getProps() : new Props());
+            toSave.setFilters(watcher.getFilters());
 
             Call<Watcher> call;
 
-            if(uuid == null || uuid.equals("") || !watcher.getUser().equals(settings.getString("userID", ""))) { // Create
-                toSave.setUser(settings.getString("userID", ""));
+            if(id == null || id.equals("") || !watcher.getUserID().equals(settings.getString("userID", ""))) { // Create
+                toSave.setUserID(settings.getString("userID", ""));
                 call = APIHelper.getInstance().addWatcher(settings.getString("userAPIKey", ""), toSave);
             } else { // Update
-                call = APIHelper.getInstance().updateWatcher(settings.getString("userAPIKey", ""), uuid, toSave);
+                call = APIHelper.getInstance().updateWatcher(settings.getString("userAPIKey", ""), id, toSave);
             }
 
             call.enqueue(new Callback<Watcher>() {
@@ -626,7 +757,7 @@ public class WatcherActivity extends AppCompatActivity {
 
                     if(response.code() == 200) {
                         watcher = response.body();
-                        uuid = watcher.getUuid();
+                        id = watcher.getID();
 
                         mode = Mode.VIEWING;
 
@@ -690,7 +821,7 @@ public class WatcherActivity extends AppCompatActivity {
         watcherError.setVisibility(View.GONE);
         setFieldsEnabled(false);
 
-        Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), uuid);
+        Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -729,7 +860,7 @@ public class WatcherActivity extends AppCompatActivity {
     private void shareWatcher() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + uuid);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + id);
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
     }
@@ -743,7 +874,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         watcher.setName(getString(R.string.watcher_copy, watcher.getName()));
 
-        uuid = null;
+        id = null;
         mode = Mode.EDITING;
         main.smoothScrollTo(0, 0);
         doneLoading();
@@ -764,19 +895,19 @@ public class WatcherActivity extends AppCompatActivity {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        if(watcher.getProps() == null) {
-                            watcher.setProps(new Props());
+                        if(watcher.getFilters() == null) {
+                            watcher.setFilters(new WatcherFilters());
                         }
                         switch(item.getItemId()) {
-                            case R.id.prop_true:
-                                callback.gotResult(true);
+                            case R.id.filter_yes:
+                                callback.gotResult(WatcherFilters.WatcherFilterValue.YES);
                                 break;
-                            case R.id.prop_false:
-                                callback.gotResult(false);
+                            case R.id.filter_no:
+                                callback.gotResult(WatcherFilters.WatcherFilterValue.NO);
                                 break;
-                            case R.id.prop_null:
+                            case R.id.filter_nopreference:
                             default:
-                                callback.gotResult(null);
+                                callback.gotResult(WatcherFilters.WatcherFilterValue.NOPREFERENCE);
                                 break;
                         }
                         updateViews();
@@ -842,6 +973,6 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private abstract class PropResultListener {
-        public abstract void gotResult(Boolean value);
+        public abstract void gotResult(WatcherFilters.WatcherFilterValue value);
     }
 }

@@ -27,7 +27,7 @@ public class WatcherListDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return oldList.get(oldItemPosition).getUuid().equals(newList.get(newItemPosition).getUuid());
+        return oldList.get(oldItemPosition).getID().equals(newList.get(newItemPosition).getID());
     }
 
     @Override

@@ -49,15 +49,23 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
 
         holder.name.setText(watcher.getName());
 
-        DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
-        String startDate = format.format(new Date(Long.parseLong(watcher.getStartAfter())));
-        String endDate = format.format(new Date(Long.parseLong(watcher.getStartBefore())));
-        holder.subtext.setText(getContext().getString(R.string.watchers_list_subtitle_date, startDate, endDate));
+        String status;
+        if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
+            status = "\uD83D\uDD34"; // Red Circle ('live', active watcher)
+        } else if(watcher.getBegin() < System.currentTimeMillis()) {
+            status = "\uD83D\uDCE6"; // Package ('archive', watcher is done and will not be active again)
+        } else {
+            status = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
+        }
+        DateFormat format = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+        String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
+        String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
+        holder.subtext.setText(getContext().getString(R.string.watchers_list_subtitle_date, status, startDate, endDate));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("uuid", watcher.getUuid()));
+                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
             }
         });
     }
