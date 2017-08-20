@@ -62,16 +62,10 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_basics_title"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -202,477 +196,129 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_date_title"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/startAfter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailIcon="@drawable/ic_date_range"
+                    app:detailTitle="@string/watcher_date_after"/>
 
-                    <ImageView
-                        android:id="@+id/startAfterIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="16dp"
-                        android:padding="8dp"
-                        android:contentDescription="@string/watcher_date_after"
-                        app:srcCompat="@drawable/ic_date_range"/>
-
-                    <TextView
-                        android:id="@+id/startAfterTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_date_after"
-                        android:layout_toEndOf="@+id/startAfterIcon"/>
-
-                    <TextView
-                        android:id="@+id/startAfterValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="Aug 24, 2017 19:16"
-                        tools:ignore="hardcodedText"
-                        android:layout_below="@+id/startAfterTitle"
-                        android:layout_toEndOf="@+id/startAfterIcon"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/startBefore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
-
-                    <TextView
-                        android:id="@+id/startBeforeTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_date_before"/>
-
-                    <TextView
-                        android:id="@+id/startBeforeValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="Aug 31, 2017 19:16"
-                        tools:ignore="hardcodedText"
-                        android:layout_below="@+id/startBeforeTitle"/>
-
-                </RelativeLayout>
+                    app:detailTitle="@string/watcher_date_before"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_prop_heading_experience"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propIMAX"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailIcon="@drawable/logo_imax"
+                    app:detailTitle="@string/watcher_prop_title_imax"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <ImageView
-                        android:id="@+id/propIMAXLogo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="16dp"
-                        android:padding="8dp"
-                        android:contentDescription="@string/watcher_prop_title_imax"
-                        app:srcCompat="@drawable/logo_imax"/>
-
-                    <TextView
-                        android:id="@+id/propIMAXTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_imax"
-                        android:layout_toEndOf="@+id/propIMAXLogo"/>
-
-                    <TextView
-                        android:id="@+id/propIMAXValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propIMAXTitle"
-                        android:layout_toEndOf="@+id/propIMAXLogo"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propDolbyCinema"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
-
-                    <ImageView
-                        android:id="@+id/propDolbyCinemaLogo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="16dp"
-                        android:padding="8dp"
-                        android:contentDescription="@string/watcher_prop_title_dolbycinema"
-                        app:srcCompat="@drawable/logo_dolby"/>
-
-                    <TextView
-                        android:id="@+id/propDolbyCinemaTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_dolbycinema"
-                        android:layout_toEndOf="@+id/propDolbyCinemaLogo"/>
-
-                    <TextView
-                        android:id="@+id/propDolbyCinemaValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propDolbyCinemaTitle"
-                        android:layout_toEndOf="@+id/propDolbyCinemaLogo"/>
-
-                </RelativeLayout>
+                    app:detailIcon="@drawable/logo_dolby"
+                    app:detailTitle="@string/watcher_prop_title_dolbycinema"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_prop_heading_projection"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/prop3D"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailTitle="@string/watcher_prop_title_3d"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <TextView
-                        android:id="@+id/prop3DTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_3d"/>
-
-                    <TextView
-                        android:id="@+id/prop3DValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/prop3DTitle"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/prop4K"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailTitle="@string/watcher_prop_title_4k"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <TextView
-                        android:id="@+id/prop4KTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_4k"/>
-
-                    <TextView
-                        android:id="@+id/prop4KValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/prop4KTitle"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propLaser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailTitle="@string/watcher_prop_title_laser"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <TextView
-                        android:id="@+id/propLaserTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_laser"/>
-
-                    <TextView
-                        android:id="@+id/propLaserValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propLaserTitle"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propHFR"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
-
-                    <TextView
-                        android:id="@+id/propHFRTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_hfr"/>
-
-                    <TextView
-                        android:id="@+id/propHFRValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propHFRTitle"/>
-
-                </RelativeLayout>
+                    app:detailTitle="@string/watcher_prop_title_hfr"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_prop_heading_audio"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propDolbyAtmos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailIcon="@drawable/logo_dolby"
+                    app:detailTitle="@string/watcher_prop_title_dolbyatmos"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <ImageView
-                        android:id="@+id/propDolbyAtmosLogo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="16dp"
-                        android:padding="8dp"
-                        android:contentDescription="@string/watcher_prop_title_dolbyatmos"
-                        app:srcCompat="@drawable/logo_dolby"/>
-
-                    <TextView
-                        android:id="@+id/propDolbyAtmosTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_dolbyatmos"
-                        android:layout_toEndOf="@+id/propDolbyAtmosLogo"/>
-
-                    <TextView
-                        android:id="@+id/propDolbyAtmosValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propDolbyAtmosTitle"
-                        android:layout_toEndOf="@+id/propDolbyAtmosLogo"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propOV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                    app:detailTitle="@string/watcher_prop_title_ov"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
-                    <TextView
-                        android:id="@+id/propOVTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_ov"/>
-
-                    <TextView
-                        android:id="@+id/propOVValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propOVTitle"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propNL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
-
-                    <TextView
-                        android:id="@+id/propNLTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_nl"/>
-
-                    <TextView
-                        android:id="@+id/propNLValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propNLTitle"/>
-
-                </RelativeLayout>
+                    app:detailTitle="@string/watcher_prop_title_nl"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?listPreferredItemHeightSmall"
                     android:text="@string/watcher_prop_heading_additionalexperiences"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center_vertical"/>
+                    style="@style/TextMaterialSubhader"/>
 
-                <RelativeLayout
+                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/propDBOX"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:minHeight="?attr/listPreferredItemHeight"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
-
-                    <ImageView
-                        android:id="@+id/propDBOXLogo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="16dp"
-                        android:padding="8dp"
-                        android:contentDescription="@string/watcher_prop_title_dbox"
-                        app:srcCompat="@drawable/logo_dbox"/>
-
-                    <TextView
-                        android:id="@+id/propDBOXTitle"
-                        style="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/watcher_prop_title_dbox"
-                        android:layout_toEndOf="@+id/propDBOXLogo"/>
-
-                    <TextView
-                        android:id="@+id/propDBOXValue"
-                        style="@style/TextAppearance.AppCompat.Small"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:text="@string/watcher_prop_value_null"
-                        android:layout_below="@+id/propDBOXTitle"
-                        android:layout_toEndOf="@+id/propDBOXLogo"/>
-
-                </RelativeLayout>
+                    app:detailIcon="@drawable/logo_dbox"
+                    app:detailTitle="@string/watcher_prop_title_dbox"
+                    app:detailValue="@string/watcher_prop_value_null"/>
 
             </LinearLayout>
 

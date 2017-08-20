@@ -12,7 +12,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
@@ -29,7 +28,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -54,6 +52,7 @@ import nl.jpelgrm.movienotifier.models.Props;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.error.Errors;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
+import nl.jpelgrm.movienotifier.ui.view.WatcherDetailView;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -83,31 +82,19 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
     @BindView(R.id.watcherCinemaID) AppCompatEditText watcherCinemaID;
 
-    @BindView(R.id.startAfter) RelativeLayout startAfter;
-    @BindView(R.id.startAfterValue) TextView startAfterValue;
-    @BindView(R.id.startBefore) RelativeLayout startBefore;
-    @BindView(R.id.startBeforeValue) TextView startBeforeValue;
+    @BindView(R.id.startAfter) WatcherDetailView startAfter;
+    @BindView(R.id.startBefore) WatcherDetailView startBefore;
 
-    @BindView(R.id.propIMAX) RelativeLayout propIMAX;
-    @BindView(R.id.propIMAXValue) TextView propIMAXValue;
-    @BindView(R.id.propDolbyCinema) RelativeLayout propDolbyCinema;
-    @BindView(R.id.propDolbyCinemaValue) TextView propDolbyCinemaValue;
-    @BindView(R.id.prop3D) RelativeLayout prop3D;
-    @BindView(R.id.prop3DValue) TextView prop3DValue;
-    @BindView(R.id.prop4K) RelativeLayout prop4K;
-    @BindView(R.id.prop4KValue) TextView prop4KValue;
-    @BindView(R.id.propLaser) RelativeLayout propLaser;
-    @BindView(R.id.propLaserValue) TextView propLaserValue;
-    @BindView(R.id.propHFR) RelativeLayout propHFR;
-    @BindView(R.id.propHFRValue) TextView propHFRValue;
-    @BindView(R.id.propDolbyAtmos) RelativeLayout propAtmos;
-    @BindView(R.id.propDolbyAtmosValue) TextView propAtmosValue;
-    @BindView(R.id.propOV) RelativeLayout propOV;
-    @BindView(R.id.propOVValue) TextView propOVValue;
-    @BindView(R.id.propNL) RelativeLayout propNL;
-    @BindView(R.id.propNLValue) TextView propNLValue;
-    @BindView(R.id.propDBOX) RelativeLayout propDBOX;
-    @BindView(R.id.propDBOXValue) TextView propDBOXValue;
+    @BindView(R.id.propIMAX) WatcherDetailView propIMAX;
+    @BindView(R.id.propDolbyCinema) WatcherDetailView propDolbyCinema;
+    @BindView(R.id.prop3D) WatcherDetailView prop3D;
+    @BindView(R.id.prop4K) WatcherDetailView prop4K;
+    @BindView(R.id.propLaser) WatcherDetailView propLaser;
+    @BindView(R.id.propHFR) WatcherDetailView propHFR;
+    @BindView(R.id.propDolbyAtmos) WatcherDetailView propAtmos;
+    @BindView(R.id.propOV) WatcherDetailView propOV;
+    @BindView(R.id.propNL) WatcherDetailView propNL;
+    @BindView(R.id.propDBOX) WatcherDetailView propDBOX;
 
     @BindView(R.id.fab) FloatingActionButton fab;
 
@@ -440,8 +427,8 @@ public class WatcherActivity extends AppCompatActivity {
         watcherCinemaID.setText(watcher.getCinemaid());
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
-        startAfterValue.setText(format.format(new Date(Long.parseLong(watcher.getStartAfter()))));
-        startBeforeValue.setText(format.format(new Date(Long.parseLong(watcher.getStartBefore()))));
+        startAfter.setValue(format.format(new Date(Long.parseLong(watcher.getStartAfter()))));
+        startBefore.setValue(format.format(new Date(Long.parseLong(watcher.getStartBefore()))));
 
         updateViewsProps();
 
@@ -458,32 +445,32 @@ public class WatcherActivity extends AppCompatActivity {
             }
         }
 
-        fab.setImageDrawable(ContextCompat.getDrawable(this, mode == Mode.EDITING ? R.drawable.ic_save : R.drawable.ic_edit));
+        fab.setImageResource(mode == Mode.EDITING ? R.drawable.ic_save : R.drawable.ic_edit);
     }
 
     private void updateViewsProps() {
         if(watcher.getProps() != null) {
-            propIMAXValue.setText(watcher.getProps().isIMAX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isIMAX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propDolbyCinemaValue.setText(watcher.getProps().isDolbyCinema() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyCinema() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            prop3DValue.setText(watcher.getProps().is3D() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is3D() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            prop4KValue.setText(watcher.getProps().is4K() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is4K() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propLaserValue.setText(watcher.getProps().isLaser() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isLaser() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propHFRValue.setText(watcher.getProps().isHFR() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isHFR() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propAtmosValue.setText(watcher.getProps().isDolbyAtmos() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyAtmos() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propOVValue.setText(watcher.getProps().isOriginalVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isOriginalVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propNLValue.setText(watcher.getProps().isDutchVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDutchVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
-            propDBOXValue.setText(watcher.getProps().isDBOX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDBOX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propIMAX.setValue(watcher.getProps().isIMAX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isIMAX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propDolbyCinema.setValue(watcher.getProps().isDolbyCinema() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyCinema() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            prop3D.setValue(watcher.getProps().is3D() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is3D() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            prop4K.setValue(watcher.getProps().is4K() == null ? R.string.watcher_prop_value_null : (watcher.getProps().is4K() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propLaser.setValue(watcher.getProps().isLaser() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isLaser() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propHFR.setValue(watcher.getProps().isHFR() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isHFR() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propAtmos.setValue(watcher.getProps().isDolbyAtmos() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDolbyAtmos() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propOV.setValue(watcher.getProps().isOriginalVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isOriginalVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propNL.setValue(watcher.getProps().isDutchVersion() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDutchVersion() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
+            propDBOX.setValue(watcher.getProps().isDBOX() == null ? R.string.watcher_prop_value_null : (watcher.getProps().isDBOX() ? R.string.watcher_prop_value_true : R.string.watcher_prop_value_false));
         } else {
-            propIMAXValue.setText(R.string.watcher_prop_value_null);
-            propDolbyCinemaValue.setText(R.string.watcher_prop_value_null);
-            prop3DValue.setText(R.string.watcher_prop_value_null);
-            prop4KValue.setText(R.string.watcher_prop_value_null);
-            propLaserValue.setText(R.string.watcher_prop_value_null);
-            propHFRValue.setText(R.string.watcher_prop_value_null);
-            propAtmosValue.setText(R.string.watcher_prop_value_null);
-            propOVValue.setText(R.string.watcher_prop_value_null);
-            propNLValue.setText(R.string.watcher_prop_value_null);
-            propDBOXValue.setText(R.string.watcher_prop_value_null);
+            propIMAX.setValue(R.string.watcher_prop_value_null);
+            propDolbyCinema.setValue(R.string.watcher_prop_value_null);
+            prop3D.setValue(R.string.watcher_prop_value_null);
+            prop4K.setValue(R.string.watcher_prop_value_null);
+            propLaser.setValue(R.string.watcher_prop_value_null);
+            propHFR.setValue(R.string.watcher_prop_value_null);
+            propAtmos.setValue(R.string.watcher_prop_value_null);
+            propOV.setValue(R.string.watcher_prop_value_null);
+            propNL.setValue(R.string.watcher_prop_value_null);
+            propDBOX.setValue(R.string.watcher_prop_value_null);
         }
     }
 

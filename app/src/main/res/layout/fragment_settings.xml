@@ -11,16 +11,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?listPreferredItemHeightSmall"
             android:text="@string/users_title"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:paddingStart="?listPreferredItemPaddingLeft"
             android:paddingEnd="?listPreferredItemPaddingRight"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:gravity="center_vertical"/>
+            style="@style/TextMaterialSubhader"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/accountsRecycler"

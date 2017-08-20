@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/detailIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        tools:srcCompat="@drawable/ic_date_range"/>
+
+    <TextView
+        android:id="@+id/detailTitle"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/detailIcon"
+        tools:text="@string/watcher_date_after"/>
+
+    <TextView
+        android:id="@+id/detailValue"
+        style="@style/TextAppearance.AppCompat.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detailTitle"
+        android:layout_toEndOf="@+id/detailIcon"
+        tools:text="Aug 24, 2017 19:16"/>
+
+</RelativeLayout>

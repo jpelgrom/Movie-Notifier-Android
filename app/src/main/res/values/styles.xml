@@ -27,6 +27,16 @@
         <item name="android:textColor">@color/textError</item>
     </style>
 
+    <style name="TextMaterialSubhader">
+        <item name="android:minHeight">?attr/listPreferredItemHeightSmall</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
     <style name="PropPopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
         <item name="android:dropDownHorizontalOffset">72dp</item>
     </style>
