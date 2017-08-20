@@ -72,6 +72,7 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.main) ScrollView main;
     @BindView(R.id.loaderError) LinearLayout loaderError;
     @BindView(R.id.loaderErrorText) TextView loaderErrorText;
+    @BindView(R.id.loaderErrorAccount) Button loaderErrorAccount;
     @BindView(R.id.loaderErrorButton) Button loaderErrorButton;
 
     @BindView(R.id.error) TextView watcherError;
@@ -280,6 +281,12 @@ public class WatcherActivity extends AppCompatActivity {
             }
         });
 
+        loaderErrorAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(WatcherActivity.this, AccountActivity.class));
+            }
+        });
         loaderErrorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -388,8 +395,10 @@ public class WatcherActivity extends AppCompatActivity {
                     } else {
                         if(response.code() == 401) {
                             loaderErrorText.setText(R.string.error_watcher_401);
+                            loaderErrorAccount.setVisibility(View.VISIBLE);
                         } else {
                             loaderErrorText.setText(getString(R.string.error_general_server, "H" + response.code()));
+                            loaderErrorAccount.setVisibility(View.GONE);
                         }
 
                         loaderErrorButton.setEnabled(true);
@@ -407,6 +416,7 @@ public class WatcherActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
 
                 loaderErrorText.setText(R.string.error_general_exception);
+                loaderErrorAccount.setVisibility(View.GONE);
                 loaderErrorButton.setEnabled(true);
                 loaderErrorButton.setVisibility(View.VISIBLE);
                 loaderError.setVisibility(View.VISIBLE);

@@ -148,7 +148,7 @@ public class WatchersFragment extends Fragment {
                         public void onFailure(Call<List<Watcher>> call, Throwable t) {
                             t.printStackTrace();
 
-                            showEmptyView();
+                            listSwiper.setRefreshing(false);
 
                             snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
                             snackbar.show();

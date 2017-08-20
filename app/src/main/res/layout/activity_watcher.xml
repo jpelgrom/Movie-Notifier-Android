@@ -338,13 +338,21 @@
                 android:layout_width="256dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:layout_marginBottom="8dp"
                 android:text="@string/error_watcher_400"/>
+
+            <Button
+                android:id="@+id/loaderErrorAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_add_title"
+                android:visibility="gone"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
 
             <Button
                 android:id="@+id/loaderErrorButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="@string/retry"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
 

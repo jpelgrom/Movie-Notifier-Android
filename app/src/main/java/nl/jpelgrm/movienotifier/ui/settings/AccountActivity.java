@@ -55,7 +55,7 @@ public class AccountActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case android.R.id.home:
             case R.id.homeAsUp:
-                super.onBackPressed();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
