@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -19,22 +19,25 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ClosableToolbar" parent="Base.Widget.AppCompat.Light.ActionBar">
-        <item name="android:homeAsUpIndicator">@drawable/ic_close_black</item>
-        <item name="android:background">#fafafa</item>
+        <item name="android:background">@color/toolbarBackgroundTransparent</item>
+        <item name="homeAsUpIndicator">@drawable/ic_close_black</item>
     </style>
 
     <style name="TextError">
         <item name="android:textColor">@color/textError</item>
     </style>
 
-    <style name="TextMaterialSubhader">
+    <style name="TextMaterialSubhaderParent">
         <item name="android:minHeight">?attr/listPreferredItemHeightSmall</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="TextMaterialSubheader" parent="TextMaterialSubhaderParent">
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
     <style name="PropPopupMenu" parent="@style/Widget.AppCompat.PopupMenu">

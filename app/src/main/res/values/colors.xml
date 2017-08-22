@@ -2,8 +2,12 @@
 <resources>
     <color name="colorPrimary">#6200EA</color>
     <color name="colorPrimaryDark">#3E00AA</color>
+    <color name="colorPrimaryLighter">#6A00FF</color>
     <color name="colorAccent">#C1185B</color>
 
+    <color name="textDelete">@android:color/holo_red_dark</color>
     <color name="textError">#F4511E</color>
-    <color name="textEmptyState">#757575</color>
+    <color name="textEmptyState">#676767</color>
+
+    <color name="toolbarBackgroundTransparent">@color/background_material_light</color>
 </resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextMaterialSubheader" parent="TextMaterialSubhaderParent">
+        <item name="android:textColor">@color/colorPrimaryLighter</item>
+    </style>
+</resources>

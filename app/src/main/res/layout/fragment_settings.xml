@@ -11,10 +11,55 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/users_title"
-            android:paddingStart="?listPreferredItemPaddingLeft"
+            android:text="@string/settings_general"
+            android:paddingStart="72dp"
             android:paddingEnd="?listPreferredItemPaddingRight"
-            style="@style/TextMaterialSubhader"/>
+            style="@style/TextMaterialSubheader"/>
+
+        <RelativeLayout
+            android:id="@+id/dayNight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/listPreferredItemHeight"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:paddingStart="?attr/listPreferredItemPaddingLeft"
+            android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/dayNightIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_brightness_auto"/>
+
+            <TextView
+                android:id="@+id/dayNightTitle"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/dayNightIcon"
+                android:text="@string/settings_general_daynight_title"/>
+
+            <TextView
+                android:id="@+id/dayNightValue"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/dayNightTitle"
+                android:layout_toEndOf="@+id/dayNightIcon"
+                android:text="@string/settings_general_daynight_auto"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/users_title"
+            android:paddingStart="72dp"
+            android:paddingEnd="?listPreferredItemPaddingRight"
+            style="@style/TextMaterialSubheader"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/accountsRecycler"
@@ -30,7 +75,7 @@
             android:orientation="vertical"
             android:paddingBottom="8dp"
             android:paddingEnd="?attr/listPreferredItemPaddingRight"
-            android:paddingStart="?attr/listPreferredItemPaddingLeft"
+            android:paddingStart="72dp"
             android:paddingTop="8dp"
             android:background="?selectableItemBackground">
 

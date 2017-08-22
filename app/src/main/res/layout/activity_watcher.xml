@@ -65,7 +65,7 @@
                     android:text="@string/watcher_basics_title"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -199,7 +199,7 @@
                     android:text="@string/watcher_date_title"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/begin"
@@ -233,7 +233,7 @@
                     android:text="@string/watcher_filter_heading_experience"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/filterIMAX"
@@ -257,7 +257,7 @@
                     android:text="@string/watcher_filter_heading_projection"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/filter3D"
@@ -293,7 +293,7 @@
                     android:text="@string/watcher_filter_heading_audio"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/filterDolbyAtmos"
@@ -323,7 +323,7 @@
                     android:text="@string/watcher_filter_heading_additionalexperiences"
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubhader"/>
+                    style="@style/TextMaterialSubheader"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
                     android:id="@+id/filterDBOX"

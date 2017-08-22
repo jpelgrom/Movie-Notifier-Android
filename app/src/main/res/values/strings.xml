@@ -5,6 +5,12 @@
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
 
+    <string name="settings_general">General</string>
+    <string name="settings_general_daynight_title">Theme</string>
+    <string name="settings_general_daynight_auto">Change automatically</string>
+    <string name="settings_general_daynight_day">Always use day mode</string>
+    <string name="settings_general_daynight_night">Always use night mode</string>
+
     <string name="account_start_title">Hi there!</string>
     <string name="account_start_subtitle">Welcome to Movie Notifier</string>
     <string name="account_start_login_text">Have you used the app before? Log in using your Movie Notifier account to manage your watchers.</string>
@@ -24,6 +30,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
 
     <string name="watchers_empty_title">No watchers found</string>
     <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
