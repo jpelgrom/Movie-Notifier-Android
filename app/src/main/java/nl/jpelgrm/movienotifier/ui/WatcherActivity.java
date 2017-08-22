@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -124,6 +125,14 @@ public class WatcherActivity extends AppCompatActivity {
     private Mode mode = Mode.VIEWING;
     private List<Cinema> cinemas = null;
 
+    Handler validateCinemaIDHandler = new Handler();
+    Runnable validateCinemaIDRunnable = new Runnable() {
+        @Override
+        public void run() {
+            validateCinemaID(false);
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,6 +184,19 @@ public class WatcherActivity extends AppCompatActivity {
         ArrayAdapter<Cinema> cinemaIDAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cinemas);
         watcherCinemaID.setAdapter(cinemaIDAdapter);
         watcherCinemaID.setThreshold(1);
+        watcherCinemaID.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                validateCinemaIDHandler.removeCallbacks(validateCinemaIDRunnable);
+                validateCinemaIDHandler.postDelayed(validateCinemaIDRunnable, 1000);
+            }
+        });
 
         begin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -608,7 +630,7 @@ public class WatcherActivity extends AppCompatActivity {
                 timePickerDialog.show();
             }
         }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
+        //datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
         datePickerDialog.show();
     }
 
@@ -668,6 +690,8 @@ public class WatcherActivity extends AppCompatActivity {
                 if(forced) {
                     watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
                     watcherCinemaIDWrapper.setErrorEnabled(true);
+                } else {
+                    watcher.getFilters().setCinemaID("");
                 }
                 return false;
             }
