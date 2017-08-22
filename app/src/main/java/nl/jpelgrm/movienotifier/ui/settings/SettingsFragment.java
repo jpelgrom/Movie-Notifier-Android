@@ -20,6 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +34,7 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import retrofit2.Call;
@@ -38,12 +45,23 @@ public class SettingsFragment extends Fragment {
     @BindView(R.id.dayNight) RelativeLayout dayNight;
     @BindView(R.id.dayNightIcon) AppCompatImageView dayNightIcon;
     @BindView(R.id.dayNightValue) TextView dayNightValue;
+    @BindView(R.id.location) RelativeLayout location;
+    @BindView(R.id.locationValue) TextView locationValue;
 
     @BindView(R.id.accountsRecycler) public RecyclerView accountsRecycler;
     @BindView(R.id.accountFlow) LinearLayout addAccount;
 
+    private List<Cinema> cinemas = null;
+    private CharSequence[] cinemaItems;
+
     private ArrayList<User> users = new ArrayList<>();
     private AccountsAdapter adapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        readCinemasJson();
+    }
 
     @Nullable
     @Override
@@ -68,6 +86,31 @@ public class SettingsFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int which) {
                         dialogInterface.dismiss();
                         setDayNight(which);
+                    }
+                }).setNegativeButton(R.string.cancel, null).show();
+            }
+        });
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String currentPreference = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getString("prefDefaultCinema", "");
+                int currentValueIndex = 0;
+                if(cinemas != null) {
+                    for(int i = 0; i < cinemas.size(); i++) {
+                        if(cinemas.get(i).getId().equals(currentPreference)) {
+                            currentValueIndex = i + 1;
+                        }
+                    }
+                }
+                if(!currentPreference.equals("") && currentValueIndex == 0) {
+                    currentValueIndex = -1; // Don't select anything
+                }
+
+                new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_location_title).setSingleChoiceItems(cinemaItems, currentValueIndex, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        dialogInterface.dismiss();
+                        setCinemaPreference(which);
                     }
                 }).setNegativeButton(R.string.cancel, null).show();
             }
@@ -97,7 +140,9 @@ public class SettingsFragment extends Fragment {
     }
 
     private void updateValues() {
-        int dayNightPreference = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
+        SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        int dayNightPreference = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
         switch(dayNightPreference) {
             case AppCompatDelegate.MODE_NIGHT_NO:
                 dayNightIcon.setImageResource(R.drawable.ic_brightness_day);
@@ -113,6 +158,22 @@ public class SettingsFragment extends Fragment {
                 dayNightValue.setText(R.string.settings_general_daynight_auto);
                 break;
         }
+
+        String locationPreference = settings.getString("prefDefaultCinema", "");
+        String locationPrefText = "";
+        if(locationPreference.equals("")) {
+            locationPrefText = getString(R.string.settings_general_location_default);
+        } else {
+            locationPrefText = locationPreference;
+            if(cinemas != null) {
+                for(Cinema cinema : cinemas) {
+                    if(cinema.getId().equals(locationPreference)) {
+                        locationPrefText = cinema.getName();
+                    }
+                }
+            }
+        }
+        locationValue.setText(locationPrefText);
     }
 
     private void updateAccountsList() {
@@ -161,5 +222,52 @@ public class SettingsFragment extends Fragment {
         } else {
             updateValues();
         }
+    }
+
+    private void setCinemaPreference(int value) {
+        String chose = cinemaItems[value].toString();
+        String setTo = ""; // Default; no preference
+
+        if(!chose.equals(getString(R.string.settings_general_location_default))) {
+            if(cinemas != null) {
+                for(Cinema cinema : cinemas) {
+                    if(cinema.getName().equals(chose)) {
+                        setTo = cinema.getId();
+                    }
+                }
+            }
+        }
+
+        getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putString("prefDefaultCinema", setTo).apply();
+        updateValues();
+    }
+
+    private void readCinemasJson() {
+        // Data
+        String json = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open("cinemas.json");
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Type listType = new TypeToken<List<Cinema>>() {}.getType();
+        cinemas = new Gson().fromJson(json, listType);
+
+        // Dialog
+        List<String> choices = new ArrayList<>();
+
+        choices.add(getString(R.string.settings_general_location_default));
+        if(cinemas != null) {
+            for(Cinema cinema : cinemas) {
+                choices.add(cinema.getName());
+            }
+        }
+        cinemaItems = choices.toArray(new CharSequence[choices.size()]);
     }
 }

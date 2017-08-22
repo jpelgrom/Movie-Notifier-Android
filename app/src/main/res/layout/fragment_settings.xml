@@ -53,6 +53,43 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/listPreferredItemHeight"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:paddingStart="?attr/listPreferredItemPaddingLeft"
+            android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/locationIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_location"/>
+
+            <TextView
+                android:id="@+id/locationTitle"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/locationIcon"
+                android:text="@string/settings_general_location_title"/>
+
+            <TextView
+                android:id="@+id/locationValue"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/locationTitle"
+                android:layout_toEndOf="@+id/locationIcon"
+                android:text="@string/settings_general_location_default"/>
+
+        </RelativeLayout>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

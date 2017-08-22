@@ -178,7 +178,7 @@
                         android:gravity="center_vertical"
                         android:layout_toEndOf="@+id/watcherCinemaIDIcon">
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <android.support.v7.widget.AppCompatAutoCompleteTextView
                             android:id="@+id/watcherCinemaID"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

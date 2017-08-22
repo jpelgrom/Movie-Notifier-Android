@@ -1,0 +1,14 @@
+[
+   {
+      "id":"CHAIN1",
+      "name":"Chain North"
+   },
+   {
+       "id": "CHAIN2",
+       "name": "Chain South"
+   },
+   {
+       "id": "LOCAL1",
+       "name": "Local Centre"
+   }
+]

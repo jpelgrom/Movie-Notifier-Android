@@ -14,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -34,20 +36,25 @@ import android.widget.TimePicker;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
+import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.models.error.Errors;
@@ -81,7 +88,7 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.watcherMovieIDWrapper) TextInputLayout watcherMovieIDWrapper;
     @BindView(R.id.watcherMovieID) AppCompatEditText watcherMovieID;
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
-    @BindView(R.id.watcherCinemaID) AppCompatEditText watcherCinemaID;
+    @BindView(R.id.watcherCinemaID) AppCompatAutoCompleteTextView watcherCinemaID;
 
     @BindView(R.id.begin) WatcherDetailView begin;
     @BindView(R.id.end) WatcherDetailView end;
@@ -115,6 +122,7 @@ public class WatcherActivity extends AppCompatActivity {
     private static Long oneMonth = 2629746000L;
 
     private Mode mode = Mode.VIEWING;
+    private List<Cinema> cinemas = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,6 +140,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         setupSharedInfo();
+        readCinemasJson();
 
         watcherName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -163,20 +172,9 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             }
         });
-        watcherCinemaID.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(watcher != null) {
-                    watcher.getFilters().setCinemaID(editable.toString());
-                }
-            }
-        });
+        ArrayAdapter<Cinema> cinemaIDAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cinemas);
+        watcherCinemaID.setAdapter(cinemaIDAdapter);
+        watcherCinemaID.setThreshold(1);
 
         begin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -370,6 +368,7 @@ public class WatcherActivity extends AppCompatActivity {
             }
             watcher.setBegin(System.currentTimeMillis());
             watcher.setEnd(System.currentTimeMillis() + oneWeek);
+            watcher.getFilters().setCinemaID(settings.getString("prefDefaultCinema", ""));
             watcher.getFilters().setStartAfter(System.currentTimeMillis() + oneWeek);
             watcher.getFilters().setStartBefore(System.currentTimeMillis() + oneWeek + oneWeek);
 
@@ -455,7 +454,18 @@ public class WatcherActivity extends AppCompatActivity {
         // Input values
         watcherName.setText(watcher.getName());
         watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
-        watcherCinemaID.setText(watcher.getFilters().getCinemaID());
+        String foundCinema = "";
+        if(cinemas != null) {
+            for(Cinema cinema : cinemas) {
+                if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+                    foundCinema = cinema.getName();
+                }
+            }
+        }
+        if(foundCinema.equals("")) { // We don't know this cinema ID's display name
+            foundCinema = watcher.getFilters().getCinemaID();
+        }
+        watcherCinemaID.setText(foundCinema);
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
         begin.setValue(format.format(new Date(watcher.getBegin())));
@@ -639,9 +649,28 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private boolean validateCinemaID(boolean forced) {
-        if(watcherCinemaID.getText().toString().length() > 0) { // TODO Proper validation, list
-            watcherCinemaIDWrapper.setErrorEnabled(false);
-            return true;
+        if(watcherCinemaID.getText().toString().length() > 0) {
+            String foundName = watcherCinemaID.getText().toString();
+            String foundID = "";
+            if(cinemas != null) {
+                for(Cinema cinema : cinemas) {
+                    if(cinema.getName().equals(foundName)) {
+                        foundID = cinema.getId();
+                    }
+                }
+            }
+            if(!foundID.equals("")) {
+                watcher.getFilters().setCinemaID(foundID);
+
+                watcherCinemaIDWrapper.setErrorEnabled(false);
+                return true;
+            } else {
+                if(forced) {
+                    watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
+                    watcherCinemaIDWrapper.setErrorEnabled(true);
+                }
+                return false;
+            }
         } else {
             if(forced) {
                 watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
@@ -736,7 +765,7 @@ public class WatcherActivity extends AppCompatActivity {
             toSave.setBegin(watcher.getBegin());
             toSave.setEnd(watcher.getEnd());
 
-            toSave.setFilters(watcher.getFilters());
+            toSave.setFilters(watcher.getFilters()); // Validation set the cinema ID correctly
 
             Call<Watcher> call;
 
@@ -969,6 +998,23 @@ public class WatcherActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void readCinemasJson() {
+        String json = null;
+        try {
+            InputStream inputStream = getAssets().open("cinemas.json");
+            int size = inputStream.available();
+            byte[] buffer = new byte[size];
+            inputStream.read(buffer);
+            inputStream.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Type listType = new TypeToken<List<Cinema>>() {}.getType();
+        cinemas = new Gson().fromJson(json, listType);
     }
 
     private abstract class PropResultListener {

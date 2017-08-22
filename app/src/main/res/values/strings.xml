@@ -10,6 +10,8 @@
     <string name="settings_general_daynight_auto">Change automatically</string>
     <string name="settings_general_daynight_day">Always use day mode</string>
     <string name="settings_general_daynight_night">Always use night mode</string>
+    <string name="settings_general_location_title">Default location for new watchers</string>
+    <string name="settings_general_location_default">Not set</string>
 
     <string name="account_start_title">Hi there!</string>
     <string name="account_start_subtitle">Welcome to Movie Notifier</string>
