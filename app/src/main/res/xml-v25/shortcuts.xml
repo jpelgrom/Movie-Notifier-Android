@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcutAddWatcher"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_add"
+        android:shortcutShortLabel="@string/watcher_add_short"
+        android:shortcutLongLabel="@string/watcher_add_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="nl.jpelgrm.movienotifier"
+            android:targetClass="nl.jpelgrm.movienotifier.ui.WatcherActivity">
+        </intent>
+    </shortcut>
+</shortcuts>

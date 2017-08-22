@@ -37,6 +37,8 @@
     <string name="watchers_empty_account">Sorry, you need an account to do that.</string>
     <string name="watchers_list_subtitle_date">%s Showings %s – %s</string>
 
+    <string name="watcher_add_short">New watcher</string>
+    <string name="watcher_add_long">Create a new watcher</string>
     <string name="watcher_basics_title">Basics</string>
     <string name="watcher_basics_name">Name</string>
     <string name="watcher_basics_movieid">Movie number</string>
