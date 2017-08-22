@@ -17,9 +17,8 @@
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="It 🤡🎈"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        tools:ignore="hardcodedText" />
+        tools:text="Inhumans (2017)" />
 
     <TextView
         android:id="@+id/watcherSubtext"
@@ -27,8 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="0dp"
-        android:text="7 sep. 2017 09:00 – 20 sep. 2017 23:00"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        tools:ignore="hardcodedText"/>
+        tools:text="Showings Aug 30, 2017 – Sep 10, 2017"/>
 
 </LinearLayout>
