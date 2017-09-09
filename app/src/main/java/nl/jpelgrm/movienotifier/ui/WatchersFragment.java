@@ -49,7 +49,6 @@ public class WatchersFragment extends Fragment {
     private WatchersAdapter adapter;
 
     private SharedPreferences settings;
-    private String previousUUID;
 
     private Snackbar snackbar;
 
@@ -95,15 +94,7 @@ public class WatchersFragment extends Fragment {
             snackbar.dismiss();
         }
 
-        checkUser();
         refreshList(false);
-    }
-
-    private void checkUser() {
-        if(previousUUID != null && !settings.getString("userID", "").equals(previousUUID) && !settings.getString("userID", "").equals("")) {
-            Snackbar.make(coordinator, R.string.account_welcome, Snackbar.LENGTH_LONG).show();
-        }
-        previousUUID = settings.getString("userID", "");
     }
 
     private void refreshList(final boolean userTriggered) {

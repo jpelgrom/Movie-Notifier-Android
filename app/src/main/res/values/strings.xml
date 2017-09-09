@@ -21,6 +21,8 @@
     <string name="account_login_subtitle">Good to see you again!</string>
     <string name="account_signup_title">Create a new account</string>
     <string name="account_signup_subtitle">You\'re already almost done</string>
+    <string name="account_notifications_title">Set up notifications</string>
+    <string name="account_notifications_subtitle">You\'ll want to select at least one</string>
     <string name="account_welcome">Welcome!</string>
 
     <string name="log_in">Log in</string>

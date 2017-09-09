@@ -170,9 +170,6 @@ public class AccountAddFragment extends Fragment {
                 if(validateName() && validateEmail() && validatePhone() && validatePassword()) {
                     User toCreate = new User(name.getText().toString(), email.getText().toString(), getRFCPhoneNumber(), password.getText().toString());
 
-                    // TODO?
-                    toCreate.setNotifications(new ArrayList<>(Collections.singletonList("FBM")));
-
                     register(toCreate);
                 }
             }
@@ -248,7 +245,9 @@ public class AccountAddFragment extends Fragment {
                     User received = response.body();
                     DBHelper.getInstance(getActivity()).addUser(received);
                     settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
-                    getActivity().finish();
+                    if(getActivity() != null && !getActivity().isFinishing()) {
+                        ((AccountActivity) getActivity()).showNotifications();
+                    }
                 } else {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
@@ -289,6 +288,7 @@ public class AccountAddFragment extends Fragment {
                         error.setText(getString(R.string.error_general_message, errorBuilder.toString()));
                     } else {
                         errorBuilder.append(getString(R.string.error_general_server, "H" + response.code()));
+                        error.setText(errorBuilder.toString());
                     }
 
                     error.setVisibility(View.VISIBLE);

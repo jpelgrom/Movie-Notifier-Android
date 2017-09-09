@@ -2,6 +2,8 @@ package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -12,6 +14,7 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 
 public class AccountActivity extends AppCompatActivity {
+    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.frame) FrameLayout frame;
 
@@ -46,6 +49,17 @@ public class AccountActivity extends AppCompatActivity {
                 .beginTransaction()
                 .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 .replace(R.id.frame, new AccountAddFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void showNotifications() {
+        Snackbar.make(coordinator, R.string.account_welcome, Snackbar.LENGTH_LONG).show();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                .replace(R.id.frame, new AccountNotificationsFragment())
                 .addToBackStack(null)
                 .commit();
     }

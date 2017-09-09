@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:indeterminate="true"
+        android:layout_marginTop="-6dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/scroll_padding"
+            android:animateLayoutChanges="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_marginTop="48dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                android:text="@string/account_notifications_title"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_marginBottom="64dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                android:text="@string/account_notifications_subtitle"/>
+
+            <TextView
+                android:id="@+id/error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextError"
+                android:layout_marginBottom="16dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                android:visibility="gone"
+                tools:text="@string/error_general_message"
+                tools:visibility="visible"/>
+
+            <LinearLayout
+                android:id="@+id/types"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <Button
+                android:id="@+id/go"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="?attr/listPreferredItemPaddingRight"
+                android:layout_marginStart="?attr/listPreferredItemPaddingLeft"
+                android:enabled="false"
+                android:text="@string/get_started" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
