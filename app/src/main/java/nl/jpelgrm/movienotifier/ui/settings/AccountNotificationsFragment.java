@@ -75,6 +75,7 @@ public class AccountNotificationsFragment extends Fragment {
         go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                error.setVisibility(View.GONE);
                 save();
             }
         });
