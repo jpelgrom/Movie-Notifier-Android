@@ -6,6 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -146,6 +150,25 @@ public class WatcherActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
             getSupportActionBar().setTitle("");
+        }
+
+        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if(nfcAdapter != null) {
+            nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
+                @Override
+                public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+                    if(id.equals("")) {
+                        return null;
+                    } else {
+                        return new NdefMessage(
+                            new NdefRecord[] {
+                                    NdefRecord.createUri(BuildConfig.SERVER_BASE_URL + "w/" + id),
+                                    NdefRecord.createApplicationRecord(BuildConfig.APPLICATION_ID)
+                            }
+                        );
+                    }
+                }
+            }, this);
         }
 
         setupSharedInfo();
@@ -341,7 +364,8 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void setupSharedInfo() {
         if((getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_SEND))
-                || (getIntent().getType() != null && getIntent().getType().equals("text/plain"))
+                || (getIntent().getAction() != null && getIntent().getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)
+                || (getIntent().getType() != null && getIntent().getType().equals("text/plain")))
                 || getIntent().getDataString() != null) {
             String data;
 
@@ -428,6 +452,11 @@ public class WatcherActivity extends AppCompatActivity {
 
                     updateViews();
                     doneLoading();
+
+                    if(mode == Mode.EDITING) {
+                        watcherName.requestFocus();
+                        InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+                    }
                 } else {
                     progress.setVisibility(View.GONE);
 
