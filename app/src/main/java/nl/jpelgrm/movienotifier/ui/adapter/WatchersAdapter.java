@@ -2,12 +2,12 @@ package nl.jpelgrm.movienotifier.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.text.emoji.widget.EmojiAppCompatTextView;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -85,8 +85,8 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.watcherName) TextView name;
-        @BindView(R.id.watcherSubtext) TextView subtext;
+        @BindView(R.id.watcherName) EmojiAppCompatTextView name;
+        @BindView(R.id.watcherSubtext) EmojiAppCompatTextView subtext;
 
         public ViewHolder(View itemView) {
             super(itemView);

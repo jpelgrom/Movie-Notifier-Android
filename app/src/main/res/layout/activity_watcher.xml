@@ -94,7 +94,7 @@
                         android:gravity="center_vertical"
                         android:layout_toEndOf="@+id/watcherNameIcon">
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <android.support.text.emoji.widget.EmojiAppCompatEditText
                             android:id="@+id/watcherName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

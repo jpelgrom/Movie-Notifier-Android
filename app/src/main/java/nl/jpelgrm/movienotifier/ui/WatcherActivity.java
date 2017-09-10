@@ -17,6 +17,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.text.emoji.widget.EmojiAppCompatEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
@@ -89,7 +90,7 @@ public class WatcherActivity extends AppCompatActivity {
 
     @BindView(R.id.error) TextView watcherError;
     @BindView(R.id.watcherNameWrapper) TextInputLayout watcherNameWrapper;
-    @BindView(R.id.watcherName) AppCompatEditText watcherName;
+    @BindView(R.id.watcherName) EmojiAppCompatEditText watcherName;
     @BindView(R.id.watcherMovieIDWrapper) TextInputLayout watcherMovieIDWrapper;
     @BindView(R.id.watcherMovieID) AppCompatEditText watcherMovieID;
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
