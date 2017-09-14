@@ -201,27 +201,27 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/begin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailIcon="@drawable/ic_notifications_active"
                     app:detailTitle="@string/watcher_date_title_begin"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/end"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailTitle="@string/watcher_date_title_end"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterStartAfter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailIcon="@drawable/ic_date_range"
                     app:detailTitle="@string/watcher_filter_title_startafter"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterStartBefore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -235,7 +235,7 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterIMAX"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -243,7 +243,7 @@
                     app:detailTitle="@string/watcher_filter_title_imax"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterDolbyCinema"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -259,28 +259,28 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filter3D"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailTitle="@string/watcher_filter_title_3d"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filter4K"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailTitle="@string/watcher_filter_title_4k"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterLaser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailTitle="@string/watcher_filter_title_laser"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterHFR"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -295,7 +295,7 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterDolbyAtmos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -303,14 +303,14 @@
                     app:detailTitle="@string/watcher_filter_title_dolbyatmos"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterOV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:detailTitle="@string/watcher_filter_title_ov"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterNL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -325,7 +325,7 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.WatcherDetailView
+                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterDBOX"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

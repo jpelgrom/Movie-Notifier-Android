@@ -96,10 +96,17 @@
     <string name="user_validate_email">Please enter a valid email address</string>
     <string name="user_validate_phone">Please enter a valid phone number in the format +[country code][phone number]</string>
     <string name="user_validate_password">Passwords need to be at least 8 characters long</string>
-    <string name="user_list_logout">Log out</string>
-    <string name="user_list_switch">Switch</string>
-    <string name="user_list_delete_title">Delete account</string>
-    <string name="user_list_delete_confirm">Are you absolutely sure that you want to delete your account? All your watchers will be permanently deleted.</string>
+    <string name="user_settings_general_switch">Switch to this account</string>
+    <string name="user_settings_general_switch_success">Switched active account</string>
+    <string name="user_settings_general_success">Account updated</string>
+    <string name="user_settings_security_title">Security</string>
+    <string name="user_settings_security_delete">Delete account</string>
+    <string name="user_settings_security_delete_confirm">Are you absolutely sure that you want to delete your account? All your watchers will be permanently deleted.</string>
+    <string name="user_settings_security_delete_success">Deleted account</string>
+    <string name="user_settings_security_logout">Log out from app</string>
+    <string name="user_settings_security_logout_success">Logged out of account</string>
+    <string name="user_settings_notifications_title">Notifications</string>
+    <string name="user_settings_notifications_error">Sorry, it is not possible to change your notification preferences right now. Please try again later.</string>
 
     <string name="error_login_401">Your username and/or password is incorrect.</string>
     <string name="error_watchers_400">Sorry, please try again.</string>

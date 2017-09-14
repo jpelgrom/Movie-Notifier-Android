@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settingsCoordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_general"
+                android:paddingStart="72dp"
+                android:paddingEnd="?listPreferredItemPaddingRight"
+                style="@style/TextMaterialSubheader"/>
+
+            <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
+                android:id="@+id/dayNight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:detailIcon="@drawable/ic_brightness_auto"
+                app:detailTitle="@string/settings_general_daynight_title"
+                app:detailValue="@string/settings_general_daynight_auto"/>
+
+            <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:detailIcon="@drawable/ic_location"
+                app:detailTitle="@string/settings_general_location_title"
+                app:detailValue="@string/settings_general_location_default"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/users_title"
+                android:paddingStart="72dp"
+                android:paddingEnd="?listPreferredItemPaddingRight"
+                style="@style/TextMaterialSubheader"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/accountsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
+                android:id="@+id/accountFlow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:detailIcon="@drawable/ic_person_add"
+                app:detailTitle="@string/user_add_title"
+                app:detailValue="@string/user_add_subtitle"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -9,16 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,49 +33,52 @@ import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
+import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SettingsFragment extends Fragment {
-    @BindView(R.id.dayNight) RelativeLayout dayNight;
-    @BindView(R.id.dayNightIcon) AppCompatImageView dayNightIcon;
-    @BindView(R.id.dayNightValue) TextView dayNightValue;
-    @BindView(R.id.location) RelativeLayout location;
-    @BindView(R.id.locationValue) TextView locationValue;
+public class SettingsMainFragment extends Fragment {
+    @BindView(R.id.dayNight) DoubleRowIconPreferenceView dayNight;
+    @BindView(R.id.location) DoubleRowIconPreferenceView location;
 
-    @BindView(R.id.accountsRecycler) public RecyclerView accountsRecycler;
-    @BindView(R.id.accountFlow) LinearLayout addAccount;
+    @BindView(R.id.accountsRecycler) RecyclerView accountsRecycler;
+    @BindView(R.id.accountFlow) DoubleRowIconPreferenceView addAccount;
 
     private List<Cinema> cinemas = null;
     private CharSequence[] cinemaItems;
 
-    private ArrayList<User> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
     private AccountsAdapter adapter;
+    private int userProgress = 0;
+
+    private SharedPreferences settings;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         readCinemasJson();
+
+        settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings_main, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        updateValues();
         dayNight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 CharSequence[] items = { getString(R.string.settings_general_daynight_auto), getString(R.string.settings_general_daynight_day),
                         getString(R.string.settings_general_daynight_night) };
-                int currentValueIndex = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
+                int currentValueIndex = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
                 new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_daynight_title).setSingleChoiceItems(items, currentValueIndex, new DialogInterface.OnClickListener() {
                     @Override
@@ -93,7 +92,7 @@ public class SettingsFragment extends Fragment {
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String currentPreference = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getString("prefDefaultCinema", "");
+                String currentPreference = settings.getString("prefDefaultCinema", "");
                 int currentValueIndex = 0;
                 if(cinemas != null) {
                     for(int i = 0; i < cinemas.size(); i++) {
@@ -131,31 +130,35 @@ public class SettingsFragment extends Fragment {
                 startActivity(new Intent(getActivity(), AccountActivity.class));
             }
         });
+
+        updateValues();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        adapter.swapItems(DBHelper.getInstance(getContext()).getUsers());
+
+        settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        updateValues();
+        updateAccountsList();
     }
 
     private void updateValues() {
-        SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-
         int dayNightPreference = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
         switch(dayNightPreference) {
             case AppCompatDelegate.MODE_NIGHT_NO:
-                dayNightIcon.setImageResource(R.drawable.ic_brightness_day);
-                dayNightValue.setText(R.string.settings_general_daynight_day);
+                dayNight.setIcon(R.drawable.ic_brightness_day);
+                dayNight.setValue(R.string.settings_general_daynight_day);
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
-                dayNightIcon.setImageResource(R.drawable.ic_brightness_night);
-                dayNightValue.setText(R.string.settings_general_daynight_night);
+                dayNight.setIcon(R.drawable.ic_brightness_night);
+                dayNight.setValue(R.string.settings_general_daynight_night);
                 break;
             case AppCompatDelegate.MODE_NIGHT_AUTO:
             default:
-                dayNightIcon.setImageResource(R.drawable.ic_brightness_auto);
-                dayNightValue.setText(R.string.settings_general_daynight_auto);
+                dayNight.setIcon(R.drawable.ic_brightness_auto);
+                dayNight.setValue(R.string.settings_general_daynight_auto);
                 break;
         }
 
@@ -173,45 +176,20 @@ public class SettingsFragment extends Fragment {
                 }
             }
         }
-        locationValue.setText(locationPrefText);
-    }
+        location.setValue(locationPrefText);
 
-    private void updateAccountsList() {
-        final DBHelper db = DBHelper.getInstance(getContext());
-        final List<User> active = db.getUsers();
+        int accounts = users.size();
+        if(accounts == 0) {
+            accountsRecycler.setVisibility(View.GONE);
+        } else {
+            accountsRecycler.setVisibility(View.VISIBLE);
 
-        for(final User user : active) {
-            Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
-            call.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
-                    if(response.code() == 200) {
-                        if(response.body() != null) {
-                            db.updateUser(response.body());
-                        }
-                    } else if(response.code() == 401) {
-                        // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
-                        db.deleteUser(user.getID());
-
-                        SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-                        if(settings.getString("userID", "").equals(user.getID())) {
-                            settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
-                        }
-                    } // else: failed with user facing error, but do nothing because it is a background task
-
-                    adapter.swapItems(db.getUsers());
-                }
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
+            users = DBHelper.getInstance(getContext()).getUsers();
+            adapter.swapItems(users);
         }
     }
 
     private void setDayNight(int value) {
-        SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
         int currentValue = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
         settings.edit().putInt("prefDayNight", value).apply();
@@ -238,7 +216,7 @@ public class SettingsFragment extends Fragment {
             }
         }
 
-        getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putString("prefDefaultCinema", setTo).apply();
+        settings.edit().putString("prefDefaultCinema", setTo).apply();
         updateValues();
     }
 
@@ -269,5 +247,47 @@ public class SettingsFragment extends Fragment {
             }
         }
         cinemaItems = choices.toArray(new CharSequence[choices.size()]);
+    }
+
+    private void updateAccountsList() {
+        final DBHelper db = DBHelper.getInstance(getContext());
+        users = db.getUsers();
+        userProgress = 0;
+
+        for(final User user : users) {
+            Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    if(response.code() == 200) {
+                        if(response.body() != null) {
+                            db.updateUser(response.body());
+                        }
+                    } else if(response.code() == 401) {
+                        // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
+                        db.deleteUser(user.getID());
+
+                        if(settings.getString("userID", "").equals(user.getID())) {
+                            settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
+                        }
+                    } // else: failed with user facing error, but do nothing because it is a background task
+
+                    finishedUserUpdate();
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+        }
+    }
+
+    private void finishedUserUpdate() {
+        userProgress++;
+        if(userProgress >= users.size()) {
+            users = DBHelper.getInstance(getContext()).getUsers();
+            updateValues();
+        }
     }
 }

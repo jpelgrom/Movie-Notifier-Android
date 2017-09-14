@@ -65,7 +65,7 @@ import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.models.error.Errors;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
-import nl.jpelgrm.movienotifier.ui.view.WatcherDetailView;
+import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -96,21 +96,21 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
     @BindView(R.id.watcherCinemaID) AppCompatAutoCompleteTextView watcherCinemaID;
 
-    @BindView(R.id.begin) WatcherDetailView begin;
-    @BindView(R.id.end) WatcherDetailView end;
-    @BindView(R.id.filterStartAfter) WatcherDetailView filterStartAfter;
-    @BindView(R.id.filterStartBefore) WatcherDetailView filterStartBefore;
+    @BindView(R.id.begin) DoubleRowIconPreferenceView begin;
+    @BindView(R.id.end) DoubleRowIconPreferenceView end;
+    @BindView(R.id.filterStartAfter) DoubleRowIconPreferenceView filterStartAfter;
+    @BindView(R.id.filterStartBefore) DoubleRowIconPreferenceView filterStartBefore;
 
-    @BindView(R.id.filterIMAX) WatcherDetailView filterIMAX;
-    @BindView(R.id.filterDolbyCinema) WatcherDetailView filterDolbyCinema;
-    @BindView(R.id.filter3D) WatcherDetailView filter3D;
-    @BindView(R.id.filter4K) WatcherDetailView filter4K;
-    @BindView(R.id.filterLaser) WatcherDetailView filterLaser;
-    @BindView(R.id.filterHFR) WatcherDetailView filterHFR;
-    @BindView(R.id.filterDolbyAtmos) WatcherDetailView filterAtmos;
-    @BindView(R.id.filterOV) WatcherDetailView filterOV;
-    @BindView(R.id.filterNL) WatcherDetailView filterNL;
-    @BindView(R.id.filterDBOX) WatcherDetailView filterDBOX;
+    @BindView(R.id.filterIMAX) DoubleRowIconPreferenceView filterIMAX;
+    @BindView(R.id.filterDolbyCinema) DoubleRowIconPreferenceView filterDolbyCinema;
+    @BindView(R.id.filter3D) DoubleRowIconPreferenceView filter3D;
+    @BindView(R.id.filter4K) DoubleRowIconPreferenceView filter4K;
+    @BindView(R.id.filterLaser) DoubleRowIconPreferenceView filterLaser;
+    @BindView(R.id.filterHFR) DoubleRowIconPreferenceView filterHFR;
+    @BindView(R.id.filterDolbyAtmos) DoubleRowIconPreferenceView filterAtmos;
+    @BindView(R.id.filterOV) DoubleRowIconPreferenceView filterOV;
+    @BindView(R.id.filterNL) DoubleRowIconPreferenceView filterNL;
+    @BindView(R.id.filterDBOX) DoubleRowIconPreferenceView filterDBOX;
 
     @BindView(R.id.fab) FloatingActionButton fab;
 

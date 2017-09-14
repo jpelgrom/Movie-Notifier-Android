@@ -12,40 +12,40 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 
-public class WatcherDetailView extends RelativeLayout {
+public class DoubleRowIconPreferenceView extends RelativeLayout {
     @BindView(R.id.detailIcon) AppCompatImageView icon;
     @BindView(R.id.detailTitle) TextView title;
     @BindView(R.id.detailValue) TextView value;
 
-    public WatcherDetailView(Context context) {
+    public DoubleRowIconPreferenceView(Context context) {
         super(context);
         init(context, null, 0);
     }
 
-    public WatcherDetailView(Context context, AttributeSet attrs) {
+    public DoubleRowIconPreferenceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public WatcherDetailView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DoubleRowIconPreferenceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
-        View view = View.inflate(context, R.layout.view_watcherdetail, this);
+        View view = View.inflate(context, R.layout.view_doublepreference, this);
         ButterKnife.bind(this, view);
 
         if(attrs != null) {
-            TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WatcherDetailView, defStyleAttr, 0);
+            TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DoubleRowIconPreferenceView, defStyleAttr, 0);
 
             int detailIcon = 0;
             String detailTitle = "";
             String detailValue = "";
             try {
-                detailIcon = array.getResourceId(R.styleable.WatcherDetailView_detailIcon, 0);
-                detailTitle = array.getString(R.styleable.WatcherDetailView_detailTitle);
-                detailValue = array.getString(R.styleable.WatcherDetailView_detailValue);
+                detailIcon = array.getResourceId(R.styleable.DoubleRowIconPreferenceView_detailIcon, 0);
+                detailTitle = array.getString(R.styleable.DoubleRowIconPreferenceView_detailTitle);
+                detailValue = array.getString(R.styleable.DoubleRowIconPreferenceView_detailValue);
             } catch(Exception e) {
                 e.printStackTrace();
             } finally {

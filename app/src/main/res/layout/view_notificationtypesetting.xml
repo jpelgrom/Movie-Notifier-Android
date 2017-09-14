@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/typeCheckBox"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:layout_marginEnd="16dp"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:id="@+id/typeTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/typeCheckBox"
+        style="@style/TextAppearance.AppCompat.Body1"
+        tools:text="Facebook Messenger"/>
+
+    <TextView
+        android:id="@+id/typeDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/typeTitle"
+        android:layout_toEndOf="@+id/typeCheckBox"
+        tools:text="Get a message on Messenger"/>
+
+</RelativeLayout>

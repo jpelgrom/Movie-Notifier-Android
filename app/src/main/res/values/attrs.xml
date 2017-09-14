@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="WatcherDetailView">
+    <declare-styleable name="DoubleRowIconPreferenceView">
         <attr name="detailIcon" format="integer"/>
         <attr name="detailTitle" format="string"/>
         <attr name="detailValue" format="string"/>
