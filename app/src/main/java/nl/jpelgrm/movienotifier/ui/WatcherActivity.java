@@ -660,7 +660,7 @@ public class WatcherActivity extends AppCompatActivity {
                 timePickerDialog.show();
             }
         }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
-        //datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
         datePickerDialog.show();
     }
 
