@@ -3,6 +3,7 @@ package nl.jpelgrm.movienotifier.ui.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.text.emoji.widget.EmojiAppCompatTextView;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.WatcherListDiffCallback;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.WatcherActivity;
+import nl.jpelgrm.movienotifier.ui.view.WatcherBottomSheet;
 
 public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHolder> {
     private List<Watcher> watchers;
@@ -66,6 +68,15 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
             @Override
             public void onClick(View view) {
                 getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                WatcherBottomSheet sheet = WatcherBottomSheet.newInstance(watcher);
+                sheet.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), sheet.getTag());
+
+                return true;
             }
         });
     }

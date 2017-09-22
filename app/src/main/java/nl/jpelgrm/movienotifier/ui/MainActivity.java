@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         dayNightPreference = getSharedPreferences("settings", MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
         if(savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.frame, new WatchersFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.frame, new WatchersFragment(), "watchersFragment").commit();
         }
     }
 

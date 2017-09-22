@@ -10,6 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminate="true"
+            android:layout_marginTop="-6dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
         <LinearLayout
             android:id="@+id/emptyView"
             android:layout_width="match_parent"

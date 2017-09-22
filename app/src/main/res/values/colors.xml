@@ -12,4 +12,6 @@
     <color name="toolbarBackgroundTransparent">@color/background_material_light</color>
 
     <color name="shortcutBackground">#FFF5F5F5</color>
+
+    <color name="dialogBackground">#FAFAFA</color>
 </resources>

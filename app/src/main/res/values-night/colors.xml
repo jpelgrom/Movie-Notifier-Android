@@ -4,4 +4,6 @@
     <color name="textEmptyState">#BDBDBD</color>
 
     <color name="toolbarBackgroundTransparent">@color/background_material_dark</color>
+
+    <color name="dialogBackground">#303030</color>
 </resources>

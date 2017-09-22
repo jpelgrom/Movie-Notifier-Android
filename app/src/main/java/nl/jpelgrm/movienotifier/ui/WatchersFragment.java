@@ -1,5 +1,6 @@
 package nl.jpelgrm.movienotifier.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +40,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class WatchersFragment extends Fragment {
     @BindView(R.id.coordinator) CoordinatorLayout coordinator;
+
+    @BindView(R.id.progress) ProgressBar progress;
 
     @BindView(R.id.emptyView) LinearLayout emptyView;
     @BindView(R.id.emptyText) TextView emptyText;
@@ -68,7 +74,7 @@ public class WatchersFragment extends Fragment {
                 if(snackbar != null && snackbar.isShown()) {
                     snackbar.dismiss();
                 }
-                refreshList(true);
+                refreshList(true, true);
             }
         });
         adapter = new WatchersAdapter(getContext(), watchers);
@@ -94,10 +100,10 @@ public class WatchersFragment extends Fragment {
             snackbar.dismiss();
         }
 
-        refreshList(false);
+        refreshList(false, true);
     }
 
-    private void refreshList(final boolean userTriggered) {
+    private void refreshList(final boolean userTriggered, final boolean showError) {
         listSwiper.post(new Runnable() {
             @Override
             public void run() {
@@ -117,21 +123,23 @@ public class WatchersFragment extends Fragment {
                                 } else {
                                     showEmptyView();
                                 }
-                            } else if(response.code() == 401) {
-                                snackbar = Snackbar.make(coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
-                                snackbar.setAction(R.string.ok, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        startActivity(new Intent(getActivity(), AccountActivity.class));
-                                    }
-                                });
-                                snackbar.show();
-                            } else if(response.code() >= 500 && response.code() < 600){
-                                snackbar = Snackbar.make(coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
-                                snackbar.show();
                             } else {
-                                snackbar = Snackbar.make(coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
-                                snackbar.show();
+                                if(showError) {
+                                    if(response.code() == 401) {
+                                        snackbar = Snackbar.make(coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
+                                        snackbar.setAction(R.string.ok, new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                startActivity(new Intent(getActivity(), AccountActivity.class));
+                                            }
+                                        });
+                                    } else if(response.code() >= 500 && response.code() < 600){
+                                        snackbar = Snackbar.make(coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
+                                    } else {
+                                        snackbar = Snackbar.make(coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
+                                    }
+                                    snackbar.show();
+                                }
                             }
                         }
 
@@ -141,8 +149,10 @@ public class WatchersFragment extends Fragment {
 
                             listSwiper.setRefreshing(false);
 
-                            snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
-                            snackbar.show();
+                            if(showError) {
+                                snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
+                                snackbar.show();
+                            }
                         }
                     });
                 } else {
@@ -169,5 +179,53 @@ public class WatchersFragment extends Fragment {
 
         emptyView.setVisibility(View.VISIBLE);
         emptyText.setText(R.string.watchers_empty_add);
+    }
+
+    public void deleteWatcher(final String id) {
+        new AlertDialog.Builder(getContext()).setMessage(R.string.watcher_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                progress.setVisibility(View.VISIBLE);
+                listRecycler.setClickable(false);
+
+                Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        progress.setVisibility(View.GONE);
+                        listRecycler.setClickable(true);
+
+                        String message;
+                        if(response.code() == 200) {
+                            message = getString(R.string.watcher_delete_success);
+                        } else {
+                            if(response.code() == 400) {
+                                message = getString(R.string.error_watcher_400);
+                            } else if(response.code() == 401) {
+                                message = getString(R.string.error_watcher_401);
+                            } else {
+                                message = getString(R.string.error_general_server, "H" + response.code());
+                            }
+                        }
+
+                        snackbar = Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                        refreshList(false, false);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        t.printStackTrace();
+
+                        progress.setVisibility(View.GONE);
+                        listRecycler.setClickable(true);
+
+                        snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_SHORT);
+                        snackbar.show();
+                        refreshList(false, false);
+                    }
+                });
+            }
+        }).setNegativeButton(R.string.no, null).show();
     }
 }

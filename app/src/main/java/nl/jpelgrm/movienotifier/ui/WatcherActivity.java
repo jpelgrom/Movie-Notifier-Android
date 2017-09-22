@@ -1041,7 +1041,7 @@ public class WatcherActivity extends AppCompatActivity {
                 duplicateWatcher();
                 return true;
             case R.id.watcherMenuDelete:
-                new AlertDialog.Builder(this).setMessage(R.string.watcher_delete).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(this).setMessage(R.string.watcher_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
