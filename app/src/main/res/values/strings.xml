@@ -106,7 +106,10 @@
     <string name="user_settings_general_switch">Switch to this account</string>
     <string name="user_settings_general_switch_success">Switched active account</string>
     <string name="user_settings_general_success">Account updated</string>
+    <string name="user_settings_my_title">My account</string>
     <string name="user_settings_security_title">Security</string>
+    <string name="user_settings_security_password">Change password</string>
+    <string name="user_settings_security_password_success">Password updated</string>
     <string name="user_settings_security_delete">Delete account</string>
     <string name="user_settings_security_delete_confirm">Are you absolutely sure that you want to delete your account? All your watchers will be permanently deleted.</string>
     <string name="user_settings_security_delete_success">Deleted account</string>
@@ -114,6 +117,10 @@
     <string name="user_settings_security_logout_success">Logged out of account</string>
     <string name="user_settings_notifications_title">Notifications</string>
     <string name="user_settings_notifications_error">Sorry, it is not possible to change your notification preferences right now. Please try again later.</string>
+    <string name="user_settings_update_go">Update</string>
+    <string name="user_settings_update_name_success">Username updated</string>
+    <string name="user_settings_update_email_success">Email address updated</string>
+    <string name="user_settings_update_phone_success">Phone number updated</string>
 
     <string name="error_login_401">Your username and/or password is incorrect.</string>
     <string name="error_watchers_400">Sorry, please try again.</string>

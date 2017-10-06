@@ -53,6 +53,15 @@ public class SettingsActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void editUserDetail(String id, SettingsAccountUpdateFragment.UpdateMode mode) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                .replace(R.id.frame, SettingsAccountUpdateFragment.newInstance(id, mode), "settingsAccountUpdateFragment")
+                .addToBackStack(null)
+                .commit();
+    }
+
     public void hideUserWithMessage(boolean loginNext, String exclude, String message) {
         if(loginNext) {
             tryLoggingInNextUser(exclude);
@@ -64,6 +73,31 @@ public class SettingsActivity extends AppCompatActivity {
 
         if(getSupportFragmentManager().findFragmentByTag("settingsAccountFragment") != null) {
             getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    public void updatedUser(SettingsAccountUpdateFragment.UpdateMode mode) {
+        switch(mode) {
+            case NAME:
+                Snackbar.make(coordinator, R.string.user_settings_update_name_success, Snackbar.LENGTH_SHORT).show();
+                break;
+            case EMAIL:
+                Snackbar.make(coordinator, R.string.user_settings_update_email_success, Snackbar.LENGTH_SHORT).show();
+                break;
+            case PHONE:
+                Snackbar.make(coordinator, R.string.user_settings_update_phone_success, Snackbar.LENGTH_SHORT).show();
+                break;
+            case PASSWORD:
+                Snackbar.make(coordinator, R.string.user_settings_security_password_success, Snackbar.LENGTH_SHORT).show();
+                break;
+        }
+
+        if(getSupportFragmentManager().findFragmentByTag("settingsAccountUpdateFragment") != null) {
+            getSupportFragmentManager().popBackStack();
+        }
+
+        if(getSupportFragmentManager().findFragmentByTag("settingsAccountFragment") != null) {
+            ((SettingsAccountFragment) getSupportFragmentManager().findFragmentByTag("settingsAccountFragment")).updatedUser();
         }
     }
 

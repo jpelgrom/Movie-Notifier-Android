@@ -45,6 +45,10 @@ public class SettingsAccountFragment extends Fragment {
     @BindView(R.id.progress) ProgressBar progress;
 
     @BindView(R.id.accountSwitch) LinearLayout accountSwitch;
+    @BindView(R.id.accountName) DoubleRowIconPreferenceView accountName;
+    @BindView(R.id.accountEmail) DoubleRowIconPreferenceView accountEmail;
+    @BindView(R.id.accountPhone) DoubleRowIconPreferenceView accountPhone;
+    @BindView(R.id.accountPassword) LinearLayout accountPassword;
     @BindView(R.id.accountLogout) LinearLayout accountLogout;
     @BindView(R.id.accountDelete) LinearLayout accountDelete;
 
@@ -98,6 +102,30 @@ public class SettingsAccountFragment extends Fragment {
                 switchToThis();
             }
         });
+        accountName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME);
+            }
+        });
+        accountEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
+            }
+        });
+        accountPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editDetail(SettingsAccountUpdateFragment.UpdateMode.PHONE);
+            }
+        });
+        accountPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD);
+            }
+        });
         accountLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,8 +140,17 @@ public class SettingsAccountFragment extends Fragment {
         });
     }
 
+    public void updatedUser() {
+        user = DBHelper.getInstance(getContext()).getUserByID(id);
+        updateNotificationsList(); // 'Reset', otherwise the calls for clicks will be triggered
+        updateValues();
+    }
+
     private void updateValues() {
         accountSwitch.setVisibility(user.getID().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
+        accountName.setValue(user.getName());
+        accountEmail.setValue(user.getEmail());
+        accountPhone.setValue(user.getPhonenumber());
 
         for(int i = 0; i < notificationsList.getChildCount(); i++) {
             View view = notificationsList.getChildAt(i);
@@ -160,6 +197,10 @@ public class SettingsAccountFragment extends Fragment {
         notificationsWrapper.setVisibility(View.VISIBLE);
         notificationsList.setVisibility(typeList.size() > 0 ? View.VISIBLE : View.GONE);
         notificationsEmpty.setVisibility(typeList.size() > 0 ? View.GONE : View.VISIBLE);
+    }
+
+    private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
+        ((SettingsActivity) getActivity()).editUserDetail(user.getID(), mode);
     }
 
     private void update(User toUpdate) {
@@ -318,6 +359,10 @@ public class SettingsAccountFragment extends Fragment {
 
     private void setFieldsEnabled(boolean enabled) {
         accountSwitch.setClickable(enabled);
+        accountName.setClickable(enabled);
+        accountEmail.setClickable(enabled);
+        accountPhone.setClickable(enabled);
+        accountPassword.setClickable(enabled);
         accountDelete.setClickable(enabled);
         accountLogout.setClickable(enabled);
 
