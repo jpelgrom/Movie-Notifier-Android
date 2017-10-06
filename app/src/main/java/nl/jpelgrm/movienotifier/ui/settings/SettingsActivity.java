@@ -48,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                .replace(R.id.frame, SettingsAccountFragment.newInstance(id), "settingsAccountFragment")
+                .replace(R.id.frame, SettingsAccountOverviewFragment.newInstance(id), "settingsAccountOverviewFragment")
                 .addToBackStack(null)
                 .commit();
     }
@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
             Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT).show();
         }
 
-        if(getSupportFragmentManager().findFragmentByTag("settingsAccountFragment") != null) {
+        if(getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment") != null) {
             getSupportFragmentManager().popBackStack();
         }
     }
@@ -96,8 +96,8 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportFragmentManager().popBackStack();
         }
 
-        if(getSupportFragmentManager().findFragmentByTag("settingsAccountFragment") != null) {
-            ((SettingsAccountFragment) getSupportFragmentManager().findFragmentByTag("settingsAccountFragment")).updatedUser();
+        if(getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment") != null) {
+            ((SettingsAccountOverviewFragment) getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment")).updatedUser();
         }
     }
 

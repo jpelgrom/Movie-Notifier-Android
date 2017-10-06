@@ -39,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SettingsAccountFragment extends Fragment {
+public class SettingsAccountOverviewFragment extends Fragment {
     @BindView(R.id.accountCoordinator) CoordinatorLayout coordinator;
 
     @BindView(R.id.progress) ProgressBar progress;
@@ -63,8 +63,8 @@ public class SettingsAccountFragment extends Fragment {
 
     private SharedPreferences settings;
 
-    public static SettingsAccountFragment newInstance(String id) {
-        SettingsAccountFragment fragment = new SettingsAccountFragment();
+    public static SettingsAccountOverviewFragment newInstance(String id) {
+        SettingsAccountOverviewFragment fragment = new SettingsAccountOverviewFragment();
         Bundle args = new Bundle();
         args.putString("id", id);
         fragment.setArguments(args);
@@ -84,7 +84,7 @@ public class SettingsAccountFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings_account, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings_account_overview, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
