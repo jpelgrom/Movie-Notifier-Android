@@ -12,6 +12,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.ui.settings.SettingsActivity;
+import nl.jpelgrm.movienotifier.ui.view.FilterBottomSheet;
+import nl.jpelgrm.movienotifier.ui.view.SortBottomSheet;
 
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -50,6 +52,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case R.id.action_sort:
+                SortBottomSheet sortSheet = new SortBottomSheet();
+                sortSheet.show(getSupportFragmentManager(), sortSheet.getTag());
+                return true;
+            case R.id.action_filter:
+                FilterBottomSheet filterSheet = new FilterBottomSheet();
+                filterSheet.show(getSupportFragmentManager(), filterSheet.getTag());
+                return true;
             case R.id.action_settings:
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 return true;

@@ -22,6 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -51,7 +53,8 @@ public class WatchersFragment extends Fragment {
 
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    private ArrayList<Watcher> watchers = new ArrayList<>();
+    private List<Watcher> watchers = new ArrayList<>();
+    private List<Watcher> watchersSorted = new ArrayList<>();
     private WatchersAdapter adapter;
 
     private SharedPreferences settings;
@@ -115,11 +118,13 @@ public class WatchersFragment extends Fragment {
                         @Override
                         public void onResponse(Call<List<Watcher>> call, Response<List<Watcher>> response) {
                             listSwiper.setRefreshing(false);
+                            watchers = response.body();
+
                             if(response.code() == 200) {
-                                if(response.body().size() > 0) {
+                                if(watchers.size() > 0) {
                                     emptyView.setVisibility(View.GONE);
                                     listRecycler.setVisibility(View.VISIBLE);
-                                    adapter.swapItems(response.body());
+                                    filterAndSort();
                                 } else {
                                     showEmptyView();
                                 }
@@ -173,12 +178,92 @@ public class WatchersFragment extends Fragment {
         });
     }
 
+    public void filterAndSort() {
+        watchersSorted.clear();
+
+        // Filter
+        int filter = settings.getInt("listFilter", 0);
+        for(int i = 0; i < watchers.size(); i++) {
+            Watcher watcher = watchers.get(i);
+            boolean match = false;
+
+            if(filter == 0) {
+                match = true;
+            } else {
+                if((filter == 2 && watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis())
+                    || (filter == 1 && watcher.getEnd() < System.currentTimeMillis())
+                    || (filter == 3 && watcher.getBegin() > System.currentTimeMillis())) {
+                    match = true;
+                }
+            }
+
+            if(match) {
+                watchersSorted.add(watcher);
+            }
+        }
+
+        // Sort
+        int sort = settings.getInt("listSort", 0);
+        Comparator<Watcher> comparator;
+        switch(sort) {
+            case 1: // End (stop checking)
+                comparator = new Comparator<Watcher>() {
+                    @Override
+                    public int compare(Watcher w1, Watcher w2) {
+                        return Long.compare(w1.getEnd(), w2.getEnd());
+                    }
+                };
+                break;
+            case 2: // Start after (first showing)
+                comparator = new Comparator<Watcher>() {
+                    @Override
+                    public int compare(Watcher w1, Watcher w2) {
+                        return Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
+                    }
+                };
+                break;
+            case 3: // A-Z
+                comparator = new Comparator<Watcher>() {
+                    @Override
+                    public int compare(Watcher w1, Watcher w2) {
+                        return w1.getName().compareToIgnoreCase(w2.getName());
+                    }
+                };
+                break;
+            case 0: // Begin (start checking)
+            default:
+                comparator = new Comparator<Watcher>() {
+                    @Override
+                    public int compare(Watcher w1, Watcher w2) {
+                        return Long.compare(w1.getBegin(), w2.getBegin());
+                    }
+                };
+                break;
+        }
+        Collections.sort(watchersSorted, comparator);
+
+        // Show
+        adapter.swapItems(watchersSorted);
+
+        // Ensure the correct state is shown
+        if(watchersSorted.size() == 0) {
+            showEmptyView();
+        } else {
+            emptyView.setVisibility(View.GONE);
+            listRecycler.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void showEmptyView() {
         listSwiper.setRefreshing(false);
         listRecycler.setVisibility(View.GONE);
 
         emptyView.setVisibility(View.VISIBLE);
-        emptyText.setText(R.string.watchers_empty_add);
+        if(watchers.size() != 0 && watchersSorted.size() == 0) {
+            emptyText.setText(R.string.watchers_empty_filters);
+        } else {
+            emptyText.setText(R.string.watchers_empty_add);
+        }
     }
 
     public void deleteWatcher(final String id) {

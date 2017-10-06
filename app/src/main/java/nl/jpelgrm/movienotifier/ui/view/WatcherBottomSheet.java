@@ -86,7 +86,18 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     }
 
     @Override
+    public void onDismiss(DialogInterface dialog) {
+        dismissalTask();
+        super.onDismiss(dialog);
+    }
+
+    @Override
     public void onCancel(DialogInterface dialog) {
+        dismissalTask();
+        super.onCancel(dialog);
+    }
+
+    private void dismissalTask() {
         if(nfcAdapter != null) {
             nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
                 @Override
@@ -100,8 +111,6 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
                 }
             }, getActivity()); // Don't keep sharing this watcher when the sheet is dismissed, return something similar to Android Beam default
         }
-
-        super.onCancel(dialog);
     }
 
     @Override
@@ -135,18 +144,18 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         String activeEmoji;
         if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDD34"; // Red Circle ('live', active watcher)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
-        } else if(watcher.getBegin() < System.currentTimeMillis()) {
+            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
+        } else if(watcher.getEnd() < System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDCE6"; // Package ('archive', watcher is done and will not be active again)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
+            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
         } else {
             activeEmoji = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
+            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
         }
 
         String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
         String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
-        dates.setText(getContext().getString(R.string.watchers_bottomsheet_dates, startDate, endDate));
+        dates.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

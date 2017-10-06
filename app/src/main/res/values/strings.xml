@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Movie Notifier</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
     <string name="settings">Settings</string>
     <string name="viewedit">View &amp; edit details</string>
     <string name="share">Share</string>
@@ -39,13 +41,24 @@
     <string name="dismiss">Dismiss</string>
 
     <string name="watchers_empty_title">No watchers found</string>
+    <string name="watchers_empty_filters">Change your filter to view other watchers you already have. Create a new watcher using the button in the bottom-right corner.</string>
     <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
     <string name="watchers_empty_account">Sorry, you need an account to do that.</string>
     <string name="watchers_list_subtitle_date">%s Showings %s – %s</string>
-    <string name="watchers_bottomsheet_dates">Showings %s – %s</string>
-    <string name="watchers_bottomsheet_active_future">%s Watcher is planned to start on %s</string>
-    <string name="watchers_bottomsheet_active_now">%s Watcher is checking until %s</string>
-    <string name="watchers_bottomsheet_active_past">%s Watcher is archived since %s</string>
+    <string name="watchers_bottomsheet_watcher_dates">Showings %s – %s</string>
+    <string name="watchers_bottomsheet_watcher_active_future">%s Watcher is planned to start on %s</string>
+    <string name="watchers_bottomsheet_watcher_active_now">%s Watcher is checking until %s</string>
+    <string name="watchers_bottomsheet_watcher_active_past">%s Watcher is archived since %s</string>
+    <string name="watchers_bottomsheet_sort_title">Sort watchers</string>
+    <string name="watchers_bottomsheet_sort_begin">Start checking date</string>
+    <string name="watchers_bottomsheet_sort_end">Stop checking date</string>
+    <string name="watchers_bottomsheet_sort_startafter">First showing</string>
+    <string name="watchers_bottomsheet_sort_az">Alphabetically</string>
+    <string name="watchers_bottomsheet_filter_title">Filter watchers</string>
+    <string name="watchers_bottomsheet_filter_all">All watchers</string>
+    <string name="watchers_bottomsheet_filter_future">Planned watchers</string>
+    <string name="watchers_bottomsheet_filter_now">Currently active watchers</string>
+    <string name="watchers_bottomsheet_filter_past">Archived watchers</string>
 
     <string name="watcher_add_short">New watcher</string>
     <string name="watcher_add_long">Create a new watcher</string>

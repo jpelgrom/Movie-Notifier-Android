@@ -54,7 +54,7 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
         String status;
         if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
             status = "\uD83D\uDD34"; // Red Circle ('live', active watcher)
-        } else if(watcher.getBegin() < System.currentTimeMillis()) {
+        } else if(watcher.getEnd() < System.currentTimeMillis()) {
             status = "\uD83D\uDCE6"; // Package ('archive', watcher is done and will not be active again)
         } else {
             status = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
