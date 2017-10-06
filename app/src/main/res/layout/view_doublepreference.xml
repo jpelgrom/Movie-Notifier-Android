@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,31 +8,43 @@
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground"
     android:paddingStart="?attr/listPreferredItemPaddingLeft"
-    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/detailIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        android:padding="8dp"
-        tools:srcCompat="@drawable/ic_date_range"/>
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/ic_date_range" />
 
     <TextView
         android:id="@+id/detailTitle"
         style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/detailIcon"
-        tools:text="@string/watcher_filter_title_startafter"/>
+        android:layout_marginStart="32dp"
+        android:gravity="bottom"
+        app:layout_constraintBottom_toTopOf="@+id/detailValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/detailIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/watcher_filter_title_startafter" />
 
     <TextView
         android:id="@+id/detailValue"
         style="@style/TextAppearance.AppCompat.Small"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/detailTitle"
-        android:layout_toEndOf="@+id/detailIcon"
-        tools:text="Aug 24, 2017 19:16"/>
+        android:layout_marginStart="32dp"
+        android:gravity="top"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/detailIcon"
+        app:layout_constraintTop_toBottomOf="@+id/detailTitle"
+        tools:text="Aug 24, 2017 19:16" />
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

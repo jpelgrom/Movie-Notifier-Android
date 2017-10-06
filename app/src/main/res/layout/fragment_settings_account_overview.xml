@@ -51,10 +51,9 @@
                 android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
                 <android.support.v7.widget.AppCompatImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="8dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="32dp"
                     app:srcCompat="@drawable/ic_exit_to_app"/>
 
                 <TextView
@@ -118,10 +117,9 @@
                     android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
                     <android.support.v7.widget.AppCompatImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="32dp"
                         app:srcCompat="@drawable/ic_lock"/>
 
                     <TextView
@@ -143,10 +141,9 @@
                     android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
                     <android.support.v7.widget.AppCompatImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="32dp"
                         app:srcCompat="@drawable/ic_delete_grey"/>
 
                     <TextView
@@ -168,10 +165,9 @@
                     android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
                     <android.support.v7.widget.AppCompatImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:padding="8dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="32dp"
                         app:srcCompat="@drawable/ic_close_grey"/>
 
                     <TextView

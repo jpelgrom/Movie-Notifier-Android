@@ -79,10 +79,9 @@
 
                     <ImageView
                         android:id="@+id/watcherNameIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="28dp"
                         android:contentDescription="@string/watcher_basics_name"
                         android:layout_centerVertical="true"
                         app:srcCompat="@drawable/ic_text_fields"/>
@@ -121,10 +120,9 @@
 
                     <ImageView
                         android:id="@+id/watcherMovieIDIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="28dp"
                         android:contentDescription="@string/watcher_basics_movieid"
                         android:layout_centerVertical="true"
                         app:srcCompat="@drawable/ic_confirmation_number"/>
@@ -163,10 +161,9 @@
 
                     <ImageView
                         android:id="@+id/watcherCinemaIDIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="28dp"
                         android:contentDescription="@string/watcher_basics_cinemaid"
                         android:layout_centerVertical="true"
                         app:srcCompat="@drawable/ic_location"/>
