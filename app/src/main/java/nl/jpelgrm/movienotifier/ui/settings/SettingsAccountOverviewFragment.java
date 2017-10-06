@@ -14,12 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +27,9 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.models.error.Errors;
-import nl.jpelgrm.movienotifier.models.error.Message;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.NotificationTypeSettingView;
+import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,6 +39,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     @BindView(R.id.accountCoordinator) CoordinatorLayout coordinator;
 
     @BindView(R.id.progress) ProgressBar progress;
+    @BindView(R.id.main) ScrollView main;
+    @BindView(R.id.error) TextView error;
 
     @BindView(R.id.accountSwitch) LinearLayout accountSwitch;
     @BindView(R.id.accountName) DoubleRowIconPreferenceView accountName;
@@ -141,6 +139,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     public void updatedUser() {
+        error.setVisibility(View.GONE);
+
         user = DBHelper.getInstance(getContext()).getUserByID(id);
         updateNotificationsList(); // 'Reset', otherwise the calls for clicks will be triggered
         updateValues();
@@ -204,6 +204,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void update(User toUpdate) {
+        error.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
@@ -223,8 +224,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
                     Snackbar.make(coordinator, R.string.user_settings_general_success, Snackbar.LENGTH_SHORT).show();
                 } else {
-                    new AlertDialog.Builder(getContext()).setMessage(getErrorMessage(call, response))
-                            .setPositiveButton(R.string.ok, null).show();
+                    error.setVisibility(View.VISIBLE);
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+
+                    main.smoothScrollTo(0, 0);
                 }
 
                 updateValues();
@@ -234,14 +237,18 @@ public class SettingsAccountOverviewFragment extends Fragment {
             public void onFailure(Call<User> call, Throwable t) {
                 t.printStackTrace();
 
-                new AlertDialog.Builder(getContext()).setMessage(R.string.error_general_exception)
-                        .setPositiveButton(R.string.ok, null).show();
+                error.setVisibility(View.VISIBLE);
+                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+
+                main.smoothScrollTo(0, 0);
+
                 updateValues();
             }
         });
     }
 
     private void switchToThis() {
+        error.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
@@ -263,14 +270,16 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
                         updateValues();
                     } else {
-                        new AlertDialog.Builder(getContext()).setMessage(getContext().getString(R.string.error_general_server, "N200"))
-                                .setPositiveButton(R.string.ok, null).show();
+                        error.setVisibility(View.VISIBLE);
+                        error.setText(getContext().getString(R.string.error_general_server, "N200"));
+
+                        main.smoothScrollTo(0, 0);
                     }
                 } else {
-                    new AlertDialog.Builder(getContext())
-                            .setMessage(getContext().getString(R.string.error_general_server, "N200"))
-                            .setPositiveButton(R.string.ok, null)
-                            .show();
+                    error.setVisibility(View.VISIBLE);
+                    error.setText(getContext().getString(R.string.error_general_server, "N" + response.code()));
+
+                    main.smoothScrollTo(0, 0);
                 }
             }
 
@@ -281,10 +290,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
                 t.printStackTrace();
 
-                new AlertDialog.Builder(getContext())
-                        .setMessage(R.string.error_general_exception)
-                        .setPositiveButton(R.string.ok, null)
-                        .show();
+                error.setVisibility(View.VISIBLE);
+                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+
+                main.smoothScrollTo(0, 0);
             }
         });
     }
@@ -306,6 +315,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void delete() {
+        error.setVisibility(View.GONE);
+
         new AlertDialog.Builder(getContext()).setMessage(R.string.user_settings_security_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -333,10 +344,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
                                 ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser, user.getID(), getString(R.string.user_settings_security_delete_success));
                             }
                         } else {
-                            new AlertDialog.Builder(getContext())
-                                    .setMessage(getContext().getString(R.string.error_general_server, "N200"))
-                                    .setPositiveButton(R.string.ok, null)
-                                    .show();
+                            error.setVisibility(View.VISIBLE);
+                            error.setText(getContext().getString(R.string.error_general_server, "N" + response.code()));
+
+                            main.smoothScrollTo(0, 0);
                         }
                     }
 
@@ -347,10 +358,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
                         t.printStackTrace();
 
-                        new AlertDialog.Builder(getContext())
-                                .setMessage(R.string.error_general_exception)
-                                .setPositiveButton(R.string.ok, null)
-                                .show();
+                        error.setVisibility(View.VISIBLE);
+                        error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+
+                        main.smoothScrollTo(0, 0);
                     }
                 });
             }
@@ -398,45 +409,5 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 notificationsEmpty.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-    private String getErrorMessage(Call<User> call, Response<User> response) {
-        Gson gson = new GsonBuilder().create();
-        StringBuilder errorBuilder = new StringBuilder();
-
-        if(response.code() == 400) {
-            if(response.errorBody() != null) {
-                try {
-                    Errors errors = gson.fromJson(response.errorBody().string(), Errors.class);
-                    for(String errorString : errors.getErrors()) {
-                        if(!errorBuilder.toString().equals("")) {
-                            errorBuilder.append("\n");
-                        }
-                        errorBuilder.append(errorString);
-                    }
-                } catch(IOException e) {
-                    errorBuilder.append(getContext().getString(R.string.error_general_server, "I400"));
-                }
-            } else {
-                errorBuilder.append(getContext().getString(R.string.error_general_server, "N400"));
-            }
-
-            return errorBuilder.toString();
-        } else if(response.code() == 500){
-            if(response.errorBody() != null) {
-                try {
-                    Message message = gson.fromJson(response.errorBody().string(), Message.class);
-                    errorBuilder.append(message.getMessage());
-                } catch(IOException e) {
-                    errorBuilder.append("I500");
-                }
-            } else {
-                errorBuilder.append("N500");
-            }
-
-            return getContext().getString(R.string.error_general_message, errorBuilder.toString());
-        } else {
-            return getContext().getString(R.string.error_general_server, "H" + response.code());
-        }
     }
 }

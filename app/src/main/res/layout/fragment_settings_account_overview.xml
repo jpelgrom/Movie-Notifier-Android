@@ -17,6 +17,7 @@
         tools:visibility="visible"/>
 
     <ScrollView
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -25,6 +26,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:animateLayoutChanges="true">
+
+            <TextView
+                android:id="@+id/error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextError"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                android:paddingStart="72dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                tools:text="@string/error_general_message"
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:id="@+id/accountSwitch"

@@ -41,7 +41,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.text.WordUtils;
@@ -63,9 +62,9 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
-import nl.jpelgrm.movienotifier.models.error.Errors;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
+import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -850,30 +849,8 @@ public class WatcherActivity extends AppCompatActivity {
                         doneLoading();
                     } else {
                         setFieldsEditable(true);
-                        Gson gson = new GsonBuilder().create();
-                        StringBuilder errorBuilder = new StringBuilder();
 
-                        if(response.code() == 400) {
-                            if(response.errorBody() != null) {
-                                try {
-                                    Errors errors = gson.fromJson(response.errorBody().string(), Errors.class);
-                                    for(String errorString : errors.getErrors()) {
-                                        if(!errorBuilder.toString().equals("")) {
-                                            errorBuilder.append("\n");
-                                        }
-                                        errorBuilder.append(errorString);
-                                    }
-                                } catch(IOException e) {
-                                    errorBuilder.append(getString(R.string.error_general_server, "I400"));
-                                }
-                            } else {
-                                errorBuilder.append(getString(R.string.error_general_server, "N400"));
-                            }
-
-                            watcherError.setText(errorBuilder.toString());
-                        } else {
-                            watcherError.setText(getString(R.string.error_general_server, "H" + response.code()));
-                        }
+                        watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, response));
                         watcherError.setVisibility(View.VISIBLE);
 
                         main.smoothScrollTo(0, 0);
@@ -888,7 +865,7 @@ public class WatcherActivity extends AppCompatActivity {
                     progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
-                    watcherError.setText(R.string.error_general_exception);
+                    watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, null));
                     watcherError.setVisibility(View.VISIBLE);
 
                     main.smoothScrollTo(0, 0);

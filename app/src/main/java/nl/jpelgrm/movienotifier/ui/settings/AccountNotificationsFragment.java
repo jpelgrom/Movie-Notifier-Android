@@ -13,10 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +23,8 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.models.error.Errors;
-import nl.jpelgrm.movienotifier.models.error.Message;
 import nl.jpelgrm.movienotifier.ui.view.NotificationTypeView;
+import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -95,27 +90,7 @@ public class AccountNotificationsFragment extends Fragment {
 
                     error.setVisibility(View.GONE);
                 } else {
-                    Gson gson = new GsonBuilder().create();
-                    StringBuilder errorBuilder = new StringBuilder();
-
-                    if(response.code() == 500) {
-                        if(response.errorBody() != null) {
-                            try {
-                                Message message = gson.fromJson(response.errorBody().string(), Message.class);
-                                errorBuilder.append(message.getMessage());
-                            } catch(IOException e) {
-                                errorBuilder.append("I500");
-                            }
-                        } else {
-                            errorBuilder.append("N500");
-                        }
-
-                        error.setText(getString(R.string.error_general_message, errorBuilder.toString()));
-                    } else {
-                        errorBuilder.append(getString(R.string.error_general_server, "H" + response.code()));
-                        error.setText(errorBuilder.toString());
-                    }
-
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
                     error.setVisibility(View.VISIBLE);
                 }
             }
@@ -127,7 +102,7 @@ public class AccountNotificationsFragment extends Fragment {
                 setFieldsEnabled(true);
                 setProgressVisible(false);
 
-                error.setText(R.string.error_general_exception);
+                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
                 error.setVisibility(View.VISIBLE);
             }
         });
@@ -176,45 +151,7 @@ public class AccountNotificationsFragment extends Fragment {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
 
-                    Gson gson = new GsonBuilder().create();
-                    StringBuilder errorBuilder = new StringBuilder();
-
-                    if(response.code() == 400) {
-                        if(response.errorBody() != null) {
-                            try {
-                                Errors errors = gson.fromJson(response.errorBody().string(), Errors.class);
-                                for(String errorString : errors.getErrors()) {
-                                    if(!errorBuilder.toString().equals("")) {
-                                        errorBuilder.append("\n");
-                                    }
-                                    errorBuilder.append(errorString);
-                                }
-                            } catch(IOException e) {
-                                errorBuilder.append(getString(R.string.error_general_server, "I400"));
-                            }
-                        } else {
-                            errorBuilder.append(getString(R.string.error_general_server, "N400"));
-                        }
-
-                        error.setText(errorBuilder.toString());
-                    } else if(response.code() == 500){
-                        if(response.errorBody() != null) {
-                            try {
-                                Message message = gson.fromJson(response.errorBody().string(), Message.class);
-                                errorBuilder.append(message.getMessage());
-                            } catch(IOException e) {
-                                errorBuilder.append("I500");
-                            }
-                        } else {
-                            errorBuilder.append("N500");
-                        }
-
-                        error.setText(getString(R.string.error_general_message, errorBuilder.toString()));
-                    } else {
-                        errorBuilder.append(getString(R.string.error_general_server, "H" + response.code()));
-                        error.setText(errorBuilder.toString());
-                    }
-
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
                     error.setVisibility(View.VISIBLE);
                 }
             }
@@ -226,7 +163,7 @@ public class AccountNotificationsFragment extends Fragment {
 
                 t.printStackTrace();
 
-                error.setText(R.string.error_general_exception);
+                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
                 error.setVisibility(View.VISIBLE);
             }
         });

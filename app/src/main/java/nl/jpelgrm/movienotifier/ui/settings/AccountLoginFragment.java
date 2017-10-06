@@ -17,11 +17,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.IOException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -29,8 +24,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.models.UserLogin;
-import nl.jpelgrm.movienotifier.models.error.Errors;
-import nl.jpelgrm.movienotifier.models.error.Message;
+import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.UserValidation;
 import retrofit2.Call;
@@ -162,48 +156,7 @@ public class AccountLoginFragment extends Fragment {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
 
-                    if(response.code() == 401) {
-                        error.setText(R.string.error_login_401);
-                    } else {
-                        Gson gson = new GsonBuilder().create();
-                        StringBuilder errorBuilder = new StringBuilder();
-
-                        if(response.code() == 400) {
-                            if(response.errorBody() != null) {
-                                try {
-                                    Errors errors = gson.fromJson(response.errorBody().string(), Errors.class);
-                                    for(String errorString : errors.getErrors()) {
-                                        if(!errorBuilder.toString().equals("")) {
-                                            errorBuilder.append("\n");
-                                        }
-                                        errorBuilder.append(errorString);
-                                    }
-                                } catch(IOException e) {
-                                    errorBuilder.append(getString(R.string.error_general_server, "I400"));
-                                }
-                            } else {
-                                errorBuilder.append(getString(R.string.error_general_server, "N400"));
-                            }
-
-                            error.setText(errorBuilder.toString());
-                        } else if(response.code() == 500){
-                            if(response.errorBody() != null) {
-                                try {
-                                    Message message = gson.fromJson(response.errorBody().string(), Message.class);
-                                    errorBuilder.append(message.getMessage());
-                                } catch(IOException e) {
-                                    errorBuilder.append("I500");
-                                }
-                            } else {
-                                errorBuilder.append("N500");
-                            }
-
-                            error.setText(getString(R.string.error_general_message, errorBuilder.toString()));
-                        } else {
-                            error.setText(getString(R.string.error_general_server, "H" + response.code()));
-                        }
-                    }
-
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), response, true));
                     error.setVisibility(View.VISIBLE);
                 }
             }
@@ -215,7 +168,7 @@ public class AccountLoginFragment extends Fragment {
 
                 t.printStackTrace();
 
-                error.setText(R.string.error_general_exception);
+                error.setText(ErrorUtil.getErrorMessage(getContext(), null, true));
                 error.setVisibility(View.VISIBLE);
             }
         });
