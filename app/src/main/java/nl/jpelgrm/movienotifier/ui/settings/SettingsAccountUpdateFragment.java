@@ -222,6 +222,14 @@ public class SettingsAccountUpdateFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        validateTextHandler.removeCallbacksAndMessages(null);
+        validatePasswordHandler.removeCallbacksAndMessages(null);
+
+        super.onDestroy();
+    }
+
     private boolean validate() {
         switch(mode) {
             case NAME:

@@ -170,6 +170,16 @@ public class AccountAddFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        validateNameHandler.removeCallbacksAndMessages(null);
+        validateEmailHandler.removeCallbacksAndMessages(null);
+        validatePhoneHandler.removeCallbacksAndMessages(null);
+        validatePasswordHandler.removeCallbacksAndMessages(null);
+
+        super.onDestroy();
+    }
+
     private boolean validateName() {
         if(UserValidation.validateName(name.getText().toString())) {
             nameWrapper.setErrorEnabled(false);

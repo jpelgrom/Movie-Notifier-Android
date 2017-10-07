@@ -435,6 +435,13 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        validateCinemaIDHandler.removeCallbacksAndMessages(null);
+
+        super.onDestroy();
+    }
+
     private void getWatcher() {
         Call<Watcher> call = APIHelper.getInstance().getWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<Watcher>() {

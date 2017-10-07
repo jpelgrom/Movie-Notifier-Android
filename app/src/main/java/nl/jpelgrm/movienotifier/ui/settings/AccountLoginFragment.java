@@ -116,6 +116,14 @@ public class AccountLoginFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        validateNameHandler.removeCallbacksAndMessages(null);
+        validatePasswordHandler.removeCallbacksAndMessages(null);
+
+        super.onDestroy();
+    }
+
     private boolean validateName() {
         if(UserValidation.validateName(name.getText().toString())) {
             nameWrapper.setErrorEnabled(false);
