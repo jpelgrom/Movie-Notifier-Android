@@ -59,7 +59,7 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
 
     private void dismissalTask() {
         if(getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment") != null) {
-            ((WatchersFragment) getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment")).filterAndSort();
+            ((WatchersFragment) getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment")).filterAndSort(true);
         }
     }
 

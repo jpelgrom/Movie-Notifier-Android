@@ -121,13 +121,7 @@ public class WatchersFragment extends Fragment {
                             watchers = response.body();
 
                             if(response.code() == 200) {
-                                if(watchers.size() > 0) {
-                                    emptyView.setVisibility(View.GONE);
-                                    listRecycler.setVisibility(View.VISIBLE);
-                                    filterAndSort();
-                                } else {
-                                    showEmptyView();
-                                }
+                                filterAndSort(false);
                             } else {
                                 if(showError) {
                                     if(response.code() == 401) {
@@ -178,7 +172,7 @@ public class WatchersFragment extends Fragment {
         });
     }
 
-    public void filterAndSort() {
+    public void filterAndSort(boolean scrollToTop) {
         watchersSorted.clear();
 
         // Filter
@@ -204,46 +198,79 @@ public class WatchersFragment extends Fragment {
 
         // Sort
         int sort = settings.getInt("listSort", 0);
-        Comparator<Watcher> comparator;
-        switch(sort) {
-            case 1: // End (stop checking)
-                comparator = new Comparator<Watcher>() {
-                    @Override
-                    public int compare(Watcher w1, Watcher w2) {
-                        return Long.compare(w1.getEnd(), w2.getEnd());
-                    }
-                };
-                break;
-            case 2: // Start after (first showing)
-                comparator = new Comparator<Watcher>() {
-                    @Override
-                    public int compare(Watcher w1, Watcher w2) {
-                        return Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
-                    }
-                };
-                break;
-            case 3: // A-Z
-                comparator = new Comparator<Watcher>() {
-                    @Override
-                    public int compare(Watcher w1, Watcher w2) {
-                        return w1.getName().compareToIgnoreCase(w2.getName());
-                    }
-                };
-                break;
-            case 0: // Begin (start checking)
-            default:
-                comparator = new Comparator<Watcher>() {
-                    @Override
-                    public int compare(Watcher w1, Watcher w2) {
-                        return Long.compare(w1.getBegin(), w2.getBegin());
-                    }
-                };
-                break;
+
+        Comparator<Watcher> sortAZ = new Comparator<Watcher>() {
+            @Override
+            public int compare(Watcher w1, Watcher w2) {
+                return w1.getName().compareToIgnoreCase(w2.getName());
+            }
+        };
+
+        if(sort == 0) { // Automagic
+            // First separate by status
+            List<Watcher> watchersPast = new ArrayList<>();
+            List<Watcher> watchersNow = new ArrayList<>();
+            List<Watcher> watchersFuture = new ArrayList<>();
+            for(int i = 0; i < watchersSorted.size(); i++) {
+                Watcher watcher = watchersSorted.get(i);
+                if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
+                    watchersNow.add(watcher);
+                } else if(watcher.getEnd() < System.currentTimeMillis()) {
+                    watchersPast.add(watcher);
+                } else if(watcher.getBegin() > System.currentTimeMillis()) {
+                    watchersFuture.add(watcher);
+                }
+            }
+
+            // Sort by alphabet
+            Collections.sort(watchersPast, sortAZ);
+            Collections.sort(watchersNow, sortAZ);
+            Collections.sort(watchersFuture, sortAZ);
+
+            watchersSorted.clear();
+            watchersSorted.addAll(watchersNow);
+            watchersSorted.addAll(watchersFuture);
+            watchersSorted.addAll(watchersPast);
+        } else {
+            Comparator<Watcher> comparator;
+            switch(sort) {
+                case 2: // End (stop checking)
+                    comparator = new Comparator<Watcher>() {
+                        @Override
+                        public int compare(Watcher w1, Watcher w2) {
+                            return Long.compare(w1.getEnd(), w2.getEnd());
+                        }
+                    };
+                    break;
+                case 3: // Start after (first showing)
+                    comparator = new Comparator<Watcher>() {
+                        @Override
+                        public int compare(Watcher w1, Watcher w2) {
+                            return Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
+                        }
+                    };
+                    break;
+                case 4: // A-Z
+                    comparator = sortAZ;
+                    break;
+                case 1: // Begin (start checking)
+                default:
+                    comparator = new Comparator<Watcher>() {
+                        @Override
+                        public int compare(Watcher w1, Watcher w2) {
+                            return Long.compare(w1.getBegin(), w2.getBegin());
+                        }
+                    };
+                    break;
+            }
+            Collections.sort(watchersSorted, comparator);
         }
-        Collections.sort(watchersSorted, comparator);
 
         // Show
         adapter.swapItems(watchersSorted);
+        if(scrollToTop) {
+            ((LinearLayoutManager) listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+        }
 
         // Ensure the correct state is shown
         if(watchersSorted.size() == 0) {

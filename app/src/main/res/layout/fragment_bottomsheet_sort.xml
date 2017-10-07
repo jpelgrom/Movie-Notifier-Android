@@ -13,6 +13,30 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:text="@string/watchers_bottomsheet_sort_title"/>
 
+    <LinearLayout
+        android:id="@+id/sortAuto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/listPreferredItemHeightSmall"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+        android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="32dp"
+            app:srcCompat="@drawable/ic_assistant"/>
+
+        <TextView
+            android:id="@+id/sortAutoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:text="@string/watchers_bottomsheet_sort_auto"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/sortBegin"

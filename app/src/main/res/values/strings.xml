@@ -50,6 +50,7 @@
     <string name="watchers_bottomsheet_watcher_active_now">%s Watcher is checking until %s</string>
     <string name="watchers_bottomsheet_watcher_active_past">%s Watcher is archived since %s</string>
     <string name="watchers_bottomsheet_sort_title">Sort watchers</string>
+    <string name="watchers_bottomsheet_sort_auto">Automagically</string>
     <string name="watchers_bottomsheet_sort_begin">Start checking date</string>
     <string name="watchers_bottomsheet_sort_end">Stop checking date</string>
     <string name="watchers_bottomsheet_sort_startafter">First showing</string>

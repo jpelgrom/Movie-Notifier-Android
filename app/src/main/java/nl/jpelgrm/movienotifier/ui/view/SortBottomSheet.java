@@ -20,6 +20,8 @@ import nl.jpelgrm.movienotifier.ui.WatchersFragment;
 import static android.content.Context.MODE_PRIVATE;
 
 public class SortBottomSheet extends BottomSheetDialogFragment {
+    @BindView(R.id.sortAuto) LinearLayout sortAuto;
+    @BindView(R.id.sortAutoText) TextView sortAutoText;
     @BindView(R.id.sortBegin) LinearLayout sortBegin;
     @BindView(R.id.sortBeginText) TextView sortBeginText;
     @BindView(R.id.sortEnd) LinearLayout sortEnd;
@@ -54,7 +56,7 @@ public class SortBottomSheet extends BottomSheetDialogFragment {
 
     private void dismissalTask() {
         if(getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment") != null) {
-            ((WatchersFragment) getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment")).filterAndSort();
+            ((WatchersFragment) getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment")).filterAndSort(true);
         }
     }
 
@@ -71,46 +73,56 @@ public class SortBottomSheet extends BottomSheetDialogFragment {
     private void setupViews() {
         int pref = settings.getInt("listSort", 0);
         switch(pref) {
-            case 1: // End (stop checking)
+            case 1: // Begin (start checking)
+                sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                break;
+            case 2: // End (stop checking)
                 sortEndText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
-            case 2: // Start after (first showing)
+            case 3: // Start after (first showing)
                 sortStartAfterText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
-            case 3: // A-Z
+            case 4: // A-Z
                 sortAZText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
-            case 0: // Begin (start checking)
+            case 0: // Automagic (status, then A-Z)
             default:
-                sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                sortAutoText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
         }
 
-        sortBegin.setOnClickListener(new View.OnClickListener() {
+        sortAuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 settings.edit().putInt("listSort", 0).apply();
                 dismiss();
             }
         });
-        sortEnd.setOnClickListener(new View.OnClickListener() {
+        sortBegin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 settings.edit().putInt("listSort", 1).apply();
                 dismiss();
             }
         });
-        sortStartAfter.setOnClickListener(new View.OnClickListener() {
+        sortEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 settings.edit().putInt("listSort", 2).apply();
                 dismiss();
             }
         });
-        sortAZ.setOnClickListener(new View.OnClickListener() {
+        sortStartAfter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 settings.edit().putInt("listSort", 3).apply();
+                dismiss();
+            }
+        });
+        sortAZ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings.edit().putInt("listSort", 4).apply();
                 dismiss();
             }
         });
