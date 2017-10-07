@@ -209,19 +209,21 @@
                     android:id="@+id/end"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:detailIcon="@drawable/ic_notifications_off"
                     app:detailTitle="@string/watcher_date_title_end"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterStartAfter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_date_range"
+                    app:detailIcon="@drawable/ic_today"
                     app:detailTitle="@string/watcher_filter_title_startafter"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filterStartBefore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:detailIcon="@drawable/ic_event"
                     app:detailTitle="@string/watcher_filter_title_startbefore"/>
 
                 <TextView
