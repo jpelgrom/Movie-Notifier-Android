@@ -1,14 +1,20 @@
 [
-   {
-      "id":"CHAIN1",
-      "name":"Chain North"
-   },
-   {
-       "id": "CHAIN2",
-       "name": "Chain South"
-   },
-   {
-       "id": "LOCAL1",
-       "name": "Local Centre"
-   }
+    {
+        "id": "CHAIN1",
+        "name": "Chain North",
+        "lat": 0.000,
+        "lon": 0.000
+    },
+    {
+        "id": "CHAIN2",
+        "name": "Chain South",
+        "lat": 0.001,
+        "lon": 0.001
+    },
+    {
+        "id": "LOCAL1",
+        "name": "Local Centre",
+        "lat": 0.002,
+        "lon": 0.002
+    }
 ]
