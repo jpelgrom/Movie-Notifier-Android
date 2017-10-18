@@ -98,7 +98,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void dismissalTask() {
-        if(nfcAdapter != null) {
+        if(nfcAdapter != null && getActivity() != null && !getActivity().isFinishing()) {
             nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
                 @Override
                 public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
@@ -160,31 +160,31 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
                 dismiss();
+                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
             }
         });
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dismiss();
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID());
                 sendIntent.setType("text/plain");
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
-                dismiss();
             }
         });
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dismiss();
                 Fragment search = getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment");
                 if(search != null) {
                     ((WatchersFragment) search).deleteWatcher(watcher.getID());
                 }
-                dismiss();
             }
         });
 
