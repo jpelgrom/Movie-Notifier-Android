@@ -1,20 +1,29 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -39,8 +48,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SettingsMainFragment extends Fragment {
+    public final static int PERMISSION_LOCATION_AUTOCOMPLETE = 150;
+
+    @BindView(R.id.settingsCoordinator) CoordinatorLayout coordinator;
+
     @BindView(R.id.dayNight) DoubleRowIconPreferenceView dayNight;
     @BindView(R.id.location) DoubleRowIconPreferenceView location;
+    @BindView(R.id.autocomplete) SwitchCompat autocomplete;
 
     @BindView(R.id.accountsRecycler) RecyclerView accountsRecycler;
     @BindView(R.id.accountFlow) DoubleRowIconPreferenceView addAccount;
@@ -114,6 +128,12 @@ public class SettingsMainFragment extends Fragment {
                 }).setNegativeButton(R.string.cancel, null).show();
             }
         });
+        autocomplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setAutocompleteLocationPreference(isChecked);
+            }
+        });
 
         adapter = new AccountsAdapter(getContext(), users);
         accountsRecycler.setAdapter(adapter);
@@ -178,6 +198,12 @@ public class SettingsMainFragment extends Fragment {
         }
         location.setValue(locationPrefText);
 
+        boolean granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if(settings.getInt("prefAutocompleteLocation", -1) == 1 && !granted) {
+            settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // Turn off, we won't get the location anyway
+        }
+        autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
+
         int accounts = users.size();
         if(accounts == 0) {
             accountsRecycler.setVisibility(View.GONE);
@@ -218,6 +244,34 @@ public class SettingsMainFragment extends Fragment {
 
         settings.edit().putString("prefDefaultCinema", setTo).apply();
         updateValues();
+    }
+
+    private void setAutocompleteLocationPreference(boolean on) {
+        if(on) {
+            if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+                updateValues();
+            } else {
+                if(getActivity() != null && !getActivity().isFinishing()) {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        autocomplete.setChecked(false); // Wait for result until switch is set
+
+                        Snackbar.make(coordinator, R.string.settings_general_location_permission, Snackbar.LENGTH_LONG)
+                                .setAction(R.string.ok, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                                    }
+                                }).show();
+                    } else {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                    }
+                }
+            }
+        } else {
+            settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+            updateValues();
+        }
     }
 
     private void readCinemasJson() {
@@ -289,5 +343,19 @@ public class SettingsMainFragment extends Fragment {
             users = DBHelper.getInstance(getContext()).getUsers();
             updateValues();
         }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case PERMISSION_LOCATION_AUTOCOMPLETE: {
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+                } else {
+                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                }
+                break;
+            }
+        }
+        updateValues();
     }
 }

@@ -3,6 +3,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -39,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if(savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.frame, new SettingsMainFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.frame, new SettingsMainFragment(), "settingsMainFragment").commit();
         }
 
         settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
@@ -145,6 +146,20 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case SettingsMainFragment.PERMISSION_LOCATION_AUTOCOMPLETE:
+                if(getSupportFragmentManager().findFragmentByTag("settingsMainFragment") != null) {
+                    getSupportFragmentManager().findFragmentByTag("settingsMainFragment").onRequestPermissionsResult(requestCode, permissions, grantResults);
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
         }
     }
 }

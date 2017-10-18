@@ -1,10 +1,14 @@
 package nl.jpelgrm.movienotifier.ui;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -12,16 +16,19 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.text.emoji.widget.EmojiAppCompatEditText;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -31,7 +38,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -59,13 +65,16 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
+import nl.jpelgrm.movienotifier.data.CinemaIDAdapter;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
+import nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
+import nl.jpelgrm.movienotifier.util.LocationUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,6 +84,8 @@ public class WatcherActivity extends AppCompatActivity {
     enum Mode {
         VIEWING, EDITING
     }
+
+    private static final int PERMISSION_LOCATION_AUTOCOMPLETE = 151;
 
     @BindView(R.id.coordinator) CoordinatorLayout coordinator;
 
@@ -93,7 +104,9 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.watcherMovieIDWrapper) TextInputLayout watcherMovieIDWrapper;
     @BindView(R.id.watcherMovieID) AppCompatEditText watcherMovieID;
     @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
-    @BindView(R.id.watcherCinemaID) AppCompatAutoCompleteTextView watcherCinemaID;
+    @BindView(R.id.watcherCinemaID) InstantAutoComplete watcherCinemaID;
+    @BindView(R.id.autocompleteSuggestion) LinearLayout autocompleteSuggestion;
+    @BindView(R.id.autocompleteSuggestionCancel) AppCompatImageButton autocompleteSuggestionCancel;
 
     @BindView(R.id.begin) DoubleRowIconPreferenceView begin;
     @BindView(R.id.end) DoubleRowIconPreferenceView end;
@@ -128,6 +141,9 @@ public class WatcherActivity extends AppCompatActivity {
 
     private Mode mode = Mode.VIEWING;
     private List<Cinema> cinemas = null;
+    CinemaIDAdapter cinemaIDAdapter;
+
+    private LocationUtil locationUtil = new LocationUtil();
 
     Handler validateCinemaIDHandler = new Handler();
     Runnable validateCinemaIDRunnable = new Runnable() {
@@ -204,9 +220,9 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             }
         });
-        ArrayAdapter<Cinema> cinemaIDAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cinemas);
+        cinemaIDAdapter = new CinemaIDAdapter(this, R.layout.spinner_cinema, cinemas);
         watcherCinemaID.setAdapter(cinemaIDAdapter);
-        watcherCinemaID.setThreshold(1);
+        watcherCinemaID.setThreshold(0);
         watcherCinemaID.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -220,6 +236,28 @@ public class WatcherActivity extends AppCompatActivity {
                 validateCinemaIDHandler.postDelayed(validateCinemaIDRunnable, 1000);
             }
         });
+
+        if(settings.getInt("prefAutocompleteLocation", -1) == -1) {
+            autocompleteSuggestion.setVisibility(View.VISIBLE);
+            autocompleteSuggestion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    askForLocation();
+                }
+            });
+            autocompleteSuggestionCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                    autocompleteSuggestion.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            autocompleteSuggestion.setVisibility(View.GONE);
+            if(settings.getInt("prefAutocompleteLocation", -1) == 1) {
+                startLocation(true);
+            }
+        }
 
         begin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -426,6 +464,12 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        locationUtil.onStart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         settings = getSharedPreferences("settings", MODE_PRIVATE);
@@ -433,6 +477,12 @@ public class WatcherActivity extends AppCompatActivity {
         if(snackbar != null && snackbar.isShown()) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationUtil.onStop();
     }
 
     @Override
@@ -1057,5 +1107,66 @@ public class WatcherActivity extends AppCompatActivity {
 
     private abstract class PropResultListener {
         public abstract void gotResult(WatcherFilters.WatcherFilterValue value);
+    }
+
+    private void askForLocation() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+            autocompleteSuggestion.setVisibility(View.GONE);
+            startLocation(false);
+        } else {
+            if(!isFinishing()) {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                                }
+                            });
+                    snackbar.show();
+                } else {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                }
+            }
+        }
+    }
+
+    private void startLocation(boolean onCreate) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationUtil.setupGoogleClient(this, onCreate);
+            locationUtil.getLocation(this, new LocationUtil.LocationUtilRequest() {
+                @Override
+                public void onLocationReceived(Location location) {
+                    if(cinemaIDAdapter != null) {
+                        cinemaIDAdapter.setLocation(location);
+                    }
+                }
+
+                @Override
+                public Context getContext() {
+                    return WatcherActivity.this;
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case PERMISSION_LOCATION_AUTOCOMPLETE: {
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+                } else {
+                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                }
+                autocompleteSuggestion.setVisibility(View.GONE);
+                startLocation(false);
+                break;
+            }
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
     }
 }

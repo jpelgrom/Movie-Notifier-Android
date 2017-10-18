@@ -37,6 +37,15 @@
                 app:detailTitle="@string/settings_general_location_title"
                 app:detailValue="@string/settings_general_location_default"/>
 
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/autocomplete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/listPreferredItemHeight"
+                android:paddingStart="72dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:text="@string/settings_general_location_autocomplete"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -33,6 +33,8 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.android.support:support-emoji-appcompat:26.1.0'
 
+    implementation 'com.google.android.gms:play-services-location:11.4.2'
+
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 

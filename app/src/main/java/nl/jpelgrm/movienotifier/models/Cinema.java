@@ -9,6 +9,12 @@ public class Cinema {
     @Expose
     private String name;
 
+    @Expose
+    private Double lat;
+
+    @Expose
+    private Double lon;
+
     public String getId() {
         return id;
     }
@@ -23,6 +29,22 @@ public class Cinema {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getLatitude() {
+        return lat;
+    }
+
+    public void setLatitude(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLongitude() {
+        return lon;
+    }
+
+    public void setLongitude(Double lon) {
+        this.lon = lon;
     }
 
     @Override

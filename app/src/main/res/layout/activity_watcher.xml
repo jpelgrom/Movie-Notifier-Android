@@ -175,7 +175,7 @@
                         android:gravity="center_vertical"
                         android:layout_toEndOf="@+id/watcherCinemaIDIcon">
 
-                        <android.support.v7.widget.AppCompatAutoCompleteTextView
+                        <nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete
                             android:id="@+id/watcherCinemaID"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -189,6 +189,39 @@
                     </android.support.design.widget.TextInputLayout>
 
                 </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/autocompleteSuggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/listPreferredItemHeight"
+                    android:gravity="center_vertical"
+                    android:background="@color/suggestionBackground"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0"
+                        android:text="@string/settings_general_location_suggestion_autocomplete"/>
+
+                    <android.support.v7.widget.AppCompatImageButton
+                        android:id="@+id/autocompleteSuggestionCancel"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_margin="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_close_black"
+                        android:contentDescription="@string/cancel"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"

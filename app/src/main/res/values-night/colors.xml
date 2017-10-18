@@ -6,4 +6,6 @@
     <color name="toolbarBackgroundTransparent">@color/background_material_dark</color>
 
     <color name="dialogBackground">#303030</color>
+
+    <color name="suggestionBackground">#111111</color>
 </resources>
