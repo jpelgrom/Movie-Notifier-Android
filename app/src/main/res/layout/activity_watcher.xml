@@ -216,7 +216,7 @@
                         android:id="@+id/autocompleteSuggestionCancel"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_margin="8dp"
+                        android:layout_marginStart="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:srcCompat="@drawable/ic_close_black"
                         android:contentDescription="@string/cancel"/>

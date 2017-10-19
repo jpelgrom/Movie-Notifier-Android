@@ -1,16 +1,24 @@
 package nl.jpelgrm.movienotifier.ui;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,9 +38,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
+import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
+import nl.jpelgrm.movienotifier.util.DataUtil;
+import nl.jpelgrm.movienotifier.util.LocationUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,6 +52,8 @@ import retrofit2.Response;
 import static android.content.Context.MODE_PRIVATE;
 
 public class WatchersFragment extends Fragment {
+    public static final int PERMISSION_LOCATION_AUTOMAGIC = 153;
+
     @BindView(R.id.coordinator) CoordinatorLayout coordinator;
 
     @BindView(R.id.progress) ProgressBar progress;
@@ -49,6 +62,8 @@ public class WatchersFragment extends Fragment {
     @BindView(R.id.emptyText) TextView emptyText;
 
     @BindView(R.id.listSwiper) SwipeRefreshLayout listSwiper;
+    @BindView(R.id.automagicSuggestion) LinearLayout listAutomagicSuggestion;
+    @BindView(R.id.automagicSuggestionCancel) AppCompatImageButton listAutomagicSuggestionCancel;
     @BindView(R.id.listRecycler) RecyclerView listRecycler;
 
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -57,9 +72,23 @@ public class WatchersFragment extends Fragment {
     private List<Watcher> watchersSorted = new ArrayList<>();
     private WatchersAdapter adapter;
 
+    private List<Cinema> cinemas = null;
+
     private SharedPreferences settings;
 
+    private LocationUtil locationUtil = new LocationUtil();
+    private Location locationUser = null;
+
     private Snackbar snackbar;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        cinemas = DataUtil.readCinemasJson(getContext());
+
+        settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +107,9 @@ public class WatchersFragment extends Fragment {
                     snackbar.dismiss();
                 }
                 refreshList(true, true);
+                if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
+                    startLocation();
+                }
             }
         });
         adapter = new WatchersAdapter(getContext(), watchers);
@@ -92,6 +124,26 @@ public class WatchersFragment extends Fragment {
                 startActivity(new Intent(getContext(), WatcherActivity.class));
             }
         });
+
+        if(settings.getInt("prefAutomagicLocation", -1) == -1) {
+            listAutomagicSuggestion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    askForLocation();
+                }
+            });
+            listAutomagicSuggestionCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
+                    listAutomagicSuggestion.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
+                startLocation();
+            }
+        }
     }
 
     @Override
@@ -104,6 +156,21 @@ public class WatchersFragment extends Fragment {
         }
 
         refreshList(false, true);
+        if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
+            startLocation();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        locationUtil.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        locationUtil.onStop();
     }
 
     private void refreshList(final boolean userTriggered, final boolean showError) {
@@ -207,29 +274,61 @@ public class WatchersFragment extends Fragment {
         };
 
         if(sort == 0) { // Automagic
+            boolean highlightNearby = false;
+            Cinema nearby = null;
+            if(settings.getInt("prefAutomagicLocation", -1) == 1
+                    && locationUser != null
+                    && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                nearby = locationUtil.getClosestCinema(locationUser, cinemas);
+                if(nearby != null && LocationUtil.getDistance(locationUser, nearby.getLatitude(), nearby.getLongitude()) < 2000) {
+                    highlightNearby = true;
+                }
+            }
+
             // First separate by status
+            List<Watcher> watchersPastNearby = new ArrayList<>();
             List<Watcher> watchersPast = new ArrayList<>();
+            List<Watcher> watchersNowNearby = new ArrayList<>();
             List<Watcher> watchersNow = new ArrayList<>();
+            List<Watcher> watchersFutureNearby = new ArrayList<>();
             List<Watcher> watchersFuture = new ArrayList<>();
             for(int i = 0; i < watchersSorted.size(); i++) {
                 Watcher watcher = watchersSorted.get(i);
                 if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
-                    watchersNow.add(watcher);
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                        watchersNowNearby.add(watcher);
+                    } else {
+                        watchersNow.add(watcher);
+                    }
                 } else if(watcher.getEnd() < System.currentTimeMillis()) {
-                    watchersPast.add(watcher);
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                        watchersPastNearby.add(watcher);
+                    } else {
+                        watchersPast.add(watcher);
+                    }
                 } else if(watcher.getBegin() > System.currentTimeMillis()) {
-                    watchersFuture.add(watcher);
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                        watchersFutureNearby.add(watcher);
+                    } else {
+                        watchersFuture.add(watcher);
+                    }
                 }
             }
 
             // Sort by alphabet
+            Collections.sort(watchersPastNearby, sortAZ);
             Collections.sort(watchersPast, sortAZ);
+            Collections.sort(watchersNowNearby, sortAZ);
             Collections.sort(watchersNow, sortAZ);
+            Collections.sort(watchersFutureNearby, sortAZ);
             Collections.sort(watchersFuture, sortAZ);
 
             watchersSorted.clear();
+            watchersSorted.addAll(watchersNowNearby);
             watchersSorted.addAll(watchersNow);
+            watchersSorted.addAll(watchersFutureNearby);
             watchersSorted.addAll(watchersFuture);
+            watchersSorted.addAll(watchersPastNearby);
             watchersSorted.addAll(watchersPast);
         } else {
             Comparator<Watcher> comparator;
@@ -278,11 +377,18 @@ public class WatchersFragment extends Fragment {
         } else {
             emptyView.setVisibility(View.GONE);
             listRecycler.setVisibility(View.VISIBLE);
+
+            if(sort == 0 && settings.getInt("prefAutomagicLocation", -1) == -1) {
+                listAutomagicSuggestion.setVisibility(View.VISIBLE);
+            } else {
+                listAutomagicSuggestion.setVisibility(View.GONE);
+            }
         }
     }
 
     private void showEmptyView() {
         listSwiper.setRefreshing(false);
+        listAutomagicSuggestion.setVisibility(View.GONE);
         listRecycler.setVisibility(View.GONE);
 
         emptyView.setVisibility(View.VISIBLE);
@@ -339,5 +445,65 @@ public class WatchersFragment extends Fragment {
                 });
             }
         }).setNegativeButton(R.string.no, null).show();
+    }
+
+    private void askForLocation() {
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            settings.edit().putInt("prefAutomagicLocation", 1).apply();
+            listAutomagicSuggestion.setVisibility(View.GONE);
+            startLocation();
+        } else {
+            if(!getActivity().isFinishing()) {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC);
+                                }
+                            });
+                    snackbar.show();
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC);
+                }
+            }
+        }
+    }
+
+    private void startLocation() {
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationUtil.setupGoogleClient(getContext(), false);
+            locationUtil.getLocation(getContext(), new LocationUtil.LocationUtilRequest() {
+                @Override
+                public void onLocationReceived(Location location, boolean isCachedResult) {
+                    locationUser = location;
+                    if(!isCachedResult && !listSwiper.isRefreshing()) {
+                        filterAndSort(true);
+                    }
+                }
+
+                @Override
+                public Context getContext() {
+                    return WatchersFragment.this.getContext();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case PERMISSION_LOCATION_AUTOMAGIC:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    settings.edit().putInt("prefAutomagicLocation", 1).apply();
+                    startLocation();
+                } else {
+                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
+                }
+                listAutomagicSuggestion.setVisibility(View.GONE);
+                break;
+        }
     }
 }

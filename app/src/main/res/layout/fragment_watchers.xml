@@ -61,13 +61,54 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/listRecycler"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                android:visibility="gone"
-                tools:visiblity="visible"/>
+                android:orientation="vertical"
+                android:animateLayoutChanges="true">
+
+                <LinearLayout
+                    android:id="@+id/automagicSuggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/listPreferredItemHeight"
+                    android:gravity="center_vertical"
+                    android:background="@color/suggestionBackground"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0"
+                        android:text="@string/settings_general_location_suggestion_automagic"/>
+
+                    <android.support.v7.widget.AppCompatImageButton
+                        android:id="@+id/automagicSuggestionCancel"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_close_black"
+                        android:contentDescription="@string/cancel"/>
+
+                </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/listRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:visibility="gone"
+                    tools:visiblity="visible"/>
+
+            </LinearLayout>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 

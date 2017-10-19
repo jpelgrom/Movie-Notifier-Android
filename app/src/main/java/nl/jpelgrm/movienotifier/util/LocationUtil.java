@@ -15,14 +15,16 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Locale;
+
+import nl.jpelgrm.movienotifier.models.Cinema;
 
 public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private GoogleApiClient googleClient;
     private boolean ready = false;
-    private List<LocationUtilRequest> queue = new ArrayList<>();
+    private ArrayDeque<LocationUtilRequest> queue = new ArrayDeque<>();
 
     public void setupGoogleClient(Context context, boolean onCreate) {
         if(googleClient == null) {
@@ -54,13 +56,13 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, Google
     public void getLocation(Context context, final LocationUtilRequest request) {
         if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if(ready) { // Immediately give something back as well, improves UI speed while we wait for a fresh location
-                request.onLocationReceived(LocationServices.FusedLocationApi.getLastLocation(googleClient));
+                request.onLocationReceived(LocationServices.FusedLocationApi.getLastLocation(googleClient), true);
             }
 
             queue.add(request);
             checkQueue();
         } else {
-            request.onLocationReceived(null);
+            request.onLocationReceived(null, false);
         }
     }
 
@@ -71,25 +73,27 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, Google
     }
 
     private void processQueue() {
-        if(ContextCompat.checkSelfPermission(queue.get(0).getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            LocationRequest googleRequest = new LocationRequest();
-            googleRequest.setInterval(2500);
-            googleRequest.setFastestInterval(2500);
-            googleRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        if(ContextCompat.checkSelfPermission(queue.getFirst().getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && googleClient != null) {
+            if(googleClient.isConnected()) {
+                LocationRequest googleRequest = new LocationRequest();
+                googleRequest.setInterval(2500);
+                googleRequest.setFastestInterval(2500);
+                googleRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleClient, googleRequest, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    for(LocationUtilRequest request : queue) {
-                        request.onLocationReceived(location);
-                        queue.remove(request);
+                LocationServices.FusedLocationApi.requestLocationUpdates(googleClient, googleRequest, new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        for(LocationUtilRequest request : queue) {
+                            request.onLocationReceived(location, false);
+                            queue.remove(request);
+                        }
+                        LocationServices.FusedLocationApi.removeLocationUpdates(googleClient, this);
                     }
-                    LocationServices.FusedLocationApi.removeLocationUpdates(googleClient, this);
-                }
-            });
+                });
+            } // else onConnected should be called soon and execute this code
         } else {
             for(LocationUtilRequest request : queue) {
-                request.onLocationReceived(null);
+                request.onLocationReceived(null, false);
                 queue.remove(request);
             }
         }
@@ -134,8 +138,22 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, Google
         return getFormattedDistance(loc1, loc2);
     }
 
+    public Cinema getClosestCinema(Location location, List<Cinema> cinemas) {
+        Cinema closest = null;
+        for(Cinema cinema: cinemas) {
+            if(cinema.getLatitude() != null && cinema.getLongitude() != null) {
+                float distance = getDistance(location, cinema.getLatitude(), cinema.getLongitude());
+                if(closest == null || distance < getDistance(location, closest.getLatitude(), closest.getLongitude())) {
+                    closest = cinema;
+                }
+            }
+        }
+
+        return closest;
+    }
+
     public interface LocationUtilRequest {
-        void onLocationReceived(Location location);
+        void onLocationReceived(Location location, boolean isCachedResult);
         Context getContext();
     }
 }

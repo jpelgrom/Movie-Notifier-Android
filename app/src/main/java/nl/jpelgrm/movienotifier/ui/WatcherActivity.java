@@ -46,14 +46,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import org.apache.commons.lang3.text.WordUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -72,6 +66,7 @@ import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete;
+import nl.jpelgrm.movienotifier.util.DataUtil;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.LocationUtil;
@@ -188,7 +183,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         setupSharedInfo();
-        readCinemasJson();
+        cinemas = DataUtil.readCinemasJson(this);
 
         watcherName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -238,7 +233,6 @@ public class WatcherActivity extends AppCompatActivity {
         });
 
         if(settings.getInt("prefAutocompleteLocation", -1) == -1) {
-            autocompleteSuggestion.setVisibility(View.VISIBLE);
             autocompleteSuggestion.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -574,6 +568,8 @@ public class WatcherActivity extends AppCompatActivity {
             foundCinema = watcher.getFilters().getCinemaID();
         }
         watcherCinemaID.setText(foundCinema);
+
+        autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
         begin.setValue(format.format(new Date(watcher.getBegin())));
@@ -1088,23 +1084,6 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
-    private void readCinemasJson() {
-        String json = null;
-        try {
-            InputStream inputStream = getAssets().open("cinemas.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Type listType = new TypeToken<List<Cinema>>() {}.getType();
-        cinemas = new Gson().fromJson(json, listType);
-    }
-
     private abstract class PropResultListener {
         public abstract void gotResult(WatcherFilters.WatcherFilterValue value);
     }
@@ -1117,7 +1096,7 @@ public class WatcherActivity extends AppCompatActivity {
         } else {
             if(!isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission, Snackbar.LENGTH_LONG)
+                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                             .setAction(R.string.ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -1137,7 +1116,7 @@ public class WatcherActivity extends AppCompatActivity {
             locationUtil.setupGoogleClient(this, onCreate);
             locationUtil.getLocation(this, new LocationUtil.LocationUtilRequest() {
                 @Override
-                public void onLocationReceived(Location location) {
+                public void onLocationReceived(Location location, boolean isCachedResult) {
                     if(cinemaIDAdapter != null) {
                         cinemaIDAdapter.setLocation(location);
                     }
@@ -1157,11 +1136,13 @@ public class WatcherActivity extends AppCompatActivity {
             case PERMISSION_LOCATION_AUTOCOMPLETE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+                    startLocation(false);
                 } else {
+                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar.show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply();
                 }
                 autocompleteSuggestion.setVisibility(View.GONE);
-                startLocation(false);
                 break;
             }
             default:

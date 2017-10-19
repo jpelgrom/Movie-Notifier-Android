@@ -13,11 +13,15 @@
     <string name="settings_general_daynight_auto">Change automatically</string>
     <string name="settings_general_daynight_day">Always use day mode</string>
     <string name="settings_general_daynight_night">Always use night mode</string>
+    <string name="settings_general_daynight_location">Improve accuracy of time used for day/night mode switch</string>
     <string name="settings_general_location_title">Default location for new watchers</string>
     <string name="settings_general_location_default">Not set</string>
-    <string name="settings_general_location_autocomplete">Use my location to improve watcher location suggestions</string>
+    <string name="settings_general_location_autocomplete">Sort watcher location suggestions by distance from my location</string>
+    <string name="settings_general_location_automagic">Use my location to make automagic sorting smarter</string>
     <string name="settings_general_location_suggestion_autocomplete">Tap to improve location suggestions by allowing Movie Notifier to use your location</string>
-    <string name="settings_general_location_permission">We\'ll need access to your location to enable this feature</string>
+    <string name="settings_general_location_suggestion_automagic">Tap to make automagic sorting smarter by allowing Movie Notifier to use your location</string>
+    <string name="settings_general_location_permission_rationale">We\'ll need access to your location to enable this feature</string>
+    <string name="settings_general_location_permission_denied">Sorry, but this feature won\'t work without access to your location</string>
 
     <string name="account_start_title">Hi there!</string>
     <string name="account_start_subtitle">Welcome to Movie Notifier</string>

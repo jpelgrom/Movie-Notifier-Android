@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settingsCoordinator"
     android:layout_width="match_parent"
@@ -11,7 +12,8 @@
 
         <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true">
 
             <TextView
                 android:layout_width="match_parent"
@@ -29,6 +31,20 @@
                 app:detailTitle="@string/settings_general_daynight_title"
                 app:detailValue="@string/settings_general_daynight_auto"/>
 
+            <TextView
+                android:id="@+id/dayNightLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/listPreferredItemHeight"
+                android:background="?attr/selectableItemBackground"
+                android:paddingStart="72dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:gravity="center_vertical"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:text="@string/settings_general_daynight_location"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
             <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                 android:id="@+id/location"
                 android:layout_width="match_parent"
@@ -45,6 +61,15 @@
                 android:paddingStart="72dp"
                 android:paddingEnd="?attr/listPreferredItemPaddingRight"
                 android:text="@string/settings_general_location_autocomplete"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/automagic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/listPreferredItemHeight"
+                android:paddingStart="72dp"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:text="@string/settings_general_location_automagic"/>
 
             <TextView
                 android:layout_width="match_parent"

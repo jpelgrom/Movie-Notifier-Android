@@ -24,13 +24,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,18 +38,23 @@ import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
+import nl.jpelgrm.movienotifier.util.DataUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SettingsMainFragment extends Fragment {
     public final static int PERMISSION_LOCATION_AUTOCOMPLETE = 150;
+    public static final int PERMISSION_LOCATION_AUTOMAGIC = 152;
+    public static final int PERMISSION_LOCATION_DAYNIGHT = 154;
 
     @BindView(R.id.settingsCoordinator) CoordinatorLayout coordinator;
 
     @BindView(R.id.dayNight) DoubleRowIconPreferenceView dayNight;
+    @BindView(R.id.dayNightLocation) TextView dayNightLocation;
     @BindView(R.id.location) DoubleRowIconPreferenceView location;
     @BindView(R.id.autocomplete) SwitchCompat autocomplete;
+    @BindView(R.id.automagic) SwitchCompat automagic;
 
     @BindView(R.id.accountsRecycler) RecyclerView accountsRecycler;
     @BindView(R.id.accountFlow) DoubleRowIconPreferenceView addAccount;
@@ -103,6 +103,24 @@ public class SettingsMainFragment extends Fragment {
                 }).setNegativeButton(R.string.cancel, null).show();
             }
         });
+        dayNightLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getActivity() != null && !getActivity().isFinishing()) {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                                .setAction(R.string.ok, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
+                                    }
+                                }).show();
+                    } else {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
+                    }
+                }
+            }
+        });
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +150,12 @@ public class SettingsMainFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setAutocompleteLocationPreference(isChecked);
+            }
+        });
+        automagic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setAutomagicLocationPreference(isChecked);
             }
         });
 
@@ -181,6 +205,9 @@ public class SettingsMainFragment extends Fragment {
                 dayNight.setValue(R.string.settings_general_daynight_auto);
                 break;
         }
+        dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO
+                && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                ? View.VISIBLE : View.GONE);
 
         String locationPreference = settings.getString("prefDefaultCinema", "");
         String locationPrefText = "";
@@ -202,7 +229,11 @@ public class SettingsMainFragment extends Fragment {
         if(settings.getInt("prefAutocompleteLocation", -1) == 1 && !granted) {
             settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // Turn off, we won't get the location anyway
         }
+        if(settings.getInt("prefAutomagicLocation", -1) == 1 && !granted) {
+            settings.edit().putInt("prefAutomagicLocation", 0).apply(); // Turn off, we won't get the location anyway
+        }
         autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
+        automagic.setChecked(settings.getInt("prefAutomagicLocation", -1) == 1 && granted);
 
         int accounts = users.size();
         if(accounts == 0) {
@@ -247,49 +278,44 @@ public class SettingsMainFragment extends Fragment {
     }
 
     private void setAutocompleteLocationPreference(boolean on) {
+        setLocationPreference(on, "prefAutocompleteLocation", autocomplete, PERMISSION_LOCATION_AUTOCOMPLETE);
+    }
+
+    private void setAutomagicLocationPreference(boolean on) {
+        setLocationPreference(on, "prefAutomagicLocation", automagic, PERMISSION_LOCATION_AUTOMAGIC);
+    }
+
+    private void setLocationPreference(boolean on, String prefKey, SwitchCompat check, final int requestCode) {
         if(on) {
             if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                settings.edit().putInt("prefAutocompleteLocation", 1).apply();
+                settings.edit().putInt(prefKey, 1).apply();
                 updateValues();
             } else {
                 if(getActivity() != null && !getActivity().isFinishing()) {
                     if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        autocomplete.setChecked(false); // Wait for result until switch is set
+                        check.setChecked(false); // Wait for result until switch is set
 
-                        Snackbar.make(coordinator, R.string.settings_general_location_permission, Snackbar.LENGTH_LONG)
+                        Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                                 .setAction(R.string.ok, new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
                                     }
                                 }).show();
                     } else {
-                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
                     }
                 }
             }
         } else {
-            settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+            settings.edit().putInt(prefKey, 0).apply();
             updateValues();
         }
     }
 
     private void readCinemasJson() {
         // Data
-        String json = null;
-        try {
-            InputStream inputStream = getContext().getAssets().open("cinemas.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Type listType = new TypeToken<List<Cinema>>() {}.getType();
-        cinemas = new Gson().fromJson(json, listType);
+        cinemas = DataUtil.readCinemasJson(getContext());
 
         // Dialog
         List<String> choices = new ArrayList<>();
@@ -347,14 +373,31 @@ public class SettingsMainFragment extends Fragment {
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch(requestCode) {
-            case PERMISSION_LOCATION_AUTOCOMPLETE: {
+            case PERMISSION_LOCATION_AUTOCOMPLETE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
                 } else {
+                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                    settings.edit().putInt("prefAutomagicLocation", 0).apply(); // The other one also won't be possible now
                 }
                 break;
-            }
+            case PERMISSION_LOCATION_AUTOMAGIC:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    settings.edit().putInt("prefAutomagicLocation", 1).apply();
+                } else {
+                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
+                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
+                    settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // The other one also won't be possible now
+                }
+                break;
+            case PERMISSION_LOCATION_DAYNIGHT:
+                if(grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
+                    settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // These also won't be possible now
+                    settings.edit().putInt("prefAutomagicLocation", 0).apply(); // These also won't be possible now
+                } // else if granted is handled by updateValues();
+                break;
         }
         updateValues();
     }
