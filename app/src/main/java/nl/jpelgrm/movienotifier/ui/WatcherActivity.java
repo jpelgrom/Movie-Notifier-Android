@@ -117,6 +117,7 @@ public class WatcherActivity extends AppCompatActivity {
     @BindView(R.id.filterDolbyAtmos) DoubleRowIconPreferenceView filterAtmos;
     @BindView(R.id.filterOV) DoubleRowIconPreferenceView filterOV;
     @BindView(R.id.filterNL) DoubleRowIconPreferenceView filterNL;
+    @BindView(R.id.filter4DX) DoubleRowIconPreferenceView filter4DX;
     @BindView(R.id.filterDBOX) DoubleRowIconPreferenceView filterDBOX;
 
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -335,6 +336,12 @@ public class WatcherActivity extends AppCompatActivity {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setDutchVersion(value);
+            }
+        });
+        setOnPropClickListener(filter4DX, new PropResultListener() {
+            @Override
+            public void gotResult(WatcherFilters.WatcherFilterValue value) {
+                watcher.getFilters().set4DX(value);
             }
         });
         setOnPropClickListener(filterDBOX, new PropResultListener() {
@@ -614,6 +621,8 @@ public class WatcherActivity extends AppCompatActivity {
                     (watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             filterDBOX.setValue(watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
@@ -626,6 +635,7 @@ public class WatcherActivity extends AppCompatActivity {
             filterAtmos.setValue(R.string.watcher_filter_value_nopreference);
             filterOV.setValue(R.string.watcher_filter_value_nopreference);
             filterNL.setValue(R.string.watcher_filter_value_nopreference);
+            filter4DX.setValue(R.string.watcher_filter_value_nopreference);
             filterDBOX.setValue(R.string.watcher_filter_value_nopreference);
         }
     }
@@ -661,6 +671,7 @@ public class WatcherActivity extends AppCompatActivity {
         filterAtmos.setClickable(editable);
         filterOV.setClickable(editable);
         filterNL.setClickable(editable);
+        filter4DX.setClickable(editable);
         filterDBOX.setClickable(editable);
     }
 

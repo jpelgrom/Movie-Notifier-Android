@@ -47,6 +47,10 @@ public class WatcherFilters {
     @Expose
     private WatcherFilterValue laser = WatcherFilterValue.NOPREFERENCE;
 
+    @SerializedName("4dx")
+    @Expose
+    private WatcherFilterValue _4dx = WatcherFilterValue.NOPREFERENCE;
+
     @Expose
     private WatcherFilterValue dbox = WatcherFilterValue.NOPREFERENCE;
 
@@ -134,6 +138,14 @@ public class WatcherFilters {
 
     public void setLaser(WatcherFilterValue laser) {
         this.laser = laser;
+    }
+
+    public WatcherFilterValue is4DX() {
+        return _4dx;
+    }
+
+    public void set4DX(WatcherFilterValue _4dx) {
+        this._4dx = _4dx;
     }
 
     public WatcherFilterValue isDBOX() {
