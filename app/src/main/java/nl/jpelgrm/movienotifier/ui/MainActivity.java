@@ -1,6 +1,7 @@
 package nl.jpelgrm.movienotifier.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +10,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.Trigger;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
 import nl.jpelgrm.movienotifier.ui.settings.SettingsActivity;
 import nl.jpelgrm.movienotifier.ui.view.FilterBottomSheet;
 import nl.jpelgrm.movienotifier.ui.view.SortBottomSheet;
@@ -20,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     int dayNightPreference;
+    boolean setupCinemaListUpdates = false;
+    SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +44,17 @@ public class MainActivity extends AppCompatActivity {
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.frame, new WatchersFragment(), "watchersFragment").commit();
         }
+
+        settings = getSharedPreferences("settings", MODE_PRIVATE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(getSharedPreferences("settings", MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO) != dayNightPreference) {
+        if(settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO) != dayNightPreference) {
             recreate();
         }
+        setupCinemaListUpdates();
     }
 
     @Override
@@ -81,5 +94,27 @@ public class MainActivity extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
         }
+    }
+
+    private void setupCinemaListUpdates() {
+        if(setupCinemaListUpdates) { return; }
+
+        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+        Job updateJob = dispatcher.newJobBuilder()
+                .setService(CinemaUpdateJob.class)
+                .setTag("cinemasListUpdate")
+                .setRecurring(true)
+                .setLifetime(Lifetime.FOREVER)
+                .setTrigger(Trigger.executionWindow(0, 60 * 60 * 24 * 7 /* once a week */))
+                .setReplaceCurrent(true)
+                .build();
+        dispatcher.mustSchedule(updateJob);
+
+        // Also run immediately if the list has never been updated
+        if(settings.getLong("cinemasUpdated", -1) == -1) {
+            dispatcher.mustSchedule(CinemaUpdateJob.getJobToUpdateImmediately(dispatcher));
+        }
+
+        setupCinemaListUpdates = true;
     }
 }

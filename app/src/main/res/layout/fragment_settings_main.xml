@@ -52,6 +52,13 @@
                 app:detailTitle="@string/settings_general_location_title"
                 app:detailValue="@string/settings_general_location_default"/>
 
+            <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
+                android:id="@+id/service"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:detailTitle="@string/settings_general_location_service_title"
+                app:detailValue="@string/settings_general_location_service_lastupdate"/>
+
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/autocomplete"
                 android:layout_width="match_parent"

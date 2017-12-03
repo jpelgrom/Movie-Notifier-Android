@@ -3,9 +3,11 @@ package nl.jpelgrm.movienotifier.ui;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -25,6 +27,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.text.emoji.widget.EmojiAppCompatEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
@@ -60,13 +63,14 @@ import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.CinemaIDAdapter;
+import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
+import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete;
-import nl.jpelgrm.movienotifier.util.DataUtil;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.LocationUtil;
@@ -149,6 +153,13 @@ public class WatcherActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver broadcastComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            readCinemas();
+        }
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,7 +195,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         setupSharedInfo();
-        cinemas = DataUtil.readCinemasJson(this);
+        cinemas = DBHelper.getInstance(this).getCinemas();
 
         watcherName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -478,6 +489,15 @@ public class WatcherActivity extends AppCompatActivity {
         if(snackbar != null && snackbar.isShown()) {
             snackbar.dismiss();
         }
+
+        readCinemas();
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastComplete, new IntentFilter(CinemaUpdateJob.BROADCAST_COMPLETE));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastComplete);
     }
 
     @Override
@@ -566,7 +586,7 @@ public class WatcherActivity extends AppCompatActivity {
         String foundCinema = "";
         if(cinemas != null) {
             for(Cinema cinema : cinemas) {
-                if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+                if(cinema.getID().equals(watcher.getFilters().getCinemaID())) {
                     foundCinema = cinema.getName();
                 }
             }
@@ -770,7 +790,7 @@ public class WatcherActivity extends AppCompatActivity {
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getName().equals(foundName)) {
-                        foundID = cinema.getId();
+                        foundID = cinema.getID();
                     }
                 }
             }
@@ -1139,6 +1159,10 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void readCinemas() {
+        cinemas = DBHelper.getInstance(this).getCinemas();
     }
 
     @Override

@@ -10,13 +10,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "notifierlocalstore";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String CREATE_USERS_TABLE = "CREATE TABLE Users (ID TEXT PRIMARY KEY, Name TEXT, Email TEXT, Phone TEXT, Notifications TEXT, APIKey TEXT)";
+    private static final String CREATE_CINEMAS_TABLE = "CREATE TABLE Cinemas (ID TEXT PRIMARY KEY, Name TEXT, Lat TEXT, Lon TEXT)"; // TEXT is used instead of REAL for precision
 
     private static DBHelper instance;
 
@@ -34,13 +36,19 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_CINEMAS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if(oldVersion != newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS Users");
-            onCreate(db);
+            if(oldVersion == 2 && newVersion == 3) {
+                db.execSQL(CREATE_CINEMAS_TABLE);
+            } else { // Default
+                db.execSQL("DROP TABLE IF EXISTS Users");
+                db.execSQL("DROP TABLE IF EXISTS Cinemas");
+                onCreate(db);
+            }
         }
     }
 
@@ -105,6 +113,64 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             // Order of deletions is important when foreign key relationships exist.
             db.delete("Users", "ID=?", new String[] { ID });
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public void addCinema(Cinema cinema) {
+        if(getCinemaByID(cinema.getID()) != null) {
+            updateCinema(cinema);
+        } else {
+            SQLiteDatabase db = getWritableDatabase();
+            db.beginTransaction();
+            try {
+                db.insertOrThrow("Cinemas", null, cinema.toContentValues());
+                db.setTransactionSuccessful();
+            } catch(Exception e) {
+                e.printStackTrace();
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    public List<Cinema> getCinemas() {
+        List<Cinema> ret = new ArrayList<>();
+        List<ContentValues> rows = performSelect("SELECT * FROM Cinemas", null);
+        for (ContentValues cv : rows) {
+            Cinema cinema = new Cinema();
+            cinema.setContent(cv);
+            ret.add(cinema);
+        }
+        return ret;
+    }
+
+    public Cinema getCinemaByID(String ID) {
+        List<ContentValues> rows = performSelect("SELECT * FROM Cinemas WHERE ID=?", new String[] { ID });
+        if (rows.size() == 0) {
+            return null;
+        }
+
+        Cinema cinema = new Cinema();
+        cinema.setContent(rows.get(0));
+        return cinema;
+    }
+
+    public int updateCinema(Cinema cinema) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.update("Cinemas", cinema.toContentValues(), "ID=?", new String[] { cinema.getID() });
+    }
+
+    public void deleteCinema(String ID) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // Order of deletions is important when foreign key relationships exist.
+            db.delete("Cinemas", "ID=?", new String[] { ID });
             db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();

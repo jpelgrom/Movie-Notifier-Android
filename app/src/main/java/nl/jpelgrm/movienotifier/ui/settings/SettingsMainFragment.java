@@ -1,9 +1,11 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
@@ -26,7 +29,15 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,9 +47,9 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
+import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
-import nl.jpelgrm.movienotifier.util.DataUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,6 +64,7 @@ public class SettingsMainFragment extends Fragment {
     @BindView(R.id.dayNight) DoubleRowIconPreferenceView dayNight;
     @BindView(R.id.dayNightLocation) TextView dayNightLocation;
     @BindView(R.id.location) DoubleRowIconPreferenceView location;
+    @BindView(R.id.service) DoubleRowIconPreferenceView service;
     @BindView(R.id.autocomplete) SwitchCompat autocomplete;
     @BindView(R.id.automagic) SwitchCompat automagic;
 
@@ -68,11 +80,19 @@ public class SettingsMainFragment extends Fragment {
 
     private SharedPreferences settings;
 
+    private BroadcastReceiver broadcastComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            readCinemas();
+            updateValues();
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        readCinemasJson();
+        readCinemas();
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
@@ -128,7 +148,7 @@ public class SettingsMainFragment extends Fragment {
                 int currentValueIndex = 0;
                 if(cinemas != null) {
                     for(int i = 0; i < cinemas.size(); i++) {
-                        if(cinemas.get(i).getId().equals(currentPreference)) {
+                        if(cinemas.get(i).getID().equals(currentPreference)) {
                             currentValueIndex = i + 1;
                         }
                     }
@@ -144,6 +164,14 @@ public class SettingsMainFragment extends Fragment {
                         setCinemaPreference(which);
                     }
                 }).setNegativeButton(R.string.cancel, null).show();
+            }
+        });
+        service.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                service.setValue(R.string.settings_general_location_service_updating);
+                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getContext()));
+                dispatcher.mustSchedule(CinemaUpdateJob.getJobToUpdateImmediately(dispatcher));
             }
         });
         autocomplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -184,8 +212,19 @@ public class SettingsMainFragment extends Fragment {
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
+        readCinemas();
         updateValues();
         updateAccountsList();
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastComplete, new IntentFilter(CinemaUpdateJob.BROADCAST_COMPLETE));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(getContext() != null) {
+            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastComplete);
+        }
     }
 
     private void updateValues() {
@@ -217,13 +256,20 @@ public class SettingsMainFragment extends Fragment {
             locationPrefText = locationPreference;
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
-                    if(cinema.getId().equals(locationPreference)) {
+                    if(cinema.getID().equals(locationPreference)) {
                         locationPrefText = cinema.getName();
                     }
                 }
             }
         }
         location.setValue(locationPrefText);
+
+        if(settings.getLong("cinemasUpdated", -1) != -1) {
+            DateFormat format = SimpleDateFormat.getDateInstance(DateFormat.LONG);
+            service.setValue(getString(R.string.settings_general_location_service_lastupdate, format.format(new Date(settings.getLong("cinemasUpdated", -1)))));
+        } else {
+            service.setValue(getString(R.string.settings_general_location_service_lastupdate, getString(R.string.settings_general_location_service_never)));
+        }
 
         boolean granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         if(settings.getInt("prefAutocompleteLocation", -1) == 1 && !granted) {
@@ -267,7 +313,7 @@ public class SettingsMainFragment extends Fragment {
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getName().equals(chose)) {
-                        setTo = cinema.getId();
+                        setTo = cinema.getID();
                     }
                 }
             }
@@ -313,9 +359,15 @@ public class SettingsMainFragment extends Fragment {
         }
     }
 
-    private void readCinemasJson() {
+    private void readCinemas() {
         // Data
-        cinemas = DataUtil.readCinemasJson(getContext());
+        cinemas = DBHelper.getInstance(getContext()).getCinemas();
+        Collections.sort(cinemas, new Comparator<Cinema>() {
+            @Override
+            public int compare(Cinema c1, Cinema c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
 
         // Dialog
         List<String> choices = new ArrayList<>();

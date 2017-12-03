@@ -38,11 +38,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
+import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
-import nl.jpelgrm.movienotifier.util.DataUtil;
 import nl.jpelgrm.movienotifier.util.LocationUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -85,7 +85,7 @@ public class WatchersFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cinemas = DataUtil.readCinemasJson(getContext());
+        cinemas = DBHelper.getInstance(getContext()).getCinemas();
 
         settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
     }
@@ -295,19 +295,19 @@ public class WatchersFragment extends Fragment {
             for(int i = 0; i < watchersSorted.size(); i++) {
                 Watcher watcher = watchersSorted.get(i);
                 if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
                         watchersNowNearby.add(watcher);
                     } else {
                         watchersNow.add(watcher);
                     }
                 } else if(watcher.getEnd() < System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
                         watchersPastNearby.add(watcher);
                     } else {
                         watchersPast.add(watcher);
                     }
                 } else if(watcher.getBegin() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
                         watchersFutureNearby.add(watcher);
                     } else {
                         watchersFuture.add(watcher);

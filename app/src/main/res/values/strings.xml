@@ -16,6 +16,10 @@
     <string name="settings_general_daynight_location">Improve accuracy of time used for day/night mode switch</string>
     <string name="settings_general_location_title">Default location for new watchers</string>
     <string name="settings_general_location_default">Not set</string>
+    <string name="settings_general_location_service_title">Update cinema locations list</string>
+    <string name="settings_general_location_service_lastupdate">Last updated: %1$s</string>
+    <string name="settings_general_location_service_never">never</string>
+    <string name="settings_general_location_service_updating">Updating…</string>
     <string name="settings_general_location_autocomplete">Sort watcher location suggestions by distance from my location</string>
     <string name="settings_general_location_automagic">Use my location to make automagic sorting smarter</string>
     <string name="settings_general_location_suggestion_autocomplete">Tap to improve location suggestions by allowing Movie Notifier to use your location</string>

@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.data;
 
 import java.util.List;
 
+import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.models.UserLogin;
@@ -57,4 +58,9 @@ public interface APIClient {
 
     @GET("/notificationtype/{notificationtypekey}")
     Call<NotificationType> getNotificationType(@Header("APIKEY") String apikey, @Path("notificationtypekey") String notificationtypekey);
+
+
+    // Cinemas
+    @GET("/cinemas")
+    Call<List<Cinema>> getCinemas();
 }

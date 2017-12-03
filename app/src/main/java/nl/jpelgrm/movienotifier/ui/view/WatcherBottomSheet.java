@@ -129,7 +129,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         String foundCinema = "";
         if(cinemas != null) {
             for(Cinema cinema : cinemas) {
-                if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+                if(cinema.getID().equals(watcher.getFilters().getCinemaID())) {
                     foundCinema = cinema.getName();
                 }
             }
