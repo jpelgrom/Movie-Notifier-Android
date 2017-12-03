@@ -9,13 +9,18 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.DBHelper;
@@ -131,7 +136,7 @@ public class SettingsActivity extends AppCompatActivity {
             Fragment licenses = getSupportFragmentManager().findFragmentByTag("settingsLicensesFragment");
 
             if((account != null && account.isVisible()) || (update != null && update.isVisible())) {
-                hideLicensesItem();
+                showMenuItems(false);
 
                 User displayed = null;
                 if(lastUserID != null && !lastUserID.equals("")) {
@@ -143,24 +148,20 @@ public class SettingsActivity extends AppCompatActivity {
                     getSupportActionBar().setTitle(R.string.settings);
                 }
             } else if(licenses != null && licenses.isVisible()) {
-                hideLicensesItem();
+                showMenuItems(false);
                 getSupportActionBar().setTitle(R.string.settings_licenses);
             } else {
-                showLicensesItem();
+                showMenuItems(true);
                 getSupportActionBar().setTitle(R.string.settings);
             }
         }
     }
 
-    private void showLicensesItem() {
-        if(toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.licenses) != null) {
-            toolbar.getMenu().findItem(R.id.licenses).setVisible(true);
-        }
-    }
-
-    private void hideLicensesItem() {
-        if(toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.licenses) != null) {
-            toolbar.getMenu().findItem(R.id.licenses).setVisible(false);
+    private void showMenuItems(boolean visible) {
+        if(toolbar.getMenu() != null) {
+            for(int i = 0; i < toolbar.getMenu().size(); i++) {
+                toolbar.getMenu().getItem(i).setVisible(visible);
+            }
         }
     }
 
@@ -198,12 +199,27 @@ public class SettingsActivity extends AppCompatActivity {
         return null;
     }
 
+    private void showAboutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = View.inflate(this, R.layout.view_about, null);
+        builder.setView(dialogView);
+        builder.setCancelable(true);
+
+        ((TextView) dialogView.findViewById(R.id.version)).setText(getString(R.string.settings_about_version, BuildConfig.VERSION_NAME, String.valueOf(BuildConfig.VERSION_CODE)));
+        ((TextView) dialogView.findViewById(R.id.source)).setMovementMethod(new LinkMovementMethod());
+
+        builder.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
             case R.id.homeAsUp:
                 onBackPressed();
+                return true;
+            case R.id.about:
+                showAboutDialog();
                 return true;
             case R.id.licenses:
                 getSupportFragmentManager()

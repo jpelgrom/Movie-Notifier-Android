@@ -23,6 +23,11 @@
     <string name="settings_general_location_permission_rationale">We\'ll need access to your location to enable this feature</string>
     <string name="settings_general_location_permission_denied">Sorry, but this feature won\'t work without access to your location</string>
     <string name="settings_licenses">Licenses</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_name">Movie Notifier Android</string>
+    <string name="settings_about_version">Version %1$s, build %2$s</string>
+    <string name="settings_about_copyright">App © 2017 Joris Pelgröm\nService © 2017 Sijmen Huizenga</string>
+    <string name="settings_about_github"><a href='https://github.com/jpelgrom/Movie-Notifier-Android'>View source code</a></string>
 
     <string name="account_start_title">Hi there!</string>
     <string name="account_start_subtitle">Welcome to Movie Notifier</string>
