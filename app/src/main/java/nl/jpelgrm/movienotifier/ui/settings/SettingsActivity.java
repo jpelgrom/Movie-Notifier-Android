@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -26,6 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private SharedPreferences settings;
+    private String lastUserID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,24 +47,35 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                updateTitle();
+            }
+        });
     }
 
     public void showUser(String id) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                 .replace(R.id.frame, SettingsAccountOverviewFragment.newInstance(id), "settingsAccountOverviewFragment")
                 .addToBackStack(null)
                 .commit();
+
+        lastUserID = id;
     }
 
     public void editUserDetail(String id, SettingsAccountUpdateFragment.UpdateMode mode) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
+                .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
                 .replace(R.id.frame, SettingsAccountUpdateFragment.newInstance(id, mode), "settingsAccountUpdateFragment")
                 .addToBackStack(null)
                 .commit();
+
+        lastUserID = id; // Just to be sure
     }
 
     public void hideUserWithMessage(boolean loginNext, String exclude, String message) {
@@ -100,6 +114,23 @@ public class SettingsActivity extends AppCompatActivity {
 
         if(getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment") != null) {
             ((SettingsAccountOverviewFragment) getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment")).updatedUser();
+        }
+    }
+
+    private void updateTitle() {
+        if(getSupportActionBar() != null) {
+            Fragment main = getSupportFragmentManager().findFragmentByTag("settingsMainFragment");
+
+            if(main != null && main.isVisible()) {
+                getSupportActionBar().setTitle(R.string.settings);
+            } else {
+                User displayed = DBHelper.getInstance(this).getUserByID(lastUserID);
+                if(displayed != null) {
+                    getSupportActionBar().setTitle(displayed.getName());
+                } else {
+                    getSupportActionBar().setTitle(R.string.settings);
+                }
+            }
         }
     }
 
@@ -142,7 +173,7 @@ public class SettingsActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case android.R.id.home:
             case R.id.homeAsUp:
-                super.onBackPressed();
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
