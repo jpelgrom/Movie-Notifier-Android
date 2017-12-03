@@ -205,7 +205,7 @@ public class SettingsMainFragment extends Fragment {
                 dayNight.setValue(R.string.settings_general_daynight_auto);
                 break;
         }
-        dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO
+        dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO && getContext() != null
                 && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 ? View.VISIBLE : View.GONE);
 

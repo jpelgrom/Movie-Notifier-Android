@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import butterknife.BindView;
@@ -51,9 +52,15 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                updateTitle();
+                updateToolbar();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
     }
 
     public void showUser(String id) {
@@ -117,20 +124,43 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private void updateTitle() {
+    private void updateToolbar() {
         if(getSupportActionBar() != null) {
-            Fragment main = getSupportFragmentManager().findFragmentByTag("settingsMainFragment");
+            Fragment account = getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment");
+            Fragment update = getSupportFragmentManager().findFragmentByTag("settingsAccountUpdateFragment");
+            Fragment licenses = getSupportFragmentManager().findFragmentByTag("settingsLicensesFragment");
 
-            if(main != null && main.isVisible()) {
-                getSupportActionBar().setTitle(R.string.settings);
-            } else {
-                User displayed = DBHelper.getInstance(this).getUserByID(lastUserID);
+            if((account != null && account.isVisible()) || (update != null && update.isVisible())) {
+                hideLicensesItem();
+
+                User displayed = null;
+                if(lastUserID != null && !lastUserID.equals("")) {
+                    displayed = DBHelper.getInstance(this).getUserByID(lastUserID);
+                }
                 if(displayed != null) {
                     getSupportActionBar().setTitle(displayed.getName());
                 } else {
                     getSupportActionBar().setTitle(R.string.settings);
                 }
+            } else if(licenses != null && licenses.isVisible()) {
+                hideLicensesItem();
+                getSupportActionBar().setTitle(R.string.settings_licenses);
+            } else {
+                showLicensesItem();
+                getSupportActionBar().setTitle(R.string.settings);
             }
+        }
+    }
+
+    private void showLicensesItem() {
+        if(toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.licenses) != null) {
+            toolbar.getMenu().findItem(R.id.licenses).setVisible(true);
+        }
+    }
+
+    private void hideLicensesItem() {
+        if(toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.licenses) != null) {
+            toolbar.getMenu().findItem(R.id.licenses).setVisible(false);
         }
     }
 
@@ -174,6 +204,14 @@ public class SettingsActivity extends AppCompatActivity {
             case android.R.id.home:
             case R.id.homeAsUp:
                 onBackPressed();
+                return true;
+            case R.id.licenses:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.frame, new SettingsLicensesFragment(), "settingsLicensesFragment")
+                        .addToBackStack(null)
+                        .commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

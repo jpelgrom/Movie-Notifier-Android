@@ -22,6 +22,7 @@
     <string name="settings_general_location_suggestion_automagic">Tap to make automagic sorting smarter by allowing Movie Notifier to use your location</string>
     <string name="settings_general_location_permission_rationale">We\'ll need access to your location to enable this feature</string>
     <string name="settings_general_location_permission_denied">Sorry, but this feature won\'t work without access to your location</string>
+    <string name="settings_licenses">Licenses</string>
 
     <string name="account_start_title">Hi there!</string>
     <string name="account_start_subtitle">Welcome to Movie Notifier</string>
