@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/licenseTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="20sp"
+        tools:text="Apache Commons Text"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/licenseNotice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="16sp"
+        tools:text="Copyright 2014-2017 The Apache Software Foundation"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/licenseLicense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        tools:text="@string/license_apache"
+        android:layout_marginBottom="8dp"/>
+
+</LinearLayout>

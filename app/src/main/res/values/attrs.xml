@@ -5,4 +5,10 @@
         <attr name="detailTitle" format="string"/>
         <attr name="detailValue" format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="LicenseTextView">
+        <attr name="licenseTitle" format="string"/>
+        <attr name="licenseNotice" format="string"/>
+        <attr name="licenseLicense" format="string"/>
+    </declare-styleable>
 </resources>

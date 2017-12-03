@@ -1,13 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
-        android:id="@+id/webview"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="16sp"
+                android:text="@string/license_intro"
+                android:layout_marginBottom="8dp"/>
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Apache Commons Text"
+                app:licenseNotice="Copyright 2014-2017 The Apache Software Foundation"
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Butter Knife"
+                app:licenseNotice="Copyright 2013 Jake Wharton"
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Firebase JobDispatcher"
+                app:licenseNotice="Copyright 2016 Google Inc."
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Gson"
+                app:licenseNotice="Copyright 2008 Google Inc."
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="libphonenumber"
+                app:licenseNotice="Copyright Google Inc., Vonage Holdings Corp., Ian Galpin &amp; Ben Gertzfield"
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Okio / Retrofit"
+                app:licenseNotice="Copyright 2013 Square, Inc."
+                app:licenseLicense="@string/license_apache" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
