@@ -433,11 +433,16 @@ public class WatcherActivity extends AppCompatActivity {
                     if(received.getPathSegments().size() == 2 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
                         id = received.getPathSegments().get(1);
                     }
-                } else if(received.getHost().equals(getString(R.string.CINEMA_HOST))) {
-                    if(received.getPathSegments().size() == 3 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")
-                            && received.getPathSegments().get(2) != null && !received.getPathSegments().get(2).equals("")) {
+                } else if(received.getHost().equals("www.pathe.nl")) {
+                    if(received.getPathSegments().size() >= 2
+                            && received.getPathSegments().get(0) != null && received.getPathSegments().get(0).equals("film")
+                            && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
                         sharedMovieID = Integer.parseInt(received.getPathSegments().get(1));
-                        sharedTitle = WordUtils.capitalizeFully(received.getPathSegments().get(2).replace("-", " "));
+
+                        if(received.getPathSegments().size() >= 3 && received.getPathSegments().get(2) != null
+                                && !received.getPathSegments().get(2).equals("")) {
+                            sharedTitle = WordUtils.capitalizeFully(received.getPathSegments().get(2).replace("-", " "));
+                        }
                     }
                 }
             }
