@@ -4,16 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -21,43 +19,33 @@ import java.util.Locale;
 
 import nl.jpelgrm.movienotifier.models.Cinema;
 
-public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private GoogleApiClient googleClient;
-    private boolean ready = false;
+public class LocationUtil {
+    private FusedLocationProviderClient locationClient;
     private ArrayDeque<LocationUtilRequest> queue = new ArrayDeque<>();
 
-    public void setupGoogleClient(Context context, boolean onCreate) {
-        if(googleClient == null) {
+    public void setupLocationClient(Context context) {
+        if(locationClient == null) {
             if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                googleClient = new GoogleApiClient.Builder(context)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
+                locationClient = LocationServices.getFusedLocationProviderClient(context);
             }
-        }
-        if(!onCreate && !googleClient.isConnected()) {
-            googleClient.connect();
-        }
-    }
-
-    public void onStart() {
-        if(googleClient != null) {
-            googleClient.connect();
         }
     }
 
     public void onStop() {
-        if(googleClient != null) {
-            googleClient.disconnect();
+        if(locationClient != null) {
+            locationClient.removeLocationUpdates(updateCallback);
         }
     }
 
     public void getLocation(Context context, final LocationUtilRequest request) {
         if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if(ready) { // Immediately give something back as well, improves UI speed while we wait for a fresh location
-                request.onLocationReceived(LocationServices.FusedLocationApi.getLastLocation(googleClient), true);
-            }
+            locationClient.getLastLocation() // Immediately give something back as well, improves UI speed while we wait for a fresh location
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            request.onLocationReceived(location, true);
+                        }
+                    });
 
             queue.add(request);
             checkQueue();
@@ -67,30 +55,19 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, Google
     }
 
     private void checkQueue() {
-        if(ready && queue.size() > 0) {
+        if(queue.size() > 0) {
             processQueue();
         }
     }
 
     private void processQueue() {
-        if(ContextCompat.checkSelfPermission(queue.getFirst().getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && googleClient != null) {
-            if(googleClient.isConnected()) {
-                LocationRequest googleRequest = new LocationRequest();
-                googleRequest.setInterval(2500);
-                googleRequest.setFastestInterval(2500);
-                googleRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        if(ContextCompat.checkSelfPermission(queue.getFirst().getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && locationClient != null) {
+            LocationRequest googleRequest = new LocationRequest();
+            googleRequest.setInterval(2500);
+            googleRequest.setFastestInterval(2500);
+            googleRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-                LocationServices.FusedLocationApi.requestLocationUpdates(googleClient, googleRequest, new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        for(LocationUtilRequest request : queue) {
-                            request.onLocationReceived(location, false);
-                            queue.remove(request);
-                        }
-                        LocationServices.FusedLocationApi.removeLocationUpdates(googleClient, this);
-                    }
-                });
-            } // else onConnected should be called soon and execute this code
+            locationClient.requestLocationUpdates(googleRequest, updateCallback, null);
         } else {
             for(LocationUtilRequest request : queue) {
                 request.onLocationReceived(null, false);
@@ -99,21 +76,23 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks, Google
         }
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        ready = true;
-        checkQueue();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        ready = false;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        ready = false;
-    }
+    private LocationCallback updateCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            if(locationResult.getLocations().size() > 0) {
+                for(LocationUtilRequest request : queue) {
+                    request.onLocationReceived(locationResult.getLocations().get(0), false);
+                    queue.remove(request);
+                }
+            } else {
+                for(LocationUtilRequest request : queue) {
+                    request.onLocationReceived(null, false);
+                    queue.remove(request);
+                }
+            }
+            locationClient.removeLocationUpdates(this);
+        };
+    };
 
     public static float getDistance(Location loc1, Location loc2) {
         return loc1.distanceTo(loc2);

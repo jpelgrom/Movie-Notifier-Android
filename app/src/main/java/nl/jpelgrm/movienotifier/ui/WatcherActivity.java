@@ -261,7 +261,7 @@ public class WatcherActivity extends AppCompatActivity {
         } else {
             autocompleteSuggestion.setVisibility(View.GONE);
             if(settings.getInt("prefAutocompleteLocation", -1) == 1) {
-                startLocation(true);
+                startLocation();
             }
         }
 
@@ -483,7 +483,6 @@ public class WatcherActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        locationUtil.onStart();
     }
 
     @Override
@@ -1128,7 +1127,7 @@ public class WatcherActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             settings.edit().putInt("prefAutocompleteLocation", 1).apply();
             autocompleteSuggestion.setVisibility(View.GONE);
-            startLocation(false);
+            startLocation();
         } else {
             if(!isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -1147,9 +1146,9 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
-    private void startLocation(boolean onCreate) {
+    private void startLocation() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationUtil.setupGoogleClient(this, onCreate);
+            locationUtil.setupLocationClient(this);
             locationUtil.getLocation(this, new LocationUtil.LocationUtilRequest() {
                 @Override
                 public void onLocationReceived(Location location, boolean isCachedResult) {
@@ -1176,7 +1175,7 @@ public class WatcherActivity extends AppCompatActivity {
             case PERMISSION_LOCATION_AUTOCOMPLETE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
-                    startLocation(false);
+                    startLocation();
                 } else {
                     snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
                     snackbar.show();

@@ -164,7 +164,6 @@ public class WatchersFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        locationUtil.onStart();
     }
 
     @Override
@@ -472,7 +471,7 @@ public class WatchersFragment extends Fragment {
 
     private void startLocation() {
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationUtil.setupGoogleClient(getContext(), false);
+            locationUtil.setupLocationClient(getContext());
             locationUtil.getLocation(getContext(), new LocationUtil.LocationUtilRequest() {
                 @Override
                 public void onLocationReceived(Location location, boolean isCachedResult) {
