@@ -1,0 +1,7 @@
+<resources>
+    <style name="AppThemeVersions" parent="AppTheme">
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:navigationBarDividerColor">@null</item>
+    </style>
+</resources>

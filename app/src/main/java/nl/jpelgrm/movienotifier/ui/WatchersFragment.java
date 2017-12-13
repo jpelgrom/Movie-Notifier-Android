@@ -277,6 +277,7 @@ public class WatchersFragment extends Fragment {
             Cinema nearby = null;
             if(settings.getInt("prefAutomagicLocation", -1) == 1
                     && locationUser != null
+                    && getContext() != null
                     && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 nearby = locationUtil.getClosestCinema(locationUser, cinemas);
                 if(nearby != null && LocationUtil.getDistance(locationUser, nearby.getLatitude(), nearby.getLongitude()) < 2000) {
