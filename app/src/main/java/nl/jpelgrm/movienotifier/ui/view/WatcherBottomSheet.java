@@ -18,11 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.WatcherActivity;
@@ -65,7 +62,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        readCinemasJson();
+        cinemas = DBHelper.getInstance(getContext()).getCinemas();
 
         watcher = new Gson().fromJson(getArguments().getString("watcher"), Watcher.class);
 
@@ -194,22 +191,5 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
                 dismiss();
             }
         });
-    }
-
-    private void readCinemasJson() {
-        String json = null;
-        try {
-            InputStream inputStream = getContext().getAssets().open("cinemas.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Type listType = new TypeToken<List<Cinema>>() {}.getType();
-        cinemas = new Gson().fromJson(json, listType);
     }
 }
