@@ -42,6 +42,17 @@ public class CinemaIDAdapter extends ArrayAdapter<Cinema> {
         }
     }
 
+    public void setCinemas(List<Cinema> newCinemas) {
+        cinemas.clear();
+        cinemas.addAll(newCinemas);
+
+        boolean wasSorting = (originals != null);
+        originals = null;
+        if(wasSorting) {
+            sortCinemas();
+        }
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

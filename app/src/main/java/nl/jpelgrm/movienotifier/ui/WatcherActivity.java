@@ -1167,6 +1167,9 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void readCinemas() {
         cinemas = DBHelper.getInstance(this).getCinemas();
+        if(cinemaIDAdapter != null) {
+            cinemaIDAdapter.setCinemas(cinemas);
+        }
     }
 
     @Override
