@@ -1,7 +1,7 @@
 package nl.jpelgrm.movienotifier.ui.view;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatCheckBox;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;

@@ -1,10 +1,10 @@
 package nl.jpelgrm.movienotifier;
 
 import android.app.Application;
-import android.support.text.emoji.EmojiCompat;
-import android.support.text.emoji.FontRequestEmojiCompatConfig;
-import android.support.v4.provider.FontRequest;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.core.provider.FontRequest;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;

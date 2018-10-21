@@ -4,7 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -91,7 +91,7 @@ public class LocationUtil {
                 }
             }
             locationClient.removeLocationUpdates(this);
-        };
+        }
     };
 
     public static float getDistance(Location loc1, Location loc2) {

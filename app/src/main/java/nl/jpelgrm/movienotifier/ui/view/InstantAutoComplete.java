@@ -2,7 +2,7 @@ package nl.jpelgrm.movienotifier.ui.view;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import android.util.AttributeSet;
 
 // Based on https://stackoverflow.com/a/5783983

@@ -22,7 +22,7 @@
         android:paddingStart="?attr/listPreferredItemPaddingLeft"
         android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
-        <android.support.text.emoji.widget.EmojiAppCompatTextView
+        <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/filterAllIndicator"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
         android:paddingStart="?attr/listPreferredItemPaddingLeft"
         android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
-        <android.support.text.emoji.widget.EmojiAppCompatTextView
+        <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/filterPastIndicator"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
         android:paddingStart="?attr/listPreferredItemPaddingLeft"
         android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
-        <android.support.text.emoji.widget.EmojiAppCompatTextView
+        <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/filterNowIndicator"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
         android:paddingStart="?attr/listPreferredItemPaddingLeft"
         android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
-        <android.support.text.emoji.widget.EmojiAppCompatTextView
+        <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/filterFutureIndicator"
             android:layout_width="56dp"
             android:layout_height="wrap_content"

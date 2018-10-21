@@ -2,10 +2,10 @@ package nl.jpelgrm.movienotifier.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.text.emoji.widget.EmojiAppCompatTextView;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.emoji.widget.EmojiAppCompatTextView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
