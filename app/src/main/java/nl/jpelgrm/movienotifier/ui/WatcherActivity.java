@@ -705,7 +705,7 @@ public class WatcherActivity extends AppCompatActivity {
         loaderErrorButton.setEnabled(true);
 
         main.setVisibility(View.VISIBLE);
-        fab.setVisibility(View.VISIBLE);
+        fab.show();
     }
 
     private void showDateTimePicker(final boolean checkingValue, final boolean beginValue, long currentValue) {
