@@ -184,9 +184,9 @@ public class WatchersFragment extends Fragment {
                         @Override
                         public void onResponse(Call<List<Watcher>> call, Response<List<Watcher>> response) {
                             listSwiper.setRefreshing(false);
-                            watchers = response.body();
 
                             if(response.code() == 200) {
+                                watchers = response.body();
                                 filterAndSort(false);
                             } else {
                                 if(showError) {
