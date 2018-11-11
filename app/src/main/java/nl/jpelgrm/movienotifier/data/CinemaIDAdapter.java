@@ -67,11 +67,11 @@ public class CinemaIDAdapter extends ArrayAdapter<Cinema> {
             name.setText(cinema.getName());
 
             TextView distance = convertView.findViewById(R.id.distance);
-            if(cinema.getLatitude() == null || cinema.getLongitude() == null || location == null) {
+            if(cinema.getLat() == null || cinema.getLon() == null || location == null) {
                 distance.setVisibility(View.GONE);
             } else {
                 distance.setVisibility(View.VISIBLE);
-                distance.setText(LocationUtil.getFormattedDistance(location, cinema.getLatitude(), cinema.getLongitude()));
+                distance.setText(LocationUtil.getFormattedDistance(location, cinema.getLat(), cinema.getLon()));
             }
         }
 
@@ -92,12 +92,12 @@ public class CinemaIDAdapter extends ArrayAdapter<Cinema> {
             @Override
             public int compare(Cinema c1, Cinema c2) {
                 if(location != null) {
-                    if(c1.getLatitude() != null && c1.getLongitude() != null && c2.getLatitude() != null && c2.getLongitude() != null) {
-                        return Double.compare(LocationUtil.getDistance(location, c1.getLatitude(), c1.getLongitude()),
-                                LocationUtil.getDistance(location, c2.getLatitude(), c2.getLongitude()));
-                    } else if(c1.getLatitude() != null && c1.getLongitude() != null) { // c2 null, and c2 should go to bottom
+                    if(c1.getLat() != null && c1.getLon() != null && c2.getLat() != null && c2.getLon() != null) {
+                        return Double.compare(LocationUtil.getDistance(location, c1.getLat(), c1.getLon()),
+                                LocationUtil.getDistance(location, c2.getLat(), c2.getLon()));
+                    } else if(c1.getLat() != null && c1.getLon() != null) { // c2 null, and c2 should go to bottom
                         return -1;
-                    } else if(c2.getLatitude() != null && c2.getLongitude() != null) { // c1 null, and c1 should go to bottom
+                    } else if(c2.getLat() != null && c2.getLon() != null) { // c1 null, and c1 should go to bottom
                         return 1;
                     }
                 }

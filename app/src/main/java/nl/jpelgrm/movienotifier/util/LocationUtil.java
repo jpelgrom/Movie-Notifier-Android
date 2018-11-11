@@ -120,9 +120,9 @@ public class LocationUtil {
     public Cinema getClosestCinema(Location location, List<Cinema> cinemas) {
         Cinema closest = null;
         for(Cinema cinema: cinemas) {
-            if(cinema.getLatitude() != null && cinema.getLongitude() != null) {
-                float distance = getDistance(location, cinema.getLatitude(), cinema.getLongitude());
-                if(closest == null || distance < getDistance(location, closest.getLatitude(), closest.getLongitude())) {
+            if(cinema.getLat() != null && cinema.getLon() != null) {
+                float distance = getDistance(location, cinema.getLat(), cinema.getLon());
+                if(closest == null || distance < getDistance(location, closest.getLat(), closest.getLon())) {
                     closest = cinema;
                 }
             }

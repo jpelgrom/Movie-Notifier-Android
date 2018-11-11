@@ -48,7 +48,9 @@
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                android:paddingEnd="?attr/listPreferredItemPaddingRight">
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="24dp"

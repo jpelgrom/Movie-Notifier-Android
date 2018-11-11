@@ -3,6 +3,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -24,7 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
@@ -56,15 +57,17 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     private User user;
     private String id;
+    private boolean isCurrentUser;
 
     private List<NotificationType> typeList = new ArrayList<>();
 
     private SharedPreferences settings;
 
-    public static SettingsAccountOverviewFragment newInstance(String id) {
+    public static SettingsAccountOverviewFragment newInstance(String id, boolean isCurrentUser) {
         SettingsAccountOverviewFragment fragment = new SettingsAccountOverviewFragment();
         Bundle args = new Bundle();
         args.putString("id", id);
+        args.putBoolean("isCurrentUser", isCurrentUser);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,7 +77,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         id = getArguments().getString("id");
-        user = DBHelper.getInstance(getContext()).getUserByID(id);
+        isCurrentUser = getArguments().getBoolean("isCurrentUser");
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
@@ -91,8 +94,17 @@ public class SettingsAccountOverviewFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        updateValues();
-        getNotificationTypes();
+        AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
+            if(user != null) {
+                this.user = user;
+
+                if(typeList.size() == 0) {
+                    getNotificationTypes();
+                }
+                updateNotificationsList(); // 'Reset', otherwise the calls for clicks will be triggered
+                updateValues();
+            }
+        });
 
         accountSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,18 +148,16 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 delete();
             }
         });
+        accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
     }
 
     public void updatedUser() {
         error.setVisibility(View.GONE);
-
-        user = DBHelper.getInstance(getContext()).getUserByID(id);
-        updateNotificationsList(); // 'Reset', otherwise the calls for clicks will be triggered
-        updateValues();
+        // UI updates are triggered via LiveData which will detect a change
     }
 
     private void updateValues() {
-        accountSwitch.setVisibility(user.getID().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
+        accountSwitch.setVisibility(user.getId().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
         accountName.setValue(user.getName());
         accountEmail.setValue(user.getEmail());
         accountPhone.setValue(user.getPhonenumber());
@@ -200,7 +210,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
-        ((SettingsActivity) getActivity()).editUserDetail(user.getID(), mode);
+        ((SettingsActivity) getActivity()).editUserDetail(user.getId(), mode);
     }
 
     private void update(User toUpdate) {
@@ -208,7 +218,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getID(), toUpdate);
+        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -216,10 +226,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 setFieldsEnabled(true);
 
                 if(response.code() == 200) {
-                    DBHelper db = DBHelper.getInstance(getContext());
                     User received = response.body();
-
-                    db.updateUser(received);
+                    AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
                     user = received;
 
                     Snackbar.make(coordinator, R.string.user_settings_general_success, Snackbar.LENGTH_SHORT).show();
@@ -252,7 +260,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
+        Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -262,9 +270,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 if(response.code() == 200 && response.body() != null) {
                     User received = response.body();
                     if(received != null) {
-                        DBHelper.getInstance(getContext()).updateUser(received);
+                        AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
                         user = received;
-                        settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
+                        isCurrentUser = true;
+                        settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
 
                         Snackbar.make(coordinator, R.string.user_settings_general_switch_success, Snackbar.LENGTH_SHORT).show();
 
@@ -302,16 +311,21 @@ public class SettingsAccountOverviewFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        boolean isThisUser = user.getID().equals(settings.getString("userID", ""));
+        boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
         if(isThisUser) {
             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
         }
 
-        DBHelper.getInstance(getContext()).deleteUser(user.getID());
+        AsyncTask.execute(() -> {
+            AppDatabase.getInstance(getContext()).users().delete(user);
 
-        if(getActivity() != null && !getActivity().isFinishing()) {
-            ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser, user.getID(), getString(R.string.user_settings_security_logout_success));
-        }
+            if(getActivity() != null && !getActivity().isFinishing()) {
+                getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
+                        user.getId(),
+                        getString(R.string.user_settings_security_logout_success))
+                );
+            }
+        });
     }
 
     private void delete() {
@@ -323,9 +337,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 progress.setVisibility(View.VISIBLE);
                 setFieldsEnabled(false);
 
-                final boolean isThisUser = user.getID().equals(settings.getString("userID", ""));
+                final boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
 
-                Call<ResponseBody> call = APIHelper.getInstance().deleteUser(user.getApikey(), user.getID());
+                Call<ResponseBody> call = APIHelper.getInstance().deleteUser(user.getApikey(), user.getId());
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -335,14 +349,19 @@ public class SettingsAccountOverviewFragment extends Fragment {
                         if(response.code() == 200 || response.code() == 401) {
                             // 200: OK
                             // 401: Unauthorized, but because API keys don't change it seems the user was already deleted
-                            if(user.getID().equals(settings.getString("userID", ""))) {
+                            if(user.getId().equals(settings.getString("userID", ""))) {
                                 settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                             }
-                            DBHelper.getInstance(getContext()).deleteUser(user.getID());
+                            AsyncTask.execute(() -> {
+                                AppDatabase.getInstance(getContext()).users().delete(user);
 
-                            if(getActivity() != null && !getActivity().isFinishing()) {
-                                ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser, user.getID(), getString(R.string.user_settings_security_delete_success));
-                            }
+                                if(getActivity() != null && !getActivity().isFinishing()) {
+                                    getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
+                                            user.getId(),
+                                            getString(R.string.user_settings_security_delete_success))
+                                    );
+                                }
+                            });
                         } else {
                             error.setVisibility(View.VISIBLE);
                             error.setText(getContext().getString(R.string.error_general_server, "N" + response.code()));
@@ -394,6 +413,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                     typeList = response.body();
                     updateNotificationsList();
                 } else {
+                    typeList.clear();
                     notificationsWrapper.setVisibility(user != null ? View.VISIBLE : View.GONE);
                     notificationsList.setVisibility(View.GONE);
                     notificationsEmpty.setVisibility(View.VISIBLE);
@@ -404,6 +424,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
             public void onFailure(Call<List<NotificationType>> call, Throwable t) {
                 t.printStackTrace();
 
+                typeList.clear();
                 notificationsWrapper.setVisibility(user != null ? View.VISIBLE : View.GONE);
                 notificationsList.setVisibility(View.GONE);
                 notificationsEmpty.setVisibility(View.VISIBLE);

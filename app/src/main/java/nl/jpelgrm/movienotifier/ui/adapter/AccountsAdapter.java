@@ -45,7 +45,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final User user = users.get(position);
         final SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        final boolean isCurrentUser = settings.getString("userID", "").equals(user.getID());
+        final boolean isCurrentUser = settings.getString("userID", "").equals(user.getId());
 
         holder.name.setText(user.getName());
         holder.status.setVisibility(isCurrentUser ? View.VISIBLE : View.GONE);
@@ -54,7 +54,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
             @Override
             public void onClick(View view) {
                 if(getContext() instanceof SettingsActivity) {
-                    ((SettingsActivity) getContext()).showUser(user.getID());
+                    ((SettingsActivity) getContext()).showUser(user.getId(), isCurrentUser);
                 }
             }
         });

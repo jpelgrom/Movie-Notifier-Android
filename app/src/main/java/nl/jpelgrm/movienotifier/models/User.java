@@ -1,40 +1,53 @@
 package nl.jpelgrm.movienotifier.models;
 
-import android.content.ContentValues;
-
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "Users")
 public class User {
     @Expose(serialize = false)
-    private String id;
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name = "ID")
+    private String id = "";
 
     @Expose
+    @ColumnInfo(name = "Name")
     private String name;
 
     @Expose
+    @ColumnInfo(name = "Email")
     private String email;
 
     @Expose
+    @ColumnInfo(name = "Phone")
     private String phonenumber;
 
     @Expose
+    @Ignore
     private String password;
 
     @Expose
+    @ColumnInfo(name = "Notifications")
     private List<String> notifications = null;
 
     @Expose(serialize = false)
+    @ColumnInfo(name = "APIKey")
     private String apikey;
 
+    @Ignore
     public User() {
         // Default constructor
     }
 
+    @Ignore
     public User(String name, String email, String phonenumber, String password) {
         this.name = name;
         this.email = email;
@@ -42,11 +55,21 @@ public class User {
         this.password = password;
     }
 
-    public String getID() {
+    public User(@NonNull String id, String name, String email, String phonenumber, List<String> notifications, String apikey) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phonenumber = phonenumber;
+        this.notifications = notifications;
+        this.apikey = apikey;
+    }
+
+    @NonNull
+    public String getId() {
         return id;
     }
 
-    public void setID(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
@@ -92,29 +115,5 @@ public class User {
 
     public void setApikey(String apikey) {
         this.apikey = apikey;
-    }
-
-    public ContentValues toContentValues() {
-        ContentValues cv = new ContentValues();
-        cv.put("ID", id);
-        cv.put("Name", name);
-        cv.put("Email", email);
-        cv.put("Phone", phonenumber);
-        cv.put("Notifications", new Gson().toJson(notifications));
-        cv.put("APIKey", apikey);
-
-        return cv;
-    }
-
-    public void setContent(ContentValues cv) {
-        id = cv.getAsString("ID");
-        name = cv.getAsString("Name");
-        email = cv.getAsString("Email");
-        phonenumber = cv.getAsString("Phone");
-
-        Type listType = new TypeToken<List<String>>() {}.getType();
-        notifications = new Gson().fromJson(cv.getAsString("Notifications"), listType);
-
-        apikey = cv.getAsString("APIKey");
     }
 }

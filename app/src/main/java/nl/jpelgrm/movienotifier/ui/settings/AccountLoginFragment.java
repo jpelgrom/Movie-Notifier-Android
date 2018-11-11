@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.Nullable;
@@ -21,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.models.UserLogin;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
@@ -157,9 +158,13 @@ public class AccountLoginFragment extends Fragment {
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.isSuccessful()) {
                     User received = response.body();
-                    DBHelper.getInstance(getActivity()).addUser(received);
-                    settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
-                    getActivity().finish();
+                    AsyncTask.execute(() -> {
+                        AppDatabase.getInstance(getContext()).users().add(received);
+                        settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
+                        if(getActivity() != null && !getActivity().isFinishing()) {
+                            getActivity().runOnUiThread(() -> getActivity().finish());
+                        }
+                    });
                 } else {
                     setFieldsEnabled(true);
                     setProgressVisible(false);

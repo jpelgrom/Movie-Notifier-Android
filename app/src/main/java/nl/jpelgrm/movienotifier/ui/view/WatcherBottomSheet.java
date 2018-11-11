@@ -28,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.WatcherActivity;
@@ -62,7 +62,10 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cinemas = DBHelper.getInstance(getContext()).getCinemas();
+        AppDatabase.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
+            this.cinemas = cinemas;
+            setupViews(true);
+        });
 
         watcher = new Gson().fromJson(getArguments().getString("watcher"), Watcher.class);
 
@@ -117,16 +120,16 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         ButterKnife.bind(this, view);
         dialog.setContentView(view);
 
-        setupViews();
+        setupViews(false);
     }
 
-    private void setupViews() {
+    private void setupViews(boolean cinemasOnly) {
         name.setText(watcher.getName());
 
         String foundCinema = "";
         if(cinemas != null) {
             for(Cinema cinema : cinemas) {
-                if(cinema.getID().equals(watcher.getFilters().getCinemaID())) {
+                if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
                     foundCinema = cinema.getName();
                 }
             }
@@ -135,6 +138,8 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             foundCinema = watcher.getFilters().getCinemaID();
         }
         location.setText(foundCinema);
+
+        if(cinemasOnly) { return; }
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
 

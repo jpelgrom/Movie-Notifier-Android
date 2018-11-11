@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.Nullable;
@@ -28,7 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
@@ -104,8 +105,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
         id = getArguments().getString("id");
         mode = (UpdateMode) getArguments().getSerializable("mode");
 
-        user = DBHelper.getInstance(getContext()).getUserByID(id);
-
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
 
@@ -120,6 +119,11 @@ public class SettingsAccountUpdateFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
+            this.user = user;
+            updateDefaultTextValue();
+        });
 
         if(mode == UpdateMode.PASSWORD) {
             textWrapper.setVisibility(View.GONE);
@@ -145,21 +149,19 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
             switch(mode) {
                 case NAME:
-                    text.setText(user.getName());
                     text.setInputType(InputType.TYPE_CLASS_TEXT);
                     textWrapper.setHint(getString(R.string.user_input_name));
                     break;
                 case EMAIL:
-                    text.setText(user.getEmail());
                     text.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                     textWrapper.setHint(getString(R.string.user_input_email));
                     break;
                 case PHONE:
-                    text.setText(user.getPhonenumber());
                     text.setInputType(InputType.TYPE_CLASS_PHONE);
                     textWrapper.setHint(getString(R.string.user_input_phone));
                     break;
             }
+            updateDefaultTextValue();
             text.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -220,6 +222,22 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void updateDefaultTextValue() {
+        if(user != null) {
+            switch(mode) {
+                case NAME:
+                    text.setText(user.getName());
+                    break;
+                case EMAIL:
+                    text.setText(user.getEmail());
+                    break;
+                case PHONE:
+                    text.setText(user.getPhonenumber());
+                    break;
+            }
+        }
     }
 
     @Override
@@ -306,7 +324,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getID(), toUpdate);
+        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
@@ -314,10 +332,8 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 setFieldsEnabled(true);
 
                 if(response.code() == 200) {
-                    DBHelper db = DBHelper.getInstance(getContext());
                     User received = response.body();
-
-                    db.updateUser(received);
+                    AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
                     user = received;
 
                     if(getActivity() != null && !getActivity().isFinishing()) {

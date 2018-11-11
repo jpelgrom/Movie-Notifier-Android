@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,14 +46,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SettingsMainFragment extends Fragment {
@@ -83,7 +84,6 @@ public class SettingsMainFragment extends Fragment {
     private BroadcastReceiver broadcastComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            readCinemas();
             updateValues();
         }
     };
@@ -92,7 +92,26 @@ public class SettingsMainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        readCinemas();
+        AppDatabase.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
+            // Data
+            Collections.sort(cinemas, new Comparator<Cinema>() {
+                @Override
+                public int compare(Cinema c1, Cinema c2) {
+                    return c1.getName().compareTo(c2.getName());
+                }
+            });
+
+            // Dialog
+            List<String> choices = new ArrayList<>();
+
+            choices.add(getString(R.string.settings_general_location_default));
+            for(Cinema cinema : cinemas) {
+                choices.add(cinema.getName());
+            }
+            cinemaItems = choices.toArray(new CharSequence[0]);
+
+            updateValues();
+        });
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
@@ -148,7 +167,7 @@ public class SettingsMainFragment extends Fragment {
                 int currentValueIndex = 0;
                 if(cinemas != null) {
                     for(int i = 0; i < cinemas.size(); i++) {
-                        if(cinemas.get(i).getID().equals(currentPreference)) {
+                        if(cinemas.get(i).getId().equals(currentPreference)) {
                             currentValueIndex = i + 1;
                         }
                     }
@@ -192,8 +211,9 @@ public class SettingsMainFragment extends Fragment {
         accountsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(accountsRecycler.getContext(), LinearLayoutManager.VERTICAL);
         accountsRecycler.addItemDecoration(dividerItemDecoration);
+        accountsRecycler.setNestedScrollingEnabled(false);
 
-        adapter.swapItems(DBHelper.getInstance(getContext()).getUsers());
+        adapter.swapItems(users);
         updateAccountsList();
 
         addAccount.setOnClickListener(new View.OnClickListener() {
@@ -211,8 +231,6 @@ public class SettingsMainFragment extends Fragment {
         super.onResume();
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-
-        readCinemas();
         updateValues();
         updateAccountsList();
 
@@ -256,7 +274,7 @@ public class SettingsMainFragment extends Fragment {
             locationPrefText = locationPreference;
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
-                    if(cinema.getID().equals(locationPreference)) {
+                    if(cinema.getId().equals(locationPreference)) {
                         locationPrefText = cinema.getName();
                     }
                 }
@@ -286,8 +304,6 @@ public class SettingsMainFragment extends Fragment {
             accountsRecycler.setVisibility(View.GONE);
         } else {
             accountsRecycler.setVisibility(View.VISIBLE);
-
-            users = DBHelper.getInstance(getContext()).getUsers();
             adapter.swapItems(users);
         }
     }
@@ -313,7 +329,7 @@ public class SettingsMainFragment extends Fragment {
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getName().equals(chose)) {
-                        setTo = cinema.getID();
+                        setTo = cinema.getId();
                     }
                 }
             }
@@ -359,67 +375,44 @@ public class SettingsMainFragment extends Fragment {
         }
     }
 
-    private void readCinemas() {
-        // Data
-        cinemas = DBHelper.getInstance(getContext()).getCinemas();
-        Collections.sort(cinemas, new Comparator<Cinema>() {
-            @Override
-            public int compare(Cinema c1, Cinema c2) {
-                return c1.getName().compareTo(c2.getName());
-            }
-        });
-
-        // Dialog
-        List<String> choices = new ArrayList<>();
-
-        choices.add(getString(R.string.settings_general_location_default));
-        if(cinemas != null) {
-            for(Cinema cinema : cinemas) {
-                choices.add(cinema.getName());
-            }
-        }
-        cinemaItems = choices.toArray(new CharSequence[choices.size()]);
-    }
-
     private void updateAccountsList() {
-        final DBHelper db = DBHelper.getInstance(getContext());
-        users = db.getUsers();
-        userProgress = 0;
+        AsyncTask.execute(() -> {
+            AppDatabase db = AppDatabase.getInstance(getContext());
+            users = db.users().getUsersSynchronous();
+            userProgress = 0;
 
-        for(final User user : users) {
-            Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getID());
-            call.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
+            for(final User user : users) {
+                Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
+                try {
+                    Response<User> response = call.execute();
                     if(response.code() == 200) {
                         if(response.body() != null) {
-                            db.updateUser(response.body());
+                            db.users().update(response.body());
                         }
                     } else if(response.code() == 401) {
                         // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
-                        db.deleteUser(user.getID());
+                        db.users().delete(user);
 
-                        if(settings.getString("userID", "").equals(user.getID())) {
+                        if(settings.getString("userID", "").equals(user.getId())) {
                             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                         }
                     } // else: failed with user facing error, but do nothing because it is a background task
 
                     finishedUserUpdate();
+                } catch(IOException | RuntimeException e) {
+                    e.printStackTrace();
                 }
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
-        }
+            }
+        });
     }
 
     private void finishedUserUpdate() {
         userProgress++;
-        if(userProgress >= users.size()) {
-            users = DBHelper.getInstance(getContext()).getUsers();
-            updateValues();
+        if(userProgress >= users.size() && getActivity() != null) {
+            users = AppDatabase.getInstance(getContext()).users().getUsersSynchronous();
+            if(getActivity() != null && !getActivity().isFinishing()) {
+                getActivity().runOnUiThread(this::updateValues);
+            }
         }
     }
 

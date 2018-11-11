@@ -3,11 +3,9 @@ package nl.jpelgrm.movienotifier.ui;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -27,7 +25,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import androidx.emoji.widget.EmojiAppCompatEditText;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -53,6 +50,7 @@ import org.apache.commons.text.WordUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -62,12 +60,11 @@ import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.data.CinemaIDAdapter;
-import nl.jpelgrm.movienotifier.data.DBHelper;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
-import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete;
@@ -140,7 +137,7 @@ public class WatcherActivity extends AppCompatActivity {
     private static Long oneMonth = 2629746000L;
 
     private Mode mode = Mode.VIEWING;
-    private List<Cinema> cinemas = null;
+    private List<Cinema> cinemas = new ArrayList<>();
     CinemaIDAdapter cinemaIDAdapter;
 
     private LocationUtil locationUtil = new LocationUtil();
@@ -150,13 +147,6 @@ public class WatcherActivity extends AppCompatActivity {
         @Override
         public void run() {
             validateCinemaID(false);
-        }
-    };
-
-    private BroadcastReceiver broadcastComplete = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            readCinemas();
         }
     };
 
@@ -195,7 +185,15 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         setupSharedInfo();
-        cinemas = DBHelper.getInstance(this).getCinemas();
+        AppDatabase.getInstance(this).cinemas().getCinemas().observe(this, cinemas -> {
+            this.cinemas = cinemas;
+
+            if(cinemaIDAdapter != null) {
+                cinemaIDAdapter.setCinemas(cinemas);
+            }
+
+            updateViews(true);
+        });
 
         watcherName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -493,15 +491,6 @@ public class WatcherActivity extends AppCompatActivity {
         if(snackbar != null && snackbar.isShown()) {
             snackbar.dismiss();
         }
-
-        readCinemas();
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastComplete, new IntentFilter(CinemaUpdateJob.BROADCAST_COMPLETE));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastComplete);
     }
 
     @Override
@@ -578,6 +567,25 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void updateViews() {
+        updateViews(false);
+    }
+
+    private void updateViews(boolean cinemaOnly) {
+        if(watcher == null) { return; }
+
+        // Input values (cinema ID)
+        String foundCinema = "";
+        for(Cinema cinema : cinemas) {
+            if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+                foundCinema = cinema.getName();
+            }
+        }
+        if(foundCinema.equals("")) { // We don't know this cinema ID's display name
+            foundCinema = watcher.getFilters().getCinemaID();
+        }
+        watcherCinemaID.setText(foundCinema);
+        if(cinemaOnly) { return; }
+
         setFieldsEditable(mode == Mode.EDITING);
 
         // Errors
@@ -587,18 +595,6 @@ public class WatcherActivity extends AppCompatActivity {
         // Input values
         watcherName.setText(watcher.getName());
         watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
-        String foundCinema = "";
-        if(cinemas != null) {
-            for(Cinema cinema : cinemas) {
-                if(cinema.getID().equals(watcher.getFilters().getCinemaID())) {
-                    foundCinema = cinema.getName();
-                }
-            }
-        }
-        if(foundCinema.equals("")) { // We don't know this cinema ID's display name
-            foundCinema = watcher.getFilters().getCinemaID();
-        }
-        watcherCinemaID.setText(foundCinema);
 
         autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
 
@@ -794,7 +790,7 @@ public class WatcherActivity extends AppCompatActivity {
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getName().equals(foundName)) {
-                        foundID = cinema.getID();
+                        foundID = cinema.getId();
                     }
                 }
             }
@@ -1162,13 +1158,6 @@ public class WatcherActivity extends AppCompatActivity {
                     return WatcherActivity.this;
                 }
             });
-        }
-    }
-
-    private void readCinemas() {
-        cinemas = DBHelper.getInstance(this).getCinemas();
-        if(cinemaIDAdapter != null) {
-            cinemaIDAdapter.setCinemas(cinemas);
         }
     }
 

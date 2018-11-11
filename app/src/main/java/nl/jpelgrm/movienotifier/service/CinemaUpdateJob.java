@@ -2,7 +2,7 @@ package nl.jpelgrm.movienotifier.service;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.os.AsyncTask;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Job;
@@ -10,14 +10,15 @@ import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.firebase.jobdispatcher.Trigger;
 
+import java.io.IOException;
 import java.util.List;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CinemaUpdateJob extends JobService {
@@ -28,25 +29,25 @@ public class CinemaUpdateJob extends JobService {
 
     @Override
     public boolean onStartJob(final JobParameters job) {
-        final DBHelper db = DBHelper.getInstance(this);
+        AppDatabase db = AppDatabase.getInstance(this);
 
         // Get up to date internet data
         update = APIHelper.getInstance().getCinemas();
-        update.enqueue(new Callback<List<Cinema>>() {
-            @Override
-            public void onResponse(Call<List<Cinema>> call, Response<List<Cinema>> response) {
+        AsyncTask.execute(() -> {
+            try {
+                Response<List<Cinema>> response = update.execute();
                 if(response.code() == 200) {
                     List<Cinema> results = response.body();
                     if(results != null) {
                         for(Cinema online : results) {
-                            db.addCinema(online); // Database will handle add vs. update
+                            db.cinemas().add(online); // Database will handle add vs. update
                         }
 
-                        List<Cinema> existing = db.getCinemas();
+                        List<Cinema> existing = db.cinemas().getCinemasSynchronous();
                         for(Cinema exists : existing) {
                             if(!results.contains(exists)) {
                                 // If something is in the database, but not the online (up-to-date) list, it should be removed
-                                db.deleteCinema(exists.getID());
+                                db.cinemas().delete(exists);
                             }
                         }
                     }
@@ -55,7 +56,7 @@ public class CinemaUpdateJob extends JobService {
                     settings.edit().putLong("cinemasUpdated", System.currentTimeMillis()).apply();
 
                     // Finally: check existing user preference for default cinema, and reset if necessary
-                    if(db.getCinemaByID(settings.getString("prefDefaultCinema", "")) == null) {
+                    if(db.cinemas().getCinemaById(settings.getString("prefDefaultCinema", "")) == null) {
                         settings.edit().putString("prefDefaultCinema", "").apply();
                     }
 
@@ -68,10 +69,7 @@ public class CinemaUpdateJob extends JobService {
                     finished = true;
                     jobFinished(job, true);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Cinema>> call, Throwable t) {
+            } catch(IOException | RuntimeException e) {
                 finished = true;
                 jobFinished(job, true);
             }

@@ -1,27 +1,51 @@
 package nl.jpelgrm.movienotifier.models;
 
-import android.content.ContentValues;
-
 import com.google.gson.annotations.Expose;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "Cinemas")
 public class Cinema {
     @Expose
-    private String id;
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name = "ID")
+    private String id= "";
 
     @Expose
+    @ColumnInfo(name = "Name")
     private String name;
 
     @Expose
+    @ColumnInfo(name = "Lat")
     private Double lat;
 
     @Expose
+    @ColumnInfo(name = "Lon")
     private Double lon;
 
-    public String getID() {
+    @Ignore
+    public Cinema() {
+        // Default constructor
+    }
+
+    public Cinema(@NonNull String id, String name, Double lat, Double lon) {
+        this.id = id;
+        this.name = name;
+        this.lat = lat;
+        this.lon = lon;
+    }
+
+    @NonNull
+    public String getId() {
         return id;
     }
 
-    public void setID(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
@@ -33,42 +57,25 @@ public class Cinema {
         this.name = name;
     }
 
-    public Double getLatitude() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLatitude(Double lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public Double getLongitude() {
+    public Double getLon() {
         return lon;
     }
 
-    public void setLongitude(Double lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
 
     @Override
     public String toString() {
         return name;
-    }
-
-    public ContentValues toContentValues() {
-        ContentValues cv = new ContentValues();
-        cv.put("ID", id);
-        cv.put("Name", name);
-        cv.put("Lat", lat);
-        cv.put("Lon", lon);
-
-        return cv;
-    }
-
-    public void setContent(ContentValues cv) {
-        id = cv.getAsString("ID");
-        name = cv.getAsString("Name");
-        lat = cv.getAsDouble("Lat");
-        lon = cv.getAsDouble("Lon");
     }
 
     @Override

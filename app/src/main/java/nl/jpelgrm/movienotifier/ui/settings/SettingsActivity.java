@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,15 +19,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
+import nl.jpelgrm.movienotifier.util.EmptyLiveData;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -34,7 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private SharedPreferences settings;
-    private String lastUserID;
+    private MutableLiveData<String> lastUserID = new MutableLiveData<>();
+    private LiveData<User> lastUser = EmptyLiveData.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +61,16 @@ public class SettingsActivity extends AppCompatActivity {
 
         settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
 
+        lastUser = Transformations.switchMap(lastUserID, newID -> {
+            if(newID != null && !newID.equals("")) {
+                return AppDatabase.getInstance(this).users().getUserById(newID);
+            } else {
+                return EmptyLiveData.create();
+            }
+        });
+        lastUserID.setValue(null);
+        lastUser.observe(this, user -> updateToolbar());
+
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
@@ -68,15 +85,15 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
-    public void showUser(String id) {
+    public void showUser(String id, boolean isCurrentUser) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.frame, SettingsAccountOverviewFragment.newInstance(id), "settingsAccountOverviewFragment")
+                .replace(R.id.frame, SettingsAccountOverviewFragment.newInstance(id, isCurrentUser), "settingsAccountOverviewFragment")
                 .addToBackStack(null)
                 .commit();
 
-        lastUserID = id;
+        lastUserID.setValue(id);
     }
 
     public void editUserDetail(String id, SettingsAccountUpdateFragment.UpdateMode mode) {
@@ -87,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
 
-        lastUserID = id; // Just to be sure
+        lastUserID.setValue(id); // Just to be sure
     }
 
     public void hideUserWithMessage(boolean loginNext, String exclude, String message) {
@@ -138,12 +155,9 @@ public class SettingsActivity extends AppCompatActivity {
             if((account != null && account.isVisible()) || (update != null && update.isVisible())) {
                 showMenuItems(false);
 
-                User displayed = null;
-                if(lastUserID != null && !lastUserID.equals("")) {
-                    displayed = DBHelper.getInstance(this).getUserByID(lastUserID);
-                }
-                if(displayed != null) {
-                    getSupportActionBar().setTitle(displayed.getName());
+
+                if(lastUser.getValue() != null) {
+                    getSupportActionBar().setTitle(lastUser.getValue().getName());
                 } else {
                     getSupportActionBar().setTitle(R.string.settings);
                 }
@@ -166,33 +180,30 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void tryLoggingInNextUser(String exclude) {
-        User switchTo = getNextInactiveUser(exclude);
+        AsyncTask.execute(() -> {
+            User switchTo = getNextInactiveUser(exclude);
 
-        if(switchTo != null) {
-            Call<User> call = APIHelper.getInstance().getUser(switchTo.getApikey(), switchTo.getID());
-            call.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
+            if(switchTo != null) {
+                Call<User> call = APIHelper.getInstance().getUser(switchTo.getApikey(), switchTo.getId());
+                try {
+                    Response<User> response = call.execute();
                     if(response.code() == 200 && response.body() != null) {
                         User received = response.body();
                         if(received != null) {
-                            DBHelper.getInstance(SettingsActivity.this).updateUser(received);
-                            settings.edit().putString("userID", received.getID()).putString("userAPIKey", received.getApikey()).apply();
+                            AppDatabase.getInstance(SettingsActivity.this).users().update(received);
+                            settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         }
                     }
-                }
-
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
+                } catch(IOException | RuntimeException e) {
                     // failed
                 }
-            });
-        } // else failed
+            } // else failed
+        });
     }
 
     private User getNextInactiveUser(String exclude) {
-        for(User user : DBHelper.getInstance(this).getUsers()) {
-            if(!user.getID().equals(settings.getString("userID", "")) && !user.getID().equals(exclude)) {
+        for(User user : AppDatabase.getInstance(this).users().getUsersSynchronous()) {
+            if(!user.getId().equals(settings.getString("userID", "")) && !user.getId().equals(exclude)) {
                 return user;
             }
         }

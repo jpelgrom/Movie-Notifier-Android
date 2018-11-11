@@ -38,7 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
@@ -72,7 +72,7 @@ public class WatchersFragment extends Fragment {
     private List<Watcher> watchersSorted = new ArrayList<>();
     private WatchersAdapter adapter;
 
-    private List<Cinema> cinemas = null;
+    private List<Cinema> cinemas = new ArrayList<>();
 
     private SharedPreferences settings;
 
@@ -85,7 +85,8 @@ public class WatchersFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        cinemas = DBHelper.getInstance(getContext()).getCinemas();
+        AppDatabase.getInstance(getContext()).cinemas().getCinemas()
+                .observe(this, cinemas -> this.cinemas = cinemas);
 
         settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
     }
@@ -280,7 +281,7 @@ public class WatchersFragment extends Fragment {
                     && getContext() != null
                     && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 nearby = locationUtil.getClosestCinema(locationUser, cinemas);
-                if(nearby != null && LocationUtil.getDistance(locationUser, nearby.getLatitude(), nearby.getLongitude()) < 2000) {
+                if(nearby != null && LocationUtil.getDistance(locationUser, nearby.getLat(), nearby.getLon()) < 2000) {
                     highlightNearby = true;
                 }
             }
@@ -295,19 +296,19 @@ public class WatchersFragment extends Fragment {
             for(int i = 0; i < watchersSorted.size(); i++) {
                 Watcher watcher = watchersSorted.get(i);
                 if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
                         watchersNowNearby.add(watcher);
                     } else {
                         watchersNow.add(watcher);
                     }
                 } else if(watcher.getEnd() < System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
                         watchersPastNearby.add(watcher);
                     } else {
                         watchersPast.add(watcher);
                     }
                 } else if(watcher.getBegin() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getID())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
                         watchersFutureNearby.add(watcher);
                     } else {
                         watchersFuture.add(watcher);

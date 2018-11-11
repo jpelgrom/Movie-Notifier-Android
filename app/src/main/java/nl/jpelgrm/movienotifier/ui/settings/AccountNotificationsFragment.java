@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
-import nl.jpelgrm.movienotifier.data.DBHelper;
+import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.view.NotificationTypeView;
@@ -60,10 +61,11 @@ public class AccountNotificationsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        User current = DBHelper.getInstance(getContext()).getUserByID(settings.getString("userID", ""));
-        if (current != null) {
-            userActivated = current.getNotifications();
-        }
+        AppDatabase.getInstance(getContext()).users().getUserById(settings.getString("userID", "")).observe(this, current -> {
+            if (current != null) {
+                userActivated = current.getNotifications();
+            }
+        });
 
         getTypes();
 
@@ -145,8 +147,12 @@ public class AccountNotificationsFragment extends Fragment {
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.code() == 200) {
                     User received = response.body();
-                    DBHelper.getInstance(getActivity()).addUser(received);
-                    getActivity().finish();
+                    AsyncTask.execute(() -> {
+                        AppDatabase.getInstance(getContext()).users().add(received);
+                        if(getActivity() != null && !getActivity().isFinishing()) {
+                            getActivity().runOnUiThread(() -> getActivity().finish());
+                        }
+                    });
                 } else {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
