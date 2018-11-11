@@ -25,6 +25,10 @@
 -renamesourcefileattribute SourceFile
 
 
+## Apache Commons Text
+-dontwarn javax.script.**
+
+
 ## Gson (https://github.com/google/gson/blob/master/examples/android-proguard-example/proguard.cfg)
 -keepattributes Signature
 -keepattributes *Annotation*
