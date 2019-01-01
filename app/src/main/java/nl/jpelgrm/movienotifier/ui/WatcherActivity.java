@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,24 +12,8 @@ import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.emoji.widget.EmojiAppCompatEditText;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -39,12 +22,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.TimePicker;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.text.WordUtils;
 
@@ -55,6 +40,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.emoji.widget.EmojiAppCompatEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
@@ -143,12 +140,7 @@ public class WatcherActivity extends AppCompatActivity {
     private LocationUtil locationUtil = new LocationUtil();
 
     Handler validateCinemaIDHandler = new Handler();
-    Runnable validateCinemaIDRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateCinemaID(false);
-        }
-    };
+    Runnable validateCinemaIDRunnable = () -> validateCinemaID(false);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,19 +159,16 @@ public class WatcherActivity extends AppCompatActivity {
 
         NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(nfcAdapter != null) {
-            nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
-                @Override
-                public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-                    if(id.equals("")) {
-                        return null;
-                    } else {
-                        return new NdefMessage(
-                            new NdefRecord[] {
-                                    NdefRecord.createUri(BuildConfig.SERVER_BASE_URL + "w/" + id),
-                                    NdefRecord.createApplicationRecord(BuildConfig.APPLICATION_ID)
-                            }
-                        );
-                    }
+            nfcAdapter.setNdefPushMessageCallback(nfcEvent -> {
+                if(id.equals("")) {
+                    return null;
+                } else {
+                    return new NdefMessage(
+                        new NdefRecord[] {
+                                NdefRecord.createUri(BuildConfig.SERVER_BASE_URL + "w/" + id),
+                                NdefRecord.createApplicationRecord(BuildConfig.APPLICATION_ID)
+                        }
+                    );
                 }
             }, this);
         }
@@ -243,18 +232,10 @@ public class WatcherActivity extends AppCompatActivity {
         });
 
         if(settings.getInt("prefAutocompleteLocation", -1) == -1) {
-            autocompleteSuggestion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    askForLocation();
-                }
-            });
-            autocompleteSuggestionCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
-                    autocompleteSuggestion.setVisibility(View.GONE);
-                }
+            autocompleteSuggestion.setOnClickListener(view -> askForLocation());
+            autocompleteSuggestionCancel.setOnClickListener(view -> {
+                settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                autocompleteSuggestion.setVisibility(View.GONE);
             });
         } else {
             autocompleteSuggestion.setVisibility(View.GONE);
@@ -263,34 +244,22 @@ public class WatcherActivity extends AppCompatActivity {
             }
         }
 
-        begin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(true, true, watcher.getBegin());
-            }
+        begin.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDateTimePicker(true, true, watcher.getBegin());
         });
-        end.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(true, false, watcher.getEnd());
-            }
+        end.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDateTimePicker(true, false, watcher.getEnd());
         });
 
-        filterStartAfter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(false, true, watcher.getFilters().getStartAfter());
-            }
+        filterStartAfter.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDateTimePicker(false, true, watcher.getFilters().getStartAfter());
         });
-        filterStartBefore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-                showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
-            }
+        filterStartBefore.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
         });
 
         setOnPropClickListener(filterIMAX, new PropResultListener() {
@@ -360,50 +329,34 @@ public class WatcherActivity extends AppCompatActivity {
             }
         });
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mode == Mode.VIEWING) {
-                    mode = Mode.EDITING;
-                    updateViews();
+        fab.setOnClickListener(view -> {
+            if(mode == Mode.VIEWING) {
+                mode = Mode.EDITING;
+                updateViews();
 
-                    watcherName.requestFocus();
-                    InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+                watcherName.requestFocus();
+                InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+            } else {
+                InterfaceUtil.hideKeyboard(WatcherActivity.this);
+                if(snackbar != null && snackbar.isShown()) {
+                    snackbar.dismiss();
+                }
+
+                if(!settings.getString("userID", "").equals("")) {
+                    saveWatcher();
                 } else {
-                    InterfaceUtil.hideKeyboard(WatcherActivity.this);
-                    if(snackbar != null && snackbar.isShown()) {
-                        snackbar.dismiss();
-                    }
-
-                    if(!settings.getString("userID", "").equals("")) {
-                        saveWatcher();
-                    } else {
-                        snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction(R.string.add, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                startActivity(new Intent(WatcherActivity.this, AccountActivity.class));
-                            }
-                        });
-                        snackbar.show();
-                    }
+                    snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction(R.string.add, view1 -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
+                    snackbar.show();
                 }
             }
         });
 
-        loaderErrorAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(WatcherActivity.this, AccountActivity.class));
-            }
-        });
-        loaderErrorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loaderErrorButton.setEnabled(false);
-                progress.setVisibility(View.VISIBLE);
-                setupWatcher();
-            }
+        loaderErrorAccount.setOnClickListener(view -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
+        loaderErrorButton.setOnClickListener(view -> {
+            loaderErrorButton.setEnabled(false);
+            progress.setVisibility(View.VISIBLE);
+            setupWatcher();
         });
 
         // Al ready to go!
@@ -423,26 +376,34 @@ public class WatcherActivity extends AppCompatActivity {
                 data = getIntent().getDataString();
             }
 
-            if(Patterns.WEB_URL.matcher(data).matches()) {
+            try {
                 Uri received = Uri.parse(data);
-                Uri instance = Uri.parse(BuildConfig.SERVER_BASE_URL);
+                if(Patterns.WEB_URL.matcher(data).matches()) {
+                    Uri instance = Uri.parse(BuildConfig.SERVER_BASE_URL);
 
-                if(received.getHost().equals(instance.getHost())) {
-                    if(received.getPathSegments().size() == 2 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
-                        id = received.getPathSegments().get(1);
-                    }
-                } else if(received.getHost().equals("www.pathe.nl")) {
-                    if(received.getPathSegments().size() >= 2
-                            && received.getPathSegments().get(0) != null && received.getPathSegments().get(0).equals("film")
-                            && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
-                        sharedMovieID = Integer.parseInt(received.getPathSegments().get(1));
+                    if(received.getHost().equals(instance.getHost())) {
+                        if(received.getPathSegments().size() == 2 && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
+                            id = received.getPathSegments().get(1);
+                        }
+                    } else if(received.getHost().equals("www.pathe.nl")) {
+                        if(received.getPathSegments().size() >= 2
+                                && received.getPathSegments().get(0) != null && received.getPathSegments().get(0).equals("film")
+                                && received.getPathSegments().get(1) != null && !received.getPathSegments().get(1).equals("")) {
+                            sharedMovieID = Integer.parseInt(received.getPathSegments().get(1));
 
-                        if(received.getPathSegments().size() >= 3 && received.getPathSegments().get(2) != null
-                                && !received.getPathSegments().get(2).equals("")) {
-                            sharedTitle = WordUtils.capitalizeFully(received.getPathSegments().get(2).replace("-", " "));
+                            if(received.getPathSegments().size() >= 3 && received.getPathSegments().get(2) != null
+                                    && !received.getPathSegments().get(2).equals("")) {
+                                sharedTitle = WordUtils.capitalizeFully(received.getPathSegments().get(2).replace("-", " "));
+                            }
                         }
                     }
+                } else if(received.getScheme() != null && received.getScheme().equals("patheapp")) {
+                    if(received.getLastPathSegment() != null) {
+                        sharedMovieID = Integer.parseInt(received.getLastPathSegment());
+                    }
                 }
+            } catch(Exception e) {
+                // Failed, don't do anything with data
             }
         }
     }
@@ -510,7 +471,7 @@ public class WatcherActivity extends AppCompatActivity {
         Call<Watcher> call = APIHelper.getInstance().getWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<Watcher>() {
             @Override
-            public void onResponse(Call<Watcher> call, Response<Watcher> response) {
+            public void onResponse(@NonNull Call<Watcher> call, @NonNull Response<Watcher> response) {
                 if(response.code() == 200) {
                     watcher = response.body();
                     id = watcher.getID();
@@ -552,7 +513,7 @@ public class WatcherActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Watcher> call, Throwable t) {
+            public void onFailure(@NonNull Call<Watcher> call, @NonNull Throwable t) {
                 t.printStackTrace();
 
                 progress.setVisibility(View.GONE);
@@ -708,40 +669,34 @@ public class WatcherActivity extends AppCompatActivity {
         final Calendar current = Calendar.getInstance();
         current.setTimeInMillis(currentValue);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                final int mYear = year;
-                final int mMonth = month;
-                final int mDay = day;
-                TimePickerDialog timePickerDialog = new TimePickerDialog(WatcherActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        Calendar setTo = Calendar.getInstance();
-                        setTo.set(mYear, mMonth, mDay, hour, minute, 0);
-                        if(checkingValue) {
-                            if(beginValue) {
-                                watcher.setBegin(setTo.getTimeInMillis());
-                                validateAndFixEnd();
-                            } else {
-                                watcher.setEnd(setTo.getTimeInMillis());
-                                validateAndFixBegin();
-                            }
-                        } else {
-                            if(beginValue) {
-                                watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
-                                validateAndFixStartBefore();
-                            } else {
-                                watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
-                                validateAndFixStartAfter();
-                            }
-                        }
-
-                        updateViews();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
+            final int mYear = year;
+            final int mMonth = month;
+            final int mDay = day;
+            TimePickerDialog timePickerDialog = new TimePickerDialog(WatcherActivity.this, (timePicker, hour, minute) -> {
+                Calendar setTo = Calendar.getInstance();
+                setTo.set(mYear, mMonth, mDay, hour, minute, 0);
+                if(checkingValue) {
+                    if(beginValue) {
+                        watcher.setBegin(setTo.getTimeInMillis());
+                        validateAndFixEnd();
+                    } else {
+                        watcher.setEnd(setTo.getTimeInMillis());
+                        validateAndFixBegin();
                     }
-                }, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), android.text.format.DateFormat.is24HourFormat(WatcherActivity.this));
-                timePickerDialog.show();
-            }
+                } else {
+                    if(beginValue) {
+                        watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
+                        validateAndFixStartBefore();
+                    } else {
+                        watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
+                        validateAndFixStartAfter();
+                    }
+                }
+
+                updateViews();
+            }, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), android.text.format.DateFormat.is24HourFormat(WatcherActivity.this));
+            timePickerDialog.show();
         }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
         datePickerDialog.show();
@@ -915,7 +870,7 @@ public class WatcherActivity extends AppCompatActivity {
 
             call.enqueue(new Callback<Watcher>() {
                 @Override
-                public void onResponse(Call<Watcher> call, Response<Watcher> response) {
+                public void onResponse(@NonNull Call<Watcher> call, @NonNull Response<Watcher> response) {
                     fab.setEnabled(true);
                     progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
@@ -942,7 +897,7 @@ public class WatcherActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<Watcher> call, Throwable t) {
+                public void onFailure(@NonNull Call<Watcher> call, @NonNull Throwable t) {
                     t.printStackTrace();
 
                     fab.setEnabled(true);
@@ -967,7 +922,7 @@ public class WatcherActivity extends AppCompatActivity {
         Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if(response.code() == 200) {
                     WatcherActivity.this.finish();
                 } else {
@@ -988,7 +943,7 @@ public class WatcherActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 t.printStackTrace();
 
                 fab.setEnabled(true);
@@ -1028,37 +983,31 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void setOnPropClickListener(final View click, final PropResultListener callback) {
-        click.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after menu close due to focusing again
+        click.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after menu close due to focusing again
 
-                PopupMenu popupMenu = new PopupMenu(WatcherActivity.this, click);
-                popupMenu.getMenuInflater().inflate(R.menu.menu_prop, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(watcher.getFilters() == null) {
-                            watcher.setFilters(new WatcherFilters());
-                        }
-                        switch(item.getItemId()) {
-                            case R.id.filter_yes:
-                                callback.gotResult(WatcherFilters.WatcherFilterValue.YES);
-                                break;
-                            case R.id.filter_no:
-                                callback.gotResult(WatcherFilters.WatcherFilterValue.NO);
-                                break;
-                            case R.id.filter_nopreference:
-                            default:
-                                callback.gotResult(WatcherFilters.WatcherFilterValue.NOPREFERENCE);
-                                break;
-                        }
-                        updateViews();
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
+            PopupMenu popupMenu = new PopupMenu(WatcherActivity.this, click);
+            popupMenu.getMenuInflater().inflate(R.menu.menu_prop, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if(watcher.getFilters() == null) {
+                    watcher.setFilters(new WatcherFilters());
+                }
+                switch(item.getItemId()) {
+                    case R.id.filter_yes:
+                        callback.gotResult(WatcherFilters.WatcherFilterValue.YES);
+                        break;
+                    case R.id.filter_no:
+                        callback.gotResult(WatcherFilters.WatcherFilterValue.NO);
+                        break;
+                    case R.id.filter_nopreference:
+                    default:
+                        callback.gotResult(WatcherFilters.WatcherFilterValue.NOPREFERENCE);
+                        break;
+                }
+                updateViews();
+                return true;
+            });
+            popupMenu.show();
         });
     }
 
@@ -1069,12 +1018,10 @@ public class WatcherActivity extends AppCompatActivity {
                 super.onBackPressed();
             } else {
                 InterfaceUtil.hideKeyboard(this);
-                new AlertDialog.Builder(this).setMessage(R.string.watcher_discard).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        WatcherActivity.super.onBackPressed();
-                    }
-                }).setNegativeButton(R.string.no, null).show();
+                new AlertDialog.Builder(this).setMessage(R.string.watcher_discard)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> WatcherActivity.super.onBackPressed())
+                        .setNegativeButton(R.string.no, null)
+                        .show();
             }
         } else {
             super.onBackPressed();
@@ -1102,13 +1049,13 @@ public class WatcherActivity extends AppCompatActivity {
                 duplicateWatcher();
                 return true;
             case R.id.watcherMenuDelete:
-                new AlertDialog.Builder(this).setMessage(R.string.watcher_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        deleteWatcher();
-                    }
-                }).setNegativeButton(R.string.no, null).show();
+                new AlertDialog.Builder(this).setMessage(R.string.watcher_delete_confirm)
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            deleteWatcher();
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -1128,12 +1075,7 @@ public class WatcherActivity extends AppCompatActivity {
             if(!isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.ok, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
-                                }
-                            });
+                            .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE));
                     snackbar.show();
                 } else {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
