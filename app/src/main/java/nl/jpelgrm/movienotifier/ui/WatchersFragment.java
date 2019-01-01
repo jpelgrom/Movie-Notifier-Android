@@ -8,20 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +15,26 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -101,16 +102,13 @@ public class WatchersFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // List
-        listSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if(snackbar != null && snackbar.isShown()) {
-                    snackbar.dismiss();
-                }
-                refreshList(true, true);
-                if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
-                    startLocation();
-                }
+        listSwiper.setOnRefreshListener(() -> {
+            if(snackbar != null && snackbar.isShown()) {
+                snackbar.dismiss();
+            }
+            refreshList(true, true);
+            if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
+                startLocation();
             }
         });
         adapter = new WatchersAdapter(getContext(), watchers);
@@ -119,26 +117,13 @@ public class WatchersFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listRecycler.getContext(), LinearLayoutManager.VERTICAL);
         listRecycler.addItemDecoration(dividerItemDecoration);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getContext(), WatcherActivity.class));
-            }
-        });
+        fab.setOnClickListener(view1 -> startActivity(new Intent(getContext(), WatcherActivity.class)));
 
         if(settings.getInt("prefAutomagicLocation", -1) == -1) {
-            listAutomagicSuggestion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    askForLocation();
-                }
-            });
-            listAutomagicSuggestionCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
-                    listAutomagicSuggestion.setVisibility(View.GONE);
-                }
+            listAutomagicSuggestion.setOnClickListener(view2 -> askForLocation());
+            listAutomagicSuggestionCancel.setOnClickListener(view3 -> {
+                settings.edit().putInt("prefAutomagicLocation", 0).apply();
+                listAutomagicSuggestion.setVisibility(View.GONE);
             });
         } else {
             if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
@@ -174,66 +159,54 @@ public class WatchersFragment extends Fragment {
     }
 
     private void refreshList(final boolean userTriggered, final boolean showError) {
-        listSwiper.post(new Runnable() {
-            @Override
-            public void run() {
-                listSwiper.setRefreshing(true);
+        listSwiper.post(() -> {
+            listSwiper.setRefreshing(true);
 
-                if(!settings.getString("userID", "").equals("")) {
-                    Call<List<Watcher>> call = APIHelper.getInstance().getWatchers(settings.getString("userAPIKey", ""));
-                    call.enqueue(new Callback<List<Watcher>>() {
-                        @Override
-                        public void onResponse(Call<List<Watcher>> call, Response<List<Watcher>> response) {
-                            listSwiper.setRefreshing(false);
+            if(!settings.getString("userID", "").equals("")) {
+                Call<List<Watcher>> call = APIHelper.getInstance().getWatchers(settings.getString("userAPIKey", ""));
+                call.enqueue(new Callback<List<Watcher>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<Watcher>> call, @NonNull Response<List<Watcher>> response) {
+                        listSwiper.setRefreshing(false);
 
-                            if(response.code() == 200) {
-                                watchers = response.body();
-                                filterAndSort(false);
-                            } else {
-                                if(showError) {
-                                    if(response.code() == 401) {
-                                        snackbar = Snackbar.make(coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
-                                        snackbar.setAction(R.string.ok, new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                startActivity(new Intent(getActivity(), AccountActivity.class));
-                                            }
-                                        });
-                                    } else if(response.code() >= 500 && response.code() < 600){
-                                        snackbar = Snackbar.make(coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
-                                    } else {
-                                        snackbar = Snackbar.make(coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
-                                    }
-                                    snackbar.show();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<List<Watcher>> call, Throwable t) {
-                            t.printStackTrace();
-
-                            listSwiper.setRefreshing(false);
-
+                        if(response.code() == 200) {
+                            watchers = response.body();
+                            filterAndSort(false);
+                        } else {
                             if(showError) {
-                                snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
+                                if(response.code() == 401) {
+                                    snackbar = Snackbar.make(coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
+                                    snackbar.setAction(R.string.ok, view -> startActivity(new Intent(getActivity(), AccountActivity.class)));
+                                } else if(response.code() >= 500 && response.code() < 600){
+                                    snackbar = Snackbar.make(coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
+                                } else {
+                                    snackbar = Snackbar.make(coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
+                                }
                                 snackbar.show();
                             }
                         }
-                    });
-                } else {
-                    showEmptyView();
-
-                    if(userTriggered) {
-                        snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction(R.string.add, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                startActivity(new Intent(getActivity(), AccountActivity.class));
-                            }
-                        });
-                        snackbar.show();
                     }
+
+                    @Override
+                    public void onFailure(@NonNull Call<List<Watcher>> call, @NonNull Throwable t) {
+                        t.printStackTrace();
+
+                        listSwiper.setRefreshing(false);
+
+                        if(showError) {
+                            snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
+                            snackbar.show();
+                        }
+                    }
+                });
+            } else {
+                watchers.clear();
+                showEmptyView();
+
+                if(userTriggered) {
+                    snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction(R.string.add, view -> startActivity(new Intent(getActivity(), AccountActivity.class)));
+                    snackbar.show();
                 }
             }
         });
@@ -266,12 +239,7 @@ public class WatchersFragment extends Fragment {
         // Sort
         int sort = settings.getInt("listSort", 0);
 
-        Comparator<Watcher> sortAZ = new Comparator<Watcher>() {
-            @Override
-            public int compare(Watcher w1, Watcher w2) {
-                return w1.getName().compareToIgnoreCase(w2.getName());
-            }
-        };
+        Comparator<Watcher> sortAZ = (w1, w2) -> w1.getName().compareToIgnoreCase(w2.getName());
 
         if(sort == 0) { // Automagic
             boolean highlightNearby = false;
@@ -335,32 +303,17 @@ public class WatchersFragment extends Fragment {
             Comparator<Watcher> comparator;
             switch(sort) {
                 case 2: // End (stop checking)
-                    comparator = new Comparator<Watcher>() {
-                        @Override
-                        public int compare(Watcher w1, Watcher w2) {
-                            return Long.compare(w1.getEnd(), w2.getEnd());
-                        }
-                    };
+                    comparator = (w1, w2) -> Long.compare(w1.getEnd(), w2.getEnd());
                     break;
                 case 3: // Start after (first showing)
-                    comparator = new Comparator<Watcher>() {
-                        @Override
-                        public int compare(Watcher w1, Watcher w2) {
-                            return Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
-                        }
-                    };
+                    comparator = (w1, w2) -> Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
                     break;
                 case 4: // A-Z
                     comparator = sortAZ;
                     break;
                 case 1: // Begin (start checking)
                 default:
-                    comparator = new Comparator<Watcher>() {
-                        @Override
-                        public int compare(Watcher w1, Watcher w2) {
-                            return Long.compare(w1.getBegin(), w2.getBegin());
-                        }
-                    };
+                    comparator = (w1, w2) -> Long.compare(w1.getBegin(), w2.getBegin());
                     break;
             }
             Collections.sort(watchersSorted, comparator);
@@ -410,7 +363,7 @@ public class WatchersFragment extends Fragment {
                 Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                         progress.setVisibility(View.GONE);
                         listRecycler.setClickable(true);
 
@@ -433,7 +386,7 @@ public class WatchersFragment extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                         t.printStackTrace();
 
                         progress.setVisibility(View.GONE);
@@ -457,12 +410,7 @@ public class WatchersFragment extends Fragment {
             if(!getActivity().isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
                     snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.ok, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC);
-                                }
-                            });
+                            .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC));
                     snackbar.show();
                 } else {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC);
