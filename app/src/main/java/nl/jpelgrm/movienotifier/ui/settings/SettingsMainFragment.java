@@ -10,38 +10,36 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -94,12 +92,8 @@ public class SettingsMainFragment extends Fragment {
 
         AppDatabase.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
             // Data
-            Collections.sort(cinemas, new Comparator<Cinema>() {
-                @Override
-                public int compare(Cinema c1, Cinema c2) {
-                    return c1.getName().compareTo(c2.getName());
-                }
-            });
+            Collections.sort(cinemas, (c1, c2) -> c1.getName().compareTo(c2.getName()));
+            this.cinemas = cinemas;
 
             // Dialog
             List<String> choices = new ArrayList<>();
@@ -126,85 +120,56 @@ public class SettingsMainFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        dayNight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CharSequence[] items = { getString(R.string.settings_general_daynight_auto), getString(R.string.settings_general_daynight_day),
-                        getString(R.string.settings_general_daynight_night) };
-                int currentValueIndex = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
+        dayNight.setOnClickListener(view1 -> {
+            CharSequence[] items = { getString(R.string.settings_general_daynight_auto), getString(R.string.settings_general_daynight_day),
+                    getString(R.string.settings_general_daynight_night) };
+            int currentValueIndex = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
-                new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_daynight_title).setSingleChoiceItems(items, currentValueIndex, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        dialogInterface.dismiss();
-                        setDayNight(which);
-                    }
-                }).setNegativeButton(R.string.cancel, null).show();
-            }
+            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_daynight_title)
+                    .setSingleChoiceItems(items, currentValueIndex, (dialogInterface, which) -> {
+                dialogInterface.dismiss();
+                setDayNight(which);
+            }).setNegativeButton(R.string.cancel, null).show();
         });
-        dayNightLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(getActivity() != null && !getActivity().isFinishing()) {
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                                .setAction(R.string.ok, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
-                                    }
-                                }).show();
-                    } else {
-                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
-                    }
+        dayNightLocation.setOnClickListener(view2 -> {
+            if(getActivity() != null && !getActivity().isFinishing()) {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.ok, view3 -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT)).show();
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
                 }
             }
         });
-        location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String currentPreference = settings.getString("prefDefaultCinema", "");
-                int currentValueIndex = 0;
-                if(cinemas != null) {
-                    for(int i = 0; i < cinemas.size(); i++) {
-                        if(cinemas.get(i).getId().equals(currentPreference)) {
-                            currentValueIndex = i + 1;
-                        }
+        location.setOnClickListener(view4 -> {
+            String currentPreference = settings.getString("prefDefaultCinema", "");
+            int currentValueIndex = 0;
+            if(cinemas != null) {
+                for(int i = 0; i < cinemas.size(); i++) {
+                    if(cinemas.get(i).getId().equals(currentPreference)) {
+                        currentValueIndex = i + 1;
                     }
                 }
-                if(!currentPreference.equals("") && currentValueIndex == 0) {
-                    currentValueIndex = -1; // Don't select anything
-                }
+            }
+            if(!currentPreference.equals("") && currentValueIndex == 0) {
+                currentValueIndex = -1; // Don't select anything
+            }
 
-                new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_location_title).setSingleChoiceItems(cinemaItems, currentValueIndex, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        dialogInterface.dismiss();
-                        setCinemaPreference(which);
-                    }
-                }).setNegativeButton(R.string.cancel, null).show();
-            }
+            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_location_title).setSingleChoiceItems(cinemaItems, currentValueIndex, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which) {
+                    dialogInterface.dismiss();
+                    setCinemaPreference(which);
+                }
+            }).setNegativeButton(R.string.cancel, null).show();
         });
-        service.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                service.setValue(R.string.settings_general_location_service_updating);
-                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getContext()));
-                dispatcher.mustSchedule(CinemaUpdateJob.getJobToUpdateImmediately(dispatcher));
-            }
+        service.setOnClickListener(view5 -> {
+            service.setValue(R.string.settings_general_location_service_updating);
+            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getContext()));
+            dispatcher.mustSchedule(CinemaUpdateJob.getJobToUpdateImmediately(dispatcher));
         });
-        autocomplete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setAutocompleteLocationPreference(isChecked);
-            }
-        });
-        automagic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setAutomagicLocationPreference(isChecked);
-            }
-        });
+        autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
+        automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
 
         adapter = new AccountsAdapter(getContext(), users);
         accountsRecycler.setAdapter(adapter);
@@ -216,12 +181,7 @@ public class SettingsMainFragment extends Fragment {
         adapter.swapItems(users);
         updateAccountsList();
 
-        addAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), AccountActivity.class));
-            }
-        });
+        addAccount.setOnClickListener(view6 -> startActivity(new Intent(getActivity(), AccountActivity.class)));
 
         updateValues();
     }
@@ -358,12 +318,7 @@ public class SettingsMainFragment extends Fragment {
                         check.setChecked(false); // Wait for result until switch is set
 
                         Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                                .setAction(R.string.ok, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
-                                    }
-                                }).show();
+                                .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode)).show();
                     } else {
                         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
                     }
