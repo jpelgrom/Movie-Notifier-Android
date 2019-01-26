@@ -86,7 +86,7 @@ public class Cinema {
         Cinema cinema = (Cinema) o;
 
         if (!id.equals(cinema.id)) return false;
-        if (!name.equals(cinema.name)) return false;
+        if (name != null ? !name.equals(cinema.name) : cinema.name != null) return false;
         if (lat != null ? !lat.equals(cinema.lat) : cinema.lat != null) return false;
         return lon != null ? lon.equals(cinema.lon) : cinema.lon == null;
     }
@@ -94,7 +94,7 @@ public class Cinema {
     @Override
     public int hashCode() {
         int result = id.hashCode();
-        result = 31 * result + name.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (lat != null ? lat.hashCode() : 0);
         result = 31 * result + (lon != null ? lon.hashCode() : 0);
         return result;

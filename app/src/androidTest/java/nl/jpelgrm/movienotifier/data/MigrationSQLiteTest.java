@@ -60,24 +60,8 @@ public class MigrationSQLiteTest {
 
         // Verify data
         User dbUser = latestDb.users().getUserByIdSynchronous(testUser.getId());
-        checkUser(dbUser, testUser);
+        assertEquals(dbUser, testUser);
         Cinema dbCinema = latestDb.cinemas().getCinemaById(testCinema.getId());
-        checkCinema(dbCinema, testCinema);
-    }
-
-    private void checkUser(User fromDB, User expected) {
-        assertEquals(fromDB.getId(), expected.getId());
-        assertEquals(fromDB.getName(), expected.getName());
-        assertEquals(fromDB.getEmail(), expected.getEmail());
-        assertEquals(fromDB.getPhonenumber(), expected.getPhonenumber());
-        assertEquals(fromDB.getNotifications(), expected.getNotifications());
-        assertEquals(fromDB.getApikey(), expected.getApikey());
-    }
-
-    private void checkCinema(Cinema fromDB, Cinema expected) {
-        assertEquals(fromDB.getId(), expected.getId());
-        assertEquals(fromDB.getName(), expected.getName());
-        assertEquals(fromDB.getLat(), expected.getLat());
-        assertEquals(fromDB.getLon(), expected.getLon());
+        assertEquals(dbCinema, testCinema);
     }
 }
