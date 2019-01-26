@@ -25,6 +25,9 @@ public interface DaoUsers {
     @Query("SELECT * FROM Users WHERE ID = :id")
     LiveData<User> getUserById(String id);
 
+    @Query("SELECT * FROM Users WHERE ID = :id")
+    User getUserByIdSynchronous(String id);
+
     @Update
     void update(User user);
 

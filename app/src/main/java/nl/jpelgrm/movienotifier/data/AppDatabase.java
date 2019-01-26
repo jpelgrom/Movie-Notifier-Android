@@ -33,7 +33,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
-    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // Room will throw an exception because the existing DB columns for ID are nullable, so fix that
