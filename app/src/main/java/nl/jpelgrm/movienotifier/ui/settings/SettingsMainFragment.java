@@ -15,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -40,6 +38,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.WorkManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -47,7 +46,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.service.CinemaUpdateJob;
+import nl.jpelgrm.movienotifier.service.CinemaUpdateWorker;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import retrofit2.Call;
@@ -165,8 +164,7 @@ public class SettingsMainFragment extends Fragment {
         });
         service.setOnClickListener(view5 -> {
             service.setValue(R.string.settings_general_location_service_updating);
-            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getContext()));
-            dispatcher.mustSchedule(CinemaUpdateJob.getJobToUpdateImmediately(dispatcher));
+            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmdiately());
         });
         autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
         automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
@@ -194,7 +192,7 @@ public class SettingsMainFragment extends Fragment {
         updateValues();
         updateAccountsList();
 
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastComplete, new IntentFilter(CinemaUpdateJob.BROADCAST_COMPLETE));
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastComplete, new IntentFilter(CinemaUpdateWorker.BROADCAST_COMPLETE));
     }
 
     @Override

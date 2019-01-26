@@ -72,14 +72,6 @@
             android:name=".ui.settings.AccountActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-
-        <service
-            android:exported="false"
-            android:name=".service.CinemaUpdateJob">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>
