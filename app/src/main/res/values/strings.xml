@@ -30,7 +30,7 @@
     <string name="settings_about_title">About</string>
     <string name="settings_about_name">Movie Notifier Android</string>
     <string name="settings_about_version">Version %1$s, build %2$s</string>
-    <string name="settings_about_copyright">App © 2017 Joris Pelgröm\nService © 2017 Sijmen Huizenga</string>
+    <string name="settings_about_copyright">App © Joris Pelgröm\nService © Sijmen Huizenga</string>
     <string name="settings_about_github"><a href='https://github.com/jpelgrom/Movie-Notifier-Android'>View source code</a></string>
 
     <string name="account_start_title">Hi there!</string>
@@ -153,6 +153,8 @@
     <string name="user_settings_update_name_success">Username updated</string>
     <string name="user_settings_update_email_success">Email address updated</string>
     <string name="user_settings_update_phone_success">Phone number updated</string>
+    <string name="user_privacy_general">Your data is stored securely and will only be used to allow you to use Movie Notifier. You can update or delete your account at any time in the app.</string>
+    <string name="user_privacy_notifications">Your email address or phone number is only shared with the notification service when a notification is sent. No data is shared when there aren\'t any notifications or if you haven\'t turned the notification service on.</string>
 
     <string name="error_login_401">Your username and/or password is incorrect.</string>
     <string name="error_watchers_400">Sorry, please try again.</string>

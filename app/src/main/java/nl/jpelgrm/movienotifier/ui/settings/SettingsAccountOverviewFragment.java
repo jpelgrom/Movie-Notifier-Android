@@ -53,6 +53,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     @BindView(R.id.notifications) LinearLayout notificationsWrapper;
     @BindView(R.id.notificationsEmpty) TextView notificationsEmpty;
+    @BindView(R.id.notificationsPrivacy) LinearLayout notificationsPrivacy;
     @BindView(R.id.notificationTypes) LinearLayout notificationsList;
 
     private User user;
@@ -207,6 +208,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         notificationsWrapper.setVisibility(View.VISIBLE);
         notificationsList.setVisibility(typeList.size() > 0 ? View.VISIBLE : View.GONE);
         notificationsEmpty.setVisibility(typeList.size() > 0 ? View.GONE : View.VISIBLE);
+        notificationsPrivacy.setVisibility(typeList.size() > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
@@ -417,6 +419,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                     notificationsWrapper.setVisibility(user != null ? View.VISIBLE : View.GONE);
                     notificationsList.setVisibility(View.GONE);
                     notificationsEmpty.setVisibility(View.VISIBLE);
+                    notificationsPrivacy.setVisibility(View.GONE);
                 }
             }
 
@@ -428,6 +431,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 notificationsWrapper.setVisibility(user != null ? View.VISIBLE : View.GONE);
                 notificationsList.setVisibility(View.GONE);
                 notificationsEmpty.setVisibility(View.VISIBLE);
+                notificationsPrivacy.setVisibility(View.GONE);
             }
         });
     }

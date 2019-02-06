@@ -115,6 +115,28 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:id="@+id/privacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/listPreferredItemHeightSmall"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="16dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="16dp"
+                    app:srcCompat="@drawable/ic_info"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_privacy_general"/>
+
+            </LinearLayout>
+
             <Button
                 android:id="@+id/go"
                 android:layout_width="match_parent"

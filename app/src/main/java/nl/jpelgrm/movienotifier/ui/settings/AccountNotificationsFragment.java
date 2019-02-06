@@ -37,6 +37,7 @@ public class AccountNotificationsFragment extends Fragment {
     @BindView(R.id.error) TextView error;
 
     @BindView(R.id.types) LinearLayout types;
+    @BindView(R.id.privacy) LinearLayout privacy;
 
     @BindView(R.id.go) Button go;
 
@@ -69,12 +70,9 @@ public class AccountNotificationsFragment extends Fragment {
 
         getTypes();
 
-        go.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                error.setVisibility(View.GONE);
-                save();
-            }
+        go.setOnClickListener(view1 -> {
+            error.setVisibility(View.GONE);
+            save();
         });
     }
 
@@ -91,9 +89,11 @@ public class AccountNotificationsFragment extends Fragment {
                     updateTypesList();
 
                     error.setVisibility(View.GONE);
+                    privacy.setVisibility(View.VISIBLE);
                 } else {
                     error.setText(ErrorUtil.getErrorMessage(getContext(), response));
                     error.setVisibility(View.VISIBLE);
+                    privacy.setVisibility(View.GONE);
                 }
             }
 
@@ -106,6 +106,7 @@ public class AccountNotificationsFragment extends Fragment {
 
                 error.setText(ErrorUtil.getErrorMessage(getContext(), null));
                 error.setVisibility(View.VISIBLE);
+                privacy.setVisibility(View.GONE);
             }
         });
     }
