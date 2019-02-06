@@ -7,8 +7,8 @@ android {
         applicationId "nl.jpelgrm.movienotifier"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 8
-        versionName "1.0"
+        versionCode 9
+        versionName "1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "SERVER_BASE_URL", SERVER_BASE_URL
@@ -54,7 +54,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
-    implementation 'android.arch.work:work-runtime:1.0.0-beta03'
+    implementation 'android.arch.work:work-runtime:1.0.0-beta04'
 
     implementation 'com.jakewharton:butterknife:10.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
