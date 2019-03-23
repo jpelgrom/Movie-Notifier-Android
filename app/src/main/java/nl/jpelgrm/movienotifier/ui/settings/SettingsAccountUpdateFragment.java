@@ -5,10 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -19,12 +15,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
+import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Locale;
-
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -40,7 +35,7 @@ import retrofit2.Response;
 
 public class SettingsAccountUpdateFragment extends Fragment {
     public enum UpdateMode {
-        NAME, EMAIL, PHONE, PASSWORD
+        NAME, EMAIL, PASSWORD
     }
 
     @BindView(R.id.progress) ProgressBar progress;
@@ -70,16 +65,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
         @Override
         public void run() {
             validateEmail();
-        }
-    };
-    Runnable validatePhoneRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if(validatePhone()) {
-                if(!text.getText().toString().equals(getRFCPhoneNumber())) {
-                    text.setText(getRFCPhoneNumber());
-                }
-            }
         }
     };
     Runnable validatePasswordRunnable = new Runnable() {
@@ -156,10 +141,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
                     text.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                     textWrapper.setHint(getString(R.string.user_input_email));
                     break;
-                case PHONE:
-                    text.setInputType(InputType.TYPE_CLASS_PHONE);
-                    textWrapper.setHint(getString(R.string.user_input_phone));
-                    break;
             }
             updateDefaultTextValue();
             text.addTextChangedListener(new TextWatcher() {
@@ -179,10 +160,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
                         case EMAIL:
                             validateTextHandler.removeCallbacks(validateEmailRunnable);
                             validateTextHandler.postDelayed(validateEmailRunnable, 1000);
-                            break;
-                        case PHONE:
-                            validateTextHandler.removeCallbacks(validatePhoneRunnable);
-                            validateTextHandler.postDelayed(validatePhoneRunnable, 1000);
                             break;
                     }
                 }
@@ -209,9 +186,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
                         case EMAIL:
                             toUpdate.setEmail(text.getText().toString());
                             break;
-                        case PHONE:
-                            toUpdate.setPhonenumber(text.getText().toString());
-                            break;
                         case PASSWORD:
                             toUpdate.setPassword(password.getText().toString());
                             break;
@@ -233,9 +207,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 case EMAIL:
                     text.setText(user.getEmail());
                     break;
-                case PHONE:
-                    text.setText(user.getPhonenumber());
-                    break;
             }
         }
     }
@@ -254,8 +225,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 return validateName();
             case EMAIL:
                 return validateEmail();
-            case PHONE:
-                return validatePhone();
             case PASSWORD:
                 return validatePassword();
             default:
@@ -286,17 +255,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
         }
     }
 
-    private boolean validatePhone() {
-        if(UserValidation.validatePhone(text.getText().toString())) {
-            textWrapper.setErrorEnabled(false);
-            return true;
-        } else {
-            textWrapper.setError(getString(R.string.user_validate_phone));
-            textWrapper.setErrorEnabled(true);
-            return false;
-        }
-    }
-
     private boolean validatePassword() {
         if(UserValidation.validatePassword(password.getText().toString())) {
             passwordWrapper.setErrorEnabled(false);
@@ -306,18 +264,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
             passwordWrapper.setErrorEnabled(true);
             return false;
         }
-    }
-
-    private String getRFCPhoneNumber() {
-        PhoneNumberUtil util = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber number;
-        try {
-            number = util.parse(text.getText().toString(), Locale.getDefault().getCountry());
-        } catch(NumberParseException e) {
-            // Should not happen, otherwise validation would have failed
-            return "";
-        }
-        return util.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
     }
 
     private void update(User toUpdate) {

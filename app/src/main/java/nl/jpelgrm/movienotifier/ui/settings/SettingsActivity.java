@@ -129,9 +129,6 @@ public class SettingsActivity extends AppCompatActivity {
             case EMAIL:
                 Snackbar.make(coordinator, R.string.user_settings_update_email_success, Snackbar.LENGTH_SHORT).show();
                 break;
-            case PHONE:
-                Snackbar.make(coordinator, R.string.user_settings_update_phone_success, Snackbar.LENGTH_SHORT).show();
-                break;
             case PASSWORD:
                 Snackbar.make(coordinator, R.string.user_settings_security_password_success, Snackbar.LENGTH_SHORT).show();
                 break;

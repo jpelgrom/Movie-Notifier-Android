@@ -135,7 +135,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             }
         }
         if(foundCinema.equals("")) { // We don't know this cinema ID's display name
-            foundCinema = watcher.getFilters().getCinemaID();
+            foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
         }
         location.setText(foundCinema);
 

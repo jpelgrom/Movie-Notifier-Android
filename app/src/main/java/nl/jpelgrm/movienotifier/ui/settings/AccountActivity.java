@@ -53,17 +53,6 @@ public class AccountActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void showNotifications() {
-        Snackbar.make(coordinator, R.string.account_welcome, Snackbar.LENGTH_LONG).show();
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                .replace(R.id.frame, new AccountNotificationsFragment())
-                .addToBackStack(null)
-                .commit();
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {

@@ -5,10 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,12 +14,11 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
+import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Locale;
-
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -47,8 +42,6 @@ public class AccountAddFragment extends Fragment {
     @BindView(R.id.name) AppCompatEditText name;
     @BindView(R.id.emailWrapper) TextInputLayout emailWrapper;
     @BindView(R.id.email) AppCompatEditText email;
-    @BindView(R.id.phoneWrapper) TextInputLayout phoneWrapper;
-    @BindView(R.id.phone) AppCompatEditText phone;
     @BindView(R.id.passwordWrapper) TextInputLayout passwordWrapper;
     @BindView(R.id.password) AppCompatEditText password;
 
@@ -56,7 +49,6 @@ public class AccountAddFragment extends Fragment {
 
     Handler validateNameHandler = new Handler();
     Handler validateEmailHandler = new Handler();
-    Handler validatePhoneHandler = new Handler();
     Handler validatePasswordHandler = new Handler();
     Runnable validateNameRunnable = new Runnable() {
         @Override
@@ -68,16 +60,6 @@ public class AccountAddFragment extends Fragment {
         @Override
         public void run() {
             validateEmail();
-        }
-    };
-    Runnable validatePhoneRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if(validatePhone()) {
-                if(!phone.getText().toString().equals(getRFCPhoneNumber())) {
-                    phone.setText(getRFCPhoneNumber());
-                }
-            }
         }
     };
     Runnable validatePasswordRunnable = new Runnable() {
@@ -129,19 +111,6 @@ public class AccountAddFragment extends Fragment {
                 validateEmailHandler.postDelayed(validateEmailRunnable, 1000);
             }
         });
-        phone.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                validatePhoneHandler.removeCallbacks(validatePhoneRunnable);
-                validatePhoneHandler.postDelayed(validatePhoneRunnable, 1000);
-            }
-        });
         password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -162,8 +131,8 @@ public class AccountAddFragment extends Fragment {
                 error.setVisibility(View.GONE);
                 InterfaceUtil.hideKeyboard(getActivity());
 
-                if(validateName() && validateEmail() && validatePhone() && validatePassword()) {
-                    User toCreate = new User(name.getText().toString(), email.getText().toString(), getRFCPhoneNumber(), password.getText().toString());
+                if(validateName() && validateEmail() && validatePassword()) {
+                    User toCreate = new User(name.getText().toString(), email.getText().toString(), password.getText().toString());
 
                     register(toCreate);
                 }
@@ -175,7 +144,6 @@ public class AccountAddFragment extends Fragment {
     public void onDestroy() {
         validateNameHandler.removeCallbacksAndMessages(null);
         validateEmailHandler.removeCallbacksAndMessages(null);
-        validatePhoneHandler.removeCallbacksAndMessages(null);
         validatePasswordHandler.removeCallbacksAndMessages(null);
 
         super.onDestroy();
@@ -204,17 +172,6 @@ public class AccountAddFragment extends Fragment {
         }
     }
 
-    private boolean validatePhone() {
-        if(UserValidation.validatePhone(phone.getText().toString())) {
-            phoneWrapper.setErrorEnabled(false);
-            return true;
-        } else {
-            phoneWrapper.setError(getString(R.string.user_validate_phone));
-            phoneWrapper.setErrorEnabled(true);
-            return false;
-        }
-    }
-
     private boolean validatePassword() {
         if(UserValidation.validatePassword(password.getText().toString())) {
             passwordWrapper.setErrorEnabled(false);
@@ -224,18 +181,6 @@ public class AccountAddFragment extends Fragment {
             passwordWrapper.setErrorEnabled(true);
             return false;
         }
-    }
-
-    private String getRFCPhoneNumber() {
-        PhoneNumberUtil util = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber number;
-        try {
-            number = util.parse(phone.getText().toString(), Locale.getDefault().getCountry());
-        } catch(NumberParseException e) {
-            // Should not happen, otherwise validation would have failed
-            return "";
-        }
-        return util.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
     }
 
     private void register(User user) {
@@ -252,7 +197,7 @@ public class AccountAddFragment extends Fragment {
                         AppDatabase.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         if(getActivity() != null && !getActivity().isFinishing()) {
-                            getActivity().runOnUiThread(() -> ((AccountActivity) getActivity()).showNotifications());
+                            getActivity().runOnUiThread(() -> getActivity().finish());
                         }
                     });
                 } else {
@@ -280,7 +225,6 @@ public class AccountAddFragment extends Fragment {
     private void setFieldsEnabled(boolean enabled) {
         nameWrapper.setEnabled(enabled);
         emailWrapper.setEnabled(enabled);
-        phoneWrapper.setEnabled(enabled);
         passwordWrapper.setEnabled(enabled);
         go.setEnabled(enabled);
     }

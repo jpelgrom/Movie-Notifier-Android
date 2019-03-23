@@ -46,7 +46,7 @@ public class MovieNotifierApp extends Application {
 
         // Also run immediately if the list has never been updated
         if(lastUpdated == -1) {
-            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmdiately());
+            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
         }
     }
 }

@@ -10,3 +10,6 @@
 
 # Windows thumbnails
 Thumbs.db
+
+# Firebase config file
+google-services.json

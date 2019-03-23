@@ -1,0 +1,179 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "69019f7c555e5f65eed594a839dc5509",
+    "entities": [
+      {
+        "tableName": "Users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` TEXT NOT NULL, `Name` TEXT, `Email` TEXT, `FCMTokens` TEXT, `APIKey` TEXT, PRIMARY KEY(`ID`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "ID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "Email",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fcmTokens",
+            "columnName": "FCMTokens",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "apikey",
+            "columnName": "APIKey",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Cinemas",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` INTEGER NOT NULL, `Name` TEXT, `Lat` REAL, `Lon` REAL, PRIMARY KEY(`ID`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "ID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "Lat",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "Lon",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Notifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` TEXT NOT NULL, `Time` INTEGER NOT NULL, `UserID` TEXT NOT NULL, `WatcherID` TEXT, `WatcherName` TEXT, `WatcherMovieID` INTEGER NOT NULL, `Matches` INTEGER NOT NULL, `Body` TEXT, PRIMARY KEY(`ID`), FOREIGN KEY(`UserID`) REFERENCES `Users`(`ID`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "ID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "Time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userid",
+            "columnName": "UserID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "watcherid",
+            "columnName": "WatcherID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "watchername",
+            "columnName": "WatcherName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "watchermovieid",
+            "columnName": "WatcherMovieID",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "matches",
+            "columnName": "Matches",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "body",
+            "columnName": "Body",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Notifications_UserID",
+            "unique": false,
+            "columnNames": [
+              "UserID"
+            ],
+            "createSql": "CREATE  INDEX `index_Notifications_UserID` ON `${TABLE_NAME}` (`UserID`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Users",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "UserID"
+            ],
+            "referencedColumns": [
+              "ID"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"69019f7c555e5f65eed594a839dc5509\")"
+    ]
+  }
+}

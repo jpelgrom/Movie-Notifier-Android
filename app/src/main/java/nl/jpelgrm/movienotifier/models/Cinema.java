@@ -14,7 +14,7 @@ public class Cinema {
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "ID")
-    private String id= "";
+    private Integer id = 0;
 
     @Expose
     @ColumnInfo(name = "Name")
@@ -33,7 +33,7 @@ public class Cinema {
         // Default constructor
     }
 
-    public Cinema(@NonNull String id, String name, Double lat, Double lon) {
+    public Cinema(@NonNull Integer id, String name, Double lat, Double lon) {
         this.id = id;
         this.name = name;
         this.lat = lat;
@@ -41,11 +41,11 @@ public class Cinema {
     }
 
     @NonNull
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(@NonNull String id) {
+    public void setId(@NonNull Integer id) {
         this.id = id;
     }
 

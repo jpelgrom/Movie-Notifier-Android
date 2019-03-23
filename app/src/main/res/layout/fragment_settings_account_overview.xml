@@ -93,13 +93,6 @@
                     app:detailIcon="@drawable/ic_mail"
                     app:detailTitle="@string/user_input_email"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/accountPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_phone"
-                    app:detailTitle="@string/user_input_phone"/>
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -195,47 +188,6 @@
                         android:paddingStart="72dp"
                         android:paddingEnd="?listPreferredItemPaddingRight"
                         style="@style/TextMaterialSubheader"/>
-
-                    <TextView
-                        android:id="@+id/notificationsEmpty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="?attr/listPreferredItemHeightSmall"
-                        android:gravity="center_vertical"
-                        android:text="@string/user_settings_notifications_error"
-                        android:paddingStart="72dp"
-                        android:paddingEnd="?listPreferredItemPaddingRight" />
-
-                    <LinearLayout
-                        android:id="@+id/notificationTypes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-
-                    <LinearLayout
-                        android:id="@+id/notificationsPrivacy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="?attr/listPreferredItemHeightSmall"
-                        android:paddingStart="?attr/listPreferredItemPaddingLeft"
-                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:visibility="gone"
-                        tools:visibility="visible">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_marginEnd="32dp"
-                            app:srcCompat="@drawable/ic_info"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/user_privacy_notifications"/>
-
-                    </LinearLayout>
 
                 </LinearLayout>
 

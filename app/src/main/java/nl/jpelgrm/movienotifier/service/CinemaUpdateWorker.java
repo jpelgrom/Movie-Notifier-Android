@@ -59,8 +59,8 @@ public class CinemaUpdateWorker extends Worker {
                 settings.edit().putLong("cinemasUpdated", System.currentTimeMillis()).apply();
 
                 // Finally: check existing user preference for default cinema, and reset if necessary
-                if(db.cinemas().getCinemaById(settings.getString("prefDefaultCinema", "")) == null) {
-                    settings.edit().putString("prefDefaultCinema", "").apply();
+                if(db.cinemas().getCinemaById(settings.getInt("prefSelectedCinema", 0)) == null) {
+                    settings.edit().putInt("prefSelectedCinema", 0).apply();
                 }
 
                 // Notify, UI might need to update
@@ -86,7 +86,7 @@ public class CinemaUpdateWorker extends Worker {
         super.onStopped();
     }
 
-    public static OneTimeWorkRequest getRequestToUpdateImmdiately() {
+    public static OneTimeWorkRequest getRequestToUpdateImmediately() {
         // https://developer.android.com/topic/libraries/architecture/workmanager/basics#workflow
         // "In most cases, (...) WorkManager runs your task right away"
         return new OneTimeWorkRequest.Builder(CinemaUpdateWorker.class)

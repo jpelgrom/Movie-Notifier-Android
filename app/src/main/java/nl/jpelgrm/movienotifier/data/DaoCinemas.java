@@ -23,7 +23,7 @@ public interface DaoCinemas {
     List<Cinema> getCinemasSynchronous();
 
     @Query("SELECT * FROM Cinemas WHERE ID = :id")
-    Cinema getCinemaById(String id);
+    Cinema getCinemaById(int id);
 
     @Update
     void update(Cinema cinema);

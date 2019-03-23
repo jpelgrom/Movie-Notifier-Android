@@ -54,14 +54,15 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+
     implementation 'android.arch.work:work-runtime:1.0.0-beta04'
 
     implementation 'com.jakewharton:butterknife:10.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
 
     implementation 'org.apache.commons:commons-text:1.6'
-
-    implementation 'com.googlecode.libphonenumber:libphonenumber:8.10.2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
@@ -76,3 +77,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.room:room-testing:2.1.0-alpha04'
 }
+
+apply plugin: 'com.google.gms.google-services'

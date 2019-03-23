@@ -27,16 +27,12 @@ public class User {
     private String email;
 
     @Expose
-    @ColumnInfo(name = "Phone")
-    private String phonenumber;
-
-    @Expose
     @Ignore
     private String password;
 
     @Expose
-    @ColumnInfo(name = "Notifications")
-    private List<String> notifications = null;
+    @ColumnInfo(name = "FCMTokens")
+    private List<String> fcmTokens = null;
 
     @Expose(serialize = false)
     @ColumnInfo(name = "APIKey")
@@ -48,19 +44,17 @@ public class User {
     }
 
     @Ignore
-    public User(String name, String email, String phonenumber, String password) {
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
-        this.phonenumber = phonenumber;
         this.password = password;
     }
 
-    public User(@NonNull String id, String name, String email, String phonenumber, List<String> notifications, String apikey) {
+    public User(@NonNull String id, String name, String email, List<String> fcmTokens, String apikey) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.phonenumber = phonenumber;
-        this.notifications = notifications;
+        this.fcmTokens = fcmTokens;
         this.apikey = apikey;
     }
 
@@ -89,24 +83,16 @@ public class User {
         this.email = email;
     }
 
-    public String getPhonenumber() {
-        return phonenumber;
-    }
-
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public List<String> getNotifications() {
-        return notifications;
+    public List<String> getFcmTokens() {
+        return fcmTokens;
     }
 
-    public void setNotifications(List<String> notifications) {
-        this.notifications = notifications;
+    public void setFcmTokens(List<String> fcmTokens) {
+        this.fcmTokens = fcmTokens;
     }
 
     public String getApikey() {
@@ -127,11 +113,9 @@ public class User {
         if (!id.equals(user.id)) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
-        if (phonenumber != null ? !phonenumber.equals(user.phonenumber) : user.phonenumber != null)
-            return false;
         if (password != null ? !password.equals(user.password) : user.password != null)
             return false;
-        if (notifications != null ? !notifications.equals(user.notifications) : user.notifications != null)
+        if (fcmTokens != null ? !fcmTokens.equals(user.fcmTokens) : user.fcmTokens != null)
             return false;
         return apikey != null ? apikey.equals(user.apikey) : user.apikey == null;
     }
@@ -141,9 +125,8 @@ public class User {
         int result = id.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (phonenumber != null ? phonenumber.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (notifications != null ? notifications.hashCode() : 0);
+        result = 31 * result + (fcmTokens != null ? fcmTokens.hashCode() : 0);
         result = 31 * result + (apikey != null ? apikey.hashCode() : 0);
         return result;
     }

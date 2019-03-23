@@ -264,19 +264,19 @@ public class WatchersFragment extends Fragment {
             for(int i = 0; i < watchersSorted.size(); i++) {
                 Watcher watcher = watchersSorted.get(i);
                 if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
                         watchersNowNearby.add(watcher);
                     } else {
                         watchersNow.add(watcher);
                     }
                 } else if(watcher.getEnd() < System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
                         watchersPastNearby.add(watcher);
                     } else {
                         watchersPast.add(watcher);
                     }
                 } else if(watcher.getBegin() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID().equals(nearby.getId())) {
+                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
                         watchersFutureNearby.add(watcher);
                     } else {
                         watchersFuture.add(watcher);

@@ -3,7 +3,6 @@ package nl.jpelgrm.movienotifier.data;
 import java.util.List;
 
 import nl.jpelgrm.movienotifier.models.Cinema;
-import nl.jpelgrm.movienotifier.models.NotificationType;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.models.UserLogin;
 import nl.jpelgrm.movienotifier.models.Watcher;
@@ -50,14 +49,6 @@ public interface APIClient {
 
     @DELETE("/watchers/{watcherid}")
     Call<ResponseBody> deleteWatcher(@Header("APIKEY") String apikey, @Path("watcherid") String watcherid);
-
-
-    // Notification type
-    @GET("/notificationtypes")
-    Call<List<NotificationType>> getNotificationTypes(@Header("APIKEY") String apikey);
-
-    @GET("/notificationtype/{notificationtypekey}")
-    Call<NotificationType> getNotificationType(@Header("APIKEY") String apikey, @Path("notificationtypekey") String notificationtypekey);
 
 
     // Cinemas

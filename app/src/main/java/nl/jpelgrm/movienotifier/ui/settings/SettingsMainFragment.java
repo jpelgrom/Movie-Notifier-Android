@@ -141,7 +141,7 @@ public class SettingsMainFragment extends Fragment {
             }
         });
         location.setOnClickListener(view4 -> {
-            String currentPreference = settings.getString("prefDefaultCinema", "");
+            int currentPreference = settings.getInt("prefSelectedCinema", 0);
             int currentValueIndex = 0;
             if(cinemas != null) {
                 for(int i = 0; i < cinemas.size(); i++) {
@@ -150,7 +150,7 @@ public class SettingsMainFragment extends Fragment {
                     }
                 }
             }
-            if(!currentPreference.equals("") && currentValueIndex == 0) {
+            if(currentPreference != 0 && currentValueIndex == 0) {
                 currentValueIndex = -1; // Don't select anything
             }
 
@@ -164,7 +164,7 @@ public class SettingsMainFragment extends Fragment {
         });
         service.setOnClickListener(view5 -> {
             service.setValue(R.string.settings_general_location_service_updating);
-            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmdiately());
+            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
         });
         autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
         automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
@@ -224,12 +224,12 @@ public class SettingsMainFragment extends Fragment {
                 && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 ? View.VISIBLE : View.GONE);
 
-        String locationPreference = settings.getString("prefDefaultCinema", "");
+        int locationPreference = settings.getInt("prefSelectedCinema", 0);
         String locationPrefText = "";
-        if(locationPreference.equals("")) {
+        if(locationPreference == 0) {
             locationPrefText = getString(R.string.settings_general_location_default);
         } else {
-            locationPrefText = locationPreference;
+            locationPrefText = String.valueOf(locationPreference);
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getId().equals(locationPreference)) {
@@ -281,7 +281,7 @@ public class SettingsMainFragment extends Fragment {
 
     private void setCinemaPreference(int value) {
         String chose = cinemaItems[value].toString();
-        String setTo = ""; // Default; no preference
+        int setTo = 0; // Default; no preference
 
         if(!chose.equals(getString(R.string.settings_general_location_default))) {
             if(cinemas != null) {
@@ -293,7 +293,7 @@ public class SettingsMainFragment extends Fragment {
             }
         }
 
-        settings.edit().putString("prefDefaultCinema", setTo).apply();
+        settings.edit().putInt("prefSelectedCinema", setTo).apply();
         updateValues();
     }
 

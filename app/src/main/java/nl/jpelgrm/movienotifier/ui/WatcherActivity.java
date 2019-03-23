@@ -428,7 +428,7 @@ public class WatcherActivity extends AppCompatActivity {
             }
             watcher.setBegin(System.currentTimeMillis());
             watcher.setEnd(System.currentTimeMillis() + oneWeek);
-            watcher.getFilters().setCinemaID(settings.getString("prefDefaultCinema", ""));
+            watcher.getFilters().setCinemaID(settings.getInt("prefSelectedCinema", 0));
             watcher.getFilters().setStartAfter(System.currentTimeMillis() + oneWeek);
             watcher.getFilters().setStartBefore(System.currentTimeMillis() + oneWeek + oneWeek);
 
@@ -541,8 +541,8 @@ public class WatcherActivity extends AppCompatActivity {
                 foundCinema = cinema.getName();
             }
         }
-        if(foundCinema.equals("")) { // We don't know this cinema ID's display name
-            foundCinema = watcher.getFilters().getCinemaID();
+        if(foundCinema.equals("") && watcher.getFilters().getCinemaID() != 0) { // We don't know this cinema ID's display name
+            foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
         }
         watcherCinemaID.setText(foundCinema);
         if(cinemaOnly) { return; }
@@ -741,7 +741,7 @@ public class WatcherActivity extends AppCompatActivity {
     private boolean validateCinemaID(boolean forced) {
         if(watcherCinemaID.getText().toString().length() > 0) {
             String foundName = watcherCinemaID.getText().toString();
-            String foundID = "";
+            int foundID = 0;
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
                     if(cinema.getName().equals(foundName)) {
@@ -749,7 +749,7 @@ public class WatcherActivity extends AppCompatActivity {
                     }
                 }
             }
-            if(!foundID.equals("")) {
+            if(foundID != 0) {
                 watcher.getFilters().setCinemaID(foundID);
 
                 watcherCinemaIDWrapper.setErrorEnabled(false);
@@ -759,7 +759,7 @@ public class WatcherActivity extends AppCompatActivity {
                     watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
                     watcherCinemaIDWrapper.setErrorEnabled(true);
                 } else {
-                    watcher.getFilters().setCinemaID("");
+                    watcher.getFilters().setCinemaID(0);
                 }
                 return false;
             }

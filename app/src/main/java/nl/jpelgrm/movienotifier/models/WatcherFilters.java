@@ -16,7 +16,7 @@ public class WatcherFilters {
     }
 
     @Expose
-    private String cinemaid;
+    private int cinemaid;
 
     @Expose
     private Long startafter;
@@ -60,11 +60,11 @@ public class WatcherFilters {
     @Expose
     private WatcherFilterValue dolbyatmos = WatcherFilterValue.NOPREFERENCE;
 
-    public String getCinemaID() {
+    public int getCinemaID() {
         return cinemaid;
     }
 
-    public void setCinemaID(String cinemaid) {
+    public void setCinemaID(int cinemaid) {
         this.cinemaid = cinemaid;
     }
 

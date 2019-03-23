@@ -83,23 +83,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/phoneWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/user_input_phone"
-                    android:text="+31"
-                    android:imeOptions="flagNoExtractUi"
-                    android:inputType="phone" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/passwordWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -40,7 +40,7 @@ public class AccountListDiffCallback extends DiffUtil.Callback {
         User newUser = newList.get(newItemPosition);
 
         return oldUser != null && newUser != null && oldUser.getId().equals(newUser.getId()) && oldUser.getName().equals(newUser.getName())
-                && oldUser.getEmail().equals(newUser.getEmail()) && oldUser.getNotifications().equals(newUser.getNotifications())
-                && oldUser.getApikey().equals(newUser.getApikey()) && (oldActive.equals(newActive) && (oldActive.equals(oldUser.getId()) || newActive.equals(newUser.getId())));
+                && oldUser.getEmail().equals(newUser.getEmail()) && oldUser.getApikey().equals(newUser.getApikey())
+                && (oldActive.equals(newActive) && (oldActive.equals(oldUser.getId()) || newActive.equals(newUser.getId())));
     }
 }

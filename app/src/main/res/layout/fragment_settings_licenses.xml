@@ -47,13 +47,6 @@
             <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:licenseTitle="libphonenumber"
-                app:licenseNotice="Copyright Google Inc., Vonage Holdings Corp., Ian Galpin &amp; Ben Gertzfield"
-                app:licenseLicense="@string/license_apache" />
-
-            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 app:licenseTitle="Okio / Retrofit"
                 app:licenseNotice="Copyright 2013 Square, Inc."
                 app:licenseLicense="@string/license_apache" />
