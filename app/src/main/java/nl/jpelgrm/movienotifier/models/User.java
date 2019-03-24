@@ -1,6 +1,7 @@
 package nl.jpelgrm.movienotifier.models;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class User {
     @Ignore
     private String password;
 
+    @SerializedName("fcm-registration-tokens")
     @Expose
     @ColumnInfo(name = "FCMTokens")
     private List<String> fcmTokens = null;

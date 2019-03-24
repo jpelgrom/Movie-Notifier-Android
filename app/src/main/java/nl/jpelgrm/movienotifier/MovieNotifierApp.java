@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import nl.jpelgrm.movienotifier.service.CinemaUpdateWorker;
@@ -37,7 +39,9 @@ public class MovieNotifierApp extends Application {
 
         if(lastUpdated < (System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7))) {
             // It's been more than a week since the last update, so setup/reset job because it should have run by now
+            Constraints updateConstraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
             PeriodicWorkRequest updateWork = new PeriodicWorkRequest.Builder(CinemaUpdateWorker.class, 7, TimeUnit.DAYS)
+                    .setConstraints(updateConstraints)
                     .addTag("cinemasListUpdate")
                     .build();
             WorkManager.getInstance().cancelAllWorkByTag("cinemasListUpdate"); // 'Replace' any existing jobs

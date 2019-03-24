@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Testing database -->
+    <exclude
+        domain="database"
+        path="notifierteststore" />
+    <!-- FCM token and other device-specific notification settings -->
+    <exclude
+        domain="sharedpref"
+        path="notifications.xml" />
+</full-backup-content>

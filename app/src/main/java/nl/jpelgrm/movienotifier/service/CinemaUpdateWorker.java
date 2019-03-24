@@ -9,6 +9,8 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -89,7 +91,9 @@ public class CinemaUpdateWorker extends Worker {
     public static OneTimeWorkRequest getRequestToUpdateImmediately() {
         // https://developer.android.com/topic/libraries/architecture/workmanager/basics#workflow
         // "In most cases, (...) WorkManager runs your task right away"
+        Constraints workConstraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
         return new OneTimeWorkRequest.Builder(CinemaUpdateWorker.class)
+                .setConstraints(workConstraints)
                 .addTag("cinemasListSetup")
                 .build();
     }
