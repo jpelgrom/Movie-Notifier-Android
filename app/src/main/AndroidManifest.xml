@@ -54,12 +54,6 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="https" android:host="@string/SERVER_HOST" android:pathPattern="/w/.*"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="patheapp" android:host="showMovie" tools:ignore="AppLinkUrlError"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.settings.SettingsActivity"

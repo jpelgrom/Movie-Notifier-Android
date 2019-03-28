@@ -65,21 +65,15 @@ public class FcmRefreshWorker extends Worker {
         users = db.users().getUsersSynchronous();
 
         for(User user: users) {
-            // TODO simplify after fix for null fcm-registration-tokens
             List<String> userFcmTokens = user.getFcmTokens();
-            boolean hasOldToken = userFcmTokens != null && userFcmTokens.contains(oldToken);
+            boolean hasOldToken = userFcmTokens.contains(oldToken);
             boolean disabledNotifications = notificationSettings.getBoolean("disabled-" + user.getId(), false);
             boolean changed = false;
             if(!oldToken.equals("") && hasOldToken) {
                 changed = userFcmTokens.remove(oldToken);
             }
-            if(!disabledNotifications && (userFcmTokens == null || !userFcmTokens.contains(newToken))) {
-                if(userFcmTokens == null) {
-                    userFcmTokens = Collections.singletonList(newToken);
-                    changed = true;
-                } else {
-                    changed = userFcmTokens.add(newToken); // always true
-                }
+            if(!disabledNotifications && !userFcmTokens.contains(newToken)) {
+                changed = userFcmTokens.add(newToken); // always true
             }
 
             if(changed) {

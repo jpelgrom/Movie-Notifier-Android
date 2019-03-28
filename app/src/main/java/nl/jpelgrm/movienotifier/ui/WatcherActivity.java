@@ -397,10 +397,6 @@ public class WatcherActivity extends AppCompatActivity {
                             }
                         }
                     }
-                } else if(received.getScheme() != null && received.getScheme().equals("patheapp")) {
-                    if(received.getLastPathSegment() != null) {
-                        sharedMovieID = Integer.parseInt(received.getLastPathSegment());
-                    }
                 }
             } catch(Exception e) {
                 // Failed, don't do anything with data
