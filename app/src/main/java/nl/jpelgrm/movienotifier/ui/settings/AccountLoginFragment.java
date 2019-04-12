@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.work.WorkManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
@@ -25,6 +28,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.models.UserLogin;
+import nl.jpelgrm.movienotifier.service.FcmRefreshWorker;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.UserValidation;
@@ -47,18 +51,8 @@ public class AccountLoginFragment extends Fragment {
 
     Handler validateNameHandler = new Handler();
     Handler validatePasswordHandler = new Handler();
-    Runnable validateNameRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateName();
-        }
-    };
-    Runnable validatePasswordRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validatePassword();
-        }
-    };
+    Runnable validateNameRunnable = this::validateName;
+    Runnable validatePasswordRunnable = this::validatePassword;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,14 +62,14 @@ public class AccountLoginFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_account_login, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -103,16 +97,13 @@ public class AccountLoginFragment extends Fragment {
             }
         });
 
-        go.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                error.setVisibility(View.GONE);
-                InterfaceUtil.hideKeyboard(getActivity());
+        go.setOnClickListener(view1 -> {
+            error.setVisibility(View.GONE);
+            InterfaceUtil.hideKeyboard(getActivity());
 
-                if(validateName() && validatePassword()) {
-                    UserLogin toLogin = new UserLogin(name.getText().toString(), password.getText().toString());
-                    login(toLogin);
-                }
+            if(validateName() && validatePassword()) {
+                UserLogin toLogin = new UserLogin(name.getText().toString(), password.getText().toString());
+                login(toLogin);
             }
         });
     }
@@ -155,13 +146,15 @@ public class AccountLoginFragment extends Fragment {
         Call<User> call = APIHelper.getInstance().login(user);
         call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     AsyncTask.execute(() -> {
                         AppDatabase.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         if(getActivity() != null && !getActivity().isFinishing()) {
+                            String token = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE).getString("token", "");
+                            WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, received.getId()));
                             getActivity().runOnUiThread(() -> getActivity().finish());
                         }
                     });
@@ -175,7 +168,7 @@ public class AccountLoginFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 setFieldsEnabled(true);
                 setProgressVisible(false);
 

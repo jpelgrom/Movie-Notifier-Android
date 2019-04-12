@@ -26,7 +26,7 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
-        WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token));
+        WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, null));
     }
 
     @Override
