@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
@@ -55,24 +56,9 @@ public class SettingsAccountUpdateFragment extends Fragment {
     private SharedPreferences settings;
     Handler validateTextHandler = new Handler();
     Handler validatePasswordHandler = new Handler();
-    Runnable validateNameRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateName();
-        }
-    };
-    Runnable validateEmailRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateEmail();
-        }
-    };
-    Runnable validatePasswordRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validatePassword();
-        }
-    };
+    Runnable validateNameRunnable = this::validateName;
+    Runnable validateEmailRunnable = this::validateEmail;
+    Runnable validatePasswordRunnable = this::validatePassword;
 
     public static SettingsAccountUpdateFragment newInstance(String id, UpdateMode mode) {
         SettingsAccountUpdateFragment fragment = new SettingsAccountUpdateFragment();
@@ -95,14 +81,14 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings_account_update, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
@@ -171,29 +157,26 @@ public class SettingsAccountUpdateFragment extends Fragment {
             InterfaceUtil.showKeyboard(getActivity(), text);
         }
 
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                error.setVisibility(View.GONE);
-                InterfaceUtil.hideKeyboard(getActivity());
+        update.setOnClickListener(view1 -> {
+            error.setVisibility(View.GONE);
+            InterfaceUtil.hideKeyboard(getActivity());
 
-                if(validate()) {
-                    User toUpdate = new User();
-                    switch(mode) {
-                        case NAME:
-                            toUpdate.setName(text.getText().toString());
-                            break;
-                        case EMAIL:
-                            toUpdate.setEmail(text.getText().toString());
-                            break;
-                        case PASSWORD:
-                            toUpdate.setPassword(password.getText().toString());
-                            break;
-                        default:
-                            return;
-                    }
-                    update(toUpdate);
+            if(validate()) {
+                User toUpdate = new User();
+                switch(mode) {
+                    case NAME:
+                        toUpdate.setName(text.getText().toString());
+                        break;
+                    case EMAIL:
+                        toUpdate.setEmail(text.getText().toString());
+                        break;
+                    case PASSWORD:
+                        toUpdate.setPassword(password.getText().toString());
+                        break;
+                    default:
+                        return;
                 }
+                update(toUpdate);
             }
         });
     }
@@ -205,7 +188,9 @@ public class SettingsAccountUpdateFragment extends Fragment {
                     text.setText(user.getName());
                     break;
                 case EMAIL:
-                    text.setText(user.getEmail());
+                    if(user.getEmail() != null && !user.getEmail().equals("")) {
+                        text.setText(user.getEmail());
+                    }
                     break;
             }
         }
@@ -273,7 +258,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
         Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
@@ -295,7 +280,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 setFieldsEnabled(true);
                 setProgressVisible(false);
 

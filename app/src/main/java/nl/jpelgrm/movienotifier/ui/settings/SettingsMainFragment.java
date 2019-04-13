@@ -177,7 +177,6 @@ public class SettingsMainFragment extends Fragment {
         accountsRecycler.setNestedScrollingEnabled(false);
 
         adapter.swapItems(users);
-        updateAccountsList();
 
         addAccount.setOnClickListener(view6 -> startActivity(new Intent(getActivity(), AccountActivity.class)));
 
@@ -354,6 +353,7 @@ public class SettingsMainFragment extends Fragment {
                     finishedUserUpdate();
                 } catch(IOException | RuntimeException e) {
                     e.printStackTrace();
+                    finishedUserUpdate();
                 }
             }
         });

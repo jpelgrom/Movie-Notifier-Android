@@ -153,7 +153,9 @@ public class AccountLoginFragment extends Fragment {
                         AppDatabase.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         if(getActivity() != null && !getActivity().isFinishing()) {
-                            String token = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE).getString("token", "");
+                            SharedPreferences notificationSettings = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE);
+                            notificationSettings.edit().putBoolean("disabled-" + received.getId(), false).apply();
+                            String token = notificationSettings.getString("token", "");
                             WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, received.getId()));
                             getActivity().runOnUiThread(() -> getActivity().finish());
                         }

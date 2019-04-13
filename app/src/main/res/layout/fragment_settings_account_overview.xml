@@ -86,21 +86,6 @@
                     app:detailIcon="@drawable/ic_person"
                     app:detailTitle="@string/user_input_name"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/accountEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_mail"
-                    app:detailTitle="@string/user_input_email"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/user_settings_security_title"
-                    android:paddingStart="72dp"
-                    android:paddingEnd="?listPreferredItemPaddingRight"
-                    style="@style/TextMaterialSubheader"/>
-
                 <LinearLayout
                     android:id="@+id/accountPassword"
                     android:layout_width="match_parent"
@@ -177,17 +162,104 @@
                     android:id="@+id/notifications"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical">
 
                     <TextView
+                        style="@style/TextMaterialSubheader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/user_settings_notifications_title"
                         android:paddingStart="72dp"
                         android:paddingEnd="?listPreferredItemPaddingRight"
-                        style="@style/TextMaterialSubheader"/>
+                        android:text="@string/user_settings_notifications_title" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/notificationsPush"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                        <ImageView
+                            android:id="@+id/notificationsPushIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:contentDescription="@string/user_settings_notifications_email"
+                            android:src="@drawable/ic_notifications" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/notificationsPushSwitch"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:text="@string/user_settings_notifications_push"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/notificationsPushIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/notificationsPushReset"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:gravity="center_vertical"
+                        style="@style/TextAppearance.AppCompat.Body1"
+                        android:text="@string/user_settings_notifications_pushdebug"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/notificationsEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                        <ImageView
+                            android:id="@+id/notificationsEmailIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:contentDescription="@string/user_settings_notifications_email"
+                            android:src="@drawable/ic_mail" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/notificationsEmailSwitch"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:text="@string/user_settings_notifications_email"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/notificationsEmailIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
+                        android:id="@+id/notificationsEmailAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:detailTitle="@string/user_input_email"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
 

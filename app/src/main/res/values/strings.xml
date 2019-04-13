@@ -142,6 +142,9 @@
     <string name="user_settings_security_logout">Log out from app</string>
     <string name="user_settings_security_logout_success">Logged out of account</string>
     <string name="user_settings_notifications_title">Notifications</string>
+    <string name="user_settings_notifications_push">Push notifications on this device</string>
+    <string name="user_settings_notifications_pushdebug">Turn push notifications off everywhere</string>
+    <string name="user_settings_notifications_email">Notifications via email</string>
     <string name="user_settings_update_go">Update</string>
     <string name="user_settings_update_name_success">Username updated</string>
     <string name="user_settings_update_email_success">Email address updated</string>

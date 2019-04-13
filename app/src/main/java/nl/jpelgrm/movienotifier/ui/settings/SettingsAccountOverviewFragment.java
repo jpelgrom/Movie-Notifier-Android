@@ -1,7 +1,6 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,12 +14,19 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
@@ -41,16 +47,23 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     @BindView(R.id.accountSwitch) LinearLayout accountSwitch;
     @BindView(R.id.accountName) DoubleRowIconPreferenceView accountName;
-    @BindView(R.id.accountEmail) DoubleRowIconPreferenceView accountEmail;
     @BindView(R.id.accountPassword) LinearLayout accountPassword;
     @BindView(R.id.accountLogout) LinearLayout accountLogout;
     @BindView(R.id.accountDelete) LinearLayout accountDelete;
+
+    @BindView(R.id.notificationsPush) ConstraintLayout notificationsPush;
+    @BindView(R.id.notificationsPushSwitch) SwitchCompat notificationsPushSwitch;
+    @BindView(R.id.notificationsPushReset) TextView notificationsPushReset;
+    @BindView(R.id.notificationsEmail) ConstraintLayout notificationsEmail;
+    @BindView(R.id.notificationsEmailSwitch) SwitchCompat notificationsEmailSwitch;
+    @BindView(R.id.notificationsEmailAddress) DoubleRowIconPreferenceView notificationsEmailAddress;
 
     private User user;
     private String id;
     private boolean isCurrentUser;
 
     private SharedPreferences settings;
+    private SharedPreferences notificationSettings;
 
     public static SettingsAccountOverviewFragment newInstance(String id, boolean isCurrentUser) {
         SettingsAccountOverviewFragment fragment = new SettingsAccountOverviewFragment();
@@ -69,18 +82,19 @@ public class SettingsAccountOverviewFragment extends Fragment {
         isCurrentUser = getArguments().getBoolean("isCurrentUser");
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        notificationSettings = getContext().getSharedPreferences("notifications", Context.MODE_PRIVATE);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings_account_overview, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
@@ -90,43 +104,19 @@ public class SettingsAccountOverviewFragment extends Fragment {
             }
         });
 
-        accountSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchToThis();
-            }
-        });
-        accountName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME);
-            }
-        });
-        accountEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
-            }
-        });
-        accountPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD);
-            }
-        });
-        accountLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                logout();
-            }
-        });
-        accountDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                delete();
-            }
-        });
+        accountSwitch.setOnClickListener(v -> switchToThis());
+        accountName.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME));
+        accountPassword.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD));
+        accountLogout.setOnClickListener(v -> logout());
+        accountDelete.setOnClickListener(v -> delete());
         accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
+
+        notificationsPush.setOnClickListener(v -> notificationsPushSwitch.performClick());
+        notificationsPushSwitch.setOnClickListener(v -> togglePushNotifications());
+        notificationsPushReset.setOnClickListener(v -> resetPushNotifications());
+        notificationsEmail.setOnClickListener(v -> notificationsEmailSwitch.performClick());
+        notificationsEmailSwitch.setOnClickListener(v -> toggleEmailNotifications());
+        notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
     }
 
     public void updatedUser() {
@@ -137,14 +127,66 @@ public class SettingsAccountOverviewFragment extends Fragment {
     private void updateValues() {
         accountSwitch.setVisibility(user.getId().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
         accountName.setValue(user.getName());
-        accountEmail.setValue(user.getEmail());
+        notificationsPushSwitch.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
+        notificationsPushReset.setVisibility(BuildConfig.DEBUG && user.getFcmTokens().size() > 0 ? View.VISIBLE : View.GONE);
+        notificationsEmailSwitch.setChecked(!user.getEmail().equals(""));
+        notificationsEmailAddress.setVisibility(!user.getEmail().equals("") ? View.VISIBLE : View.GONE);
+        notificationsEmailAddress.setValue(user.getEmail());
     }
 
     private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
         ((SettingsActivity) getActivity()).editUserDetail(user.getId(), mode);
     }
 
-    private void update(User toUpdate) {
+    private void togglePushNotifications() {
+        String token = notificationSettings.getString("token", "");
+        User toUpdate = new User();
+        toUpdate.setFcmTokens(new ArrayList<>());
+        for(String s : user.getFcmTokens()) {
+            toUpdate.getFcmTokens().add(s);
+        }
+        boolean changed = false;
+        boolean setToEnabled = notificationsPushSwitch.isChecked();
+        if(setToEnabled) {
+            if(!toUpdate.getFcmTokens().contains(token)) {
+                changed = toUpdate.getFcmTokens().add(token);
+            }
+        } else {
+            if(toUpdate.getFcmTokens().contains(token)) {
+                changed = toUpdate.getFcmTokens().remove(token);
+            }
+        }
+        if(changed) {
+            update(toUpdate, success -> {
+                if(success) {
+                    notificationSettings.edit().putBoolean("disabled-" + user.getId(), !setToEnabled).apply();
+                }
+            });
+        }
+    }
+
+    private void resetPushNotifications() {
+        User toUpdate = new User();
+        toUpdate.setFcmTokens(Collections.emptyList());
+        update(toUpdate, success -> {
+            if(success) {
+                notificationSettings.edit().putBoolean("disabled-" + user.getId(), true).apply();
+            }
+        });
+    }
+
+    private void toggleEmailNotifications() {
+        if(notificationsEmailSwitch.isChecked()) {
+            notificationsEmailSwitch.setChecked(false);
+            editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
+        } else {
+            User toUpdate = new User();
+            toUpdate.setEmail("");
+            update(toUpdate, null);
+        }
+    }
+
+    private void update(User toUpdate, @Nullable OnUpdatedListener listener) {
         error.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
@@ -152,7 +194,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
@@ -170,10 +212,16 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 }
 
                 updateValues();
+                if(listener != null) {
+                    listener.onResult(response.code() == 200);
+                }
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                progress.setVisibility(View.GONE);
+                setFieldsEnabled(true);
+
                 t.printStackTrace();
 
                 error.setVisibility(View.VISIBLE);
@@ -182,6 +230,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 main.smoothScrollTo(0, 0);
 
                 updateValues();
+                if(listener != null) {
+                    listener.onResult(false);
+                }
             }
         });
     }
@@ -194,7 +245,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
         call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
@@ -211,20 +262,20 @@ public class SettingsAccountOverviewFragment extends Fragment {
                         updateValues();
                     } else {
                         error.setVisibility(View.VISIBLE);
-                        error.setText(getContext().getString(R.string.error_general_server, "N200"));
+                        error.setText(getString(R.string.error_general_server, "N200"));
 
                         main.smoothScrollTo(0, 0);
                     }
                 } else {
                     error.setVisibility(View.VISIBLE);
-                    error.setText(getContext().getString(R.string.error_general_server, "N" + response.code()));
+                    error.setText(getString(R.string.error_general_server, "N" + response.code()));
 
                     main.smoothScrollTo(0, 0);
                 }
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
@@ -239,9 +290,55 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void logout() {
+        error.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
+        String token = notificationSettings.getString("token", "");
+        User toUpdate = new User();
+        toUpdate.setFcmTokens(new ArrayList<>());
+        for(String s : user.getFcmTokens()) {
+            toUpdate.getFcmTokens().add(s);
+        }
+        if(toUpdate.getFcmTokens().contains(token)) {
+            toUpdate.getFcmTokens().remove(token);
+
+            Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                    progress.setVisibility(View.GONE);
+                    setFieldsEnabled(true);
+
+                    if(response.code() == 200) {
+                        logoutLocal();
+                    } else {
+                        error.setVisibility(View.VISIBLE);
+                        error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+
+                        main.smoothScrollTo(0, 0);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                    progress.setVisibility(View.GONE);
+                    setFieldsEnabled(true);
+
+                    t.printStackTrace();
+
+                    error.setVisibility(View.VISIBLE);
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+
+                    main.smoothScrollTo(0, 0);
+                }
+            });
+        } else {
+            logoutLocal();
+        }
+    }
+
+    private void logoutLocal() {
         boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
         if(isThisUser) {
             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
@@ -262,68 +359,75 @@ public class SettingsAccountOverviewFragment extends Fragment {
     private void delete() {
         error.setVisibility(View.GONE);
 
-        new AlertDialog.Builder(getContext()).setMessage(R.string.user_settings_security_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                progress.setVisibility(View.VISIBLE);
-                setFieldsEnabled(false);
+        new AlertDialog.Builder(getContext()).setMessage(R.string.user_settings_security_delete_confirm).setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+            progress.setVisibility(View.VISIBLE);
+            setFieldsEnabled(false);
 
-                final boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
+            final boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
 
-                Call<ResponseBody> call = APIHelper.getInstance().deleteUser(user.getApikey(), user.getId());
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        progress.setVisibility(View.GONE);
-                        setFieldsEnabled(true);
+            Call<ResponseBody> call = APIHelper.getInstance().deleteUser(user.getApikey(), user.getId());
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                    progress.setVisibility(View.GONE);
+                    setFieldsEnabled(true);
 
-                        if(response.code() == 200 || response.code() == 401) {
-                            // 200: OK
-                            // 401: Unauthorized, but because API keys don't change it seems the user was already deleted
-                            if(user.getId().equals(settings.getString("userID", ""))) {
-                                settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
-                            }
-                            AsyncTask.execute(() -> {
-                                AppDatabase.getInstance(getContext()).users().delete(user);
-
-                                if(getActivity() != null && !getActivity().isFinishing()) {
-                                    getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
-                                            user.getId(),
-                                            getString(R.string.user_settings_security_delete_success))
-                                    );
-                                }
-                            });
-                        } else {
-                            error.setVisibility(View.VISIBLE);
-                            error.setText(getContext().getString(R.string.error_general_server, "N" + response.code()));
-
-                            main.smoothScrollTo(0, 0);
+                    if(response.code() == 200 || response.code() == 401) {
+                        // 200: OK
+                        // 401: Unauthorized, but because API keys don't change it seems the user was already deleted
+                        if(user.getId().equals(settings.getString("userID", ""))) {
+                            settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                         }
-                    }
+                        AsyncTask.execute(() -> {
+                            AppDatabase.getInstance(getContext()).users().delete(user);
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        progress.setVisibility(View.GONE);
-                        setFieldsEnabled(true);
-
-                        t.printStackTrace();
-
+                            if(getActivity() != null && !getActivity().isFinishing()) {
+                                getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
+                                        user.getId(),
+                                        getString(R.string.user_settings_security_delete_success))
+                                );
+                            }
+                        });
+                    } else {
                         error.setVisibility(View.VISIBLE);
-                        error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                        error.setText(getString(R.string.error_general_server, "N" + response.code()));
 
                         main.smoothScrollTo(0, 0);
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                    progress.setVisibility(View.GONE);
+                    setFieldsEnabled(true);
+
+                    t.printStackTrace();
+
+                    error.setVisibility(View.VISIBLE);
+                    error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+
+                    main.smoothScrollTo(0, 0);
+                }
+            });
         }).setNegativeButton(R.string.no, null).show();
     }
 
     private void setFieldsEnabled(boolean enabled) {
         accountSwitch.setClickable(enabled);
         accountName.setClickable(enabled);
-        accountEmail.setClickable(enabled);
         accountPassword.setClickable(enabled);
         accountDelete.setClickable(enabled);
         accountLogout.setClickable(enabled);
+
+        notificationsPush.setClickable(enabled);
+        notificationsPushSwitch.setEnabled(enabled);
+        notificationsPushReset.setClickable(enabled);
+        notificationsEmail.setClickable(enabled);
+        notificationsEmailSwitch.setEnabled(enabled);
+        notificationsEmailAddress.setClickable(enabled);
+    }
+
+    private interface OnUpdatedListener {
+        void onResult(boolean success);
     }
 }
