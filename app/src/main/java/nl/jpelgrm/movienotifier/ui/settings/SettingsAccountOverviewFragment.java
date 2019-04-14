@@ -141,10 +141,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     private void togglePushNotifications() {
         String token = notificationSettings.getString("token", "");
         User toUpdate = new User();
-        toUpdate.setFcmTokens(new ArrayList<>());
-        for(String s : user.getFcmTokens()) {
-            toUpdate.getFcmTokens().add(s);
-        }
+        toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         boolean changed = false;
         boolean setToEnabled = notificationsPushSwitch.isChecked();
         if(setToEnabled) {
@@ -296,10 +293,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         String token = notificationSettings.getString("token", "");
         User toUpdate = new User();
-        toUpdate.setFcmTokens(new ArrayList<>());
-        for(String s : user.getFcmTokens()) {
-            toUpdate.getFcmTokens().add(s);
-        }
+        toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         if(toUpdate.getFcmTokens().contains(token)) {
             toUpdate.getFcmTokens().remove(token);
 
