@@ -22,109 +22,151 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingEnd="?attr/listPreferredItemPaddingRight"
-            android:paddingStart="?attr/listPreferredItemPaddingLeft"
-            android:paddingBottom="@dimen/scroll_padding"
-            android:animateLayoutChanges="true">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.AppCompat.Title"
-                android:layout_marginTop="48dp"
-                android:text="@string/account_signup_title"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_marginBottom="64dp"
-                android:text="@string/account_signup_subtitle"/>
-
-            <TextView
-                android:id="@+id/error"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/TextError"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                tools:text="@string/error_general_message"
-                tools:visibility="visible"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/nameWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/user_input_name"
-                    android:imeOptions="flagNoExtractUi"
-                    android:inputType="text" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/user_input_email"
-                    android:imeOptions="flagNoExtractUi"
-                    android:inputType="text|textEmailAddress" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:passwordToggleEnabled="true">
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/user_input_password"
-                    android:imeOptions="flagNoExtractUi"
-                    android:inputType="text|textPassword" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/privacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="?attr/listPreferredItemHeightSmall"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:layout_marginTop="16dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    app:srcCompat="@drawable/ic_info"/>
+                android:orientation="vertical"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                android:animateLayoutChanges="true">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/user_privacy_general"/>
+                    style="@style/TextAppearance.AppCompat.Title"
+                    android:layout_marginTop="48dp"
+                    android:text="@string/account_signup_title"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_marginBottom="64dp"
+                    android:text="@string/account_signup_subtitle"/>
+
+                <TextView
+                    android:id="@+id/error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextError"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"
+                    tools:text="@string/error_general_message"
+                    tools:visibility="visible"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameWrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/user_input_name"
+                        android:imeOptions="flagNoExtractUi"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordWrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/user_input_password"
+                        android:imeOptions="flagNoExtractUi"
+                        android:inputType="text|textPassword" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:text="@string/account_signup_notifications"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp"/>
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/go"
+            <nl.jpelgrm.movienotifier.ui.view.IconSwitchView
+                android:id="@+id/push"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sign_up" />
+                app:switchIcon="@drawable/ic_notifications"
+                app:switchTitle="@string/user_settings_notifications_push"/>
+
+            <nl.jpelgrm.movienotifier.ui.view.IconSwitchView
+                android:id="@+id/emailOn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:switchIcon="@drawable/ic_mail"
+                app:switchTitle="@string/user_settings_notifications_email"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                android:paddingBottom="@dimen/scroll_padding"
+                android:animateLayoutChanges="true">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailWrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/user_input_email"
+                        android:imeOptions="flagNoExtractUi"
+                        android:inputType="text|textEmailAddress" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/privacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/listPreferredItemHeightSmall"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        app:srcCompat="@drawable/ic_info"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/user_privacy_general"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/go"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sign_up"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -41,6 +41,7 @@
     <string name="account_login_subtitle">Good to see you again!</string>
     <string name="account_signup_title">Create a new account</string>
     <string name="account_signup_subtitle">You\'re already almost done</string>
+    <string name="account_signup_notifications">How do you want to be notified about new showings?</string>
 
     <string name="log_in">Log in</string>
     <string name="sign_up">Sign up</string>
@@ -129,6 +130,7 @@
     <string name="user_validate_name_regex">Usernames can only contain a–z, 0–9, and only a–z in the first 4 characters</string>
     <string name="user_validate_email">Please enter a valid email address</string>
     <string name="user_validate_password">Passwords need to be at least 8 characters long</string>
+    <string name="user_validate_notifications">You haven\'t enabled any notifications, which means that if we find new showings for you, you won\'t be notified. Are you sure that you want to continue?</string>
     <string name="user_settings_general_switch">Switch to this account</string>
     <string name="user_settings_general_switch_success">Switched active account</string>
     <string name="user_settings_general_success">Account updated</string>
@@ -148,7 +150,7 @@
     <string name="user_settings_update_go">Update</string>
     <string name="user_settings_update_name_success">Username updated</string>
     <string name="user_settings_update_email_success">Email address updated</string>
-    <string name="user_privacy_general">Your data is stored securely and will only be used to allow you to use Movie Notifier. You can update or delete your account at any time in the app.</string>
+    <string name="user_privacy_general">Your data is stored securely and will only be used to allow you to use Movie Notifier. We may share data with a third party in order to deliver notifications, limited to what is necessary to do so. You can update or delete your account at any time in the app.</string>
 
     <string name="error_login_401">Your username and/or password is incorrect.</string>
     <string name="error_watchers_400">Sorry, please try again.</string>

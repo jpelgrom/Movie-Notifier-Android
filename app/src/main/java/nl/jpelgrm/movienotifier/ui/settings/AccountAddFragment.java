@@ -16,7 +16,11 @@ import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Collections;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
@@ -25,6 +29,7 @@ import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
+import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.UserValidation;
@@ -34,57 +39,46 @@ import retrofit2.Response;
 
 public class AccountAddFragment extends Fragment {
     SharedPreferences settings;
+    SharedPreferences notificationSettings;
 
     @BindView(R.id.progress) ProgressBar progress;
     @BindView(R.id.error) TextView error;
 
     @BindView(R.id.nameWrapper) TextInputLayout nameWrapper;
     @BindView(R.id.name) AppCompatEditText name;
-    @BindView(R.id.emailWrapper) TextInputLayout emailWrapper;
-    @BindView(R.id.email) AppCompatEditText email;
     @BindView(R.id.passwordWrapper) TextInputLayout passwordWrapper;
     @BindView(R.id.password) AppCompatEditText password;
+    @BindView(R.id.push) IconSwitchView push;
+    @BindView(R.id.emailOn) IconSwitchView emailOn;
+    @BindView(R.id.emailWrapper) TextInputLayout emailWrapper;
+    @BindView(R.id.email) AppCompatEditText email;
 
     @BindView(R.id.go) Button go;
 
     Handler validateNameHandler = new Handler();
     Handler validateEmailHandler = new Handler();
     Handler validatePasswordHandler = new Handler();
-    Runnable validateNameRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateName();
-        }
-    };
-    Runnable validateEmailRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validateEmail();
-        }
-    };
-    Runnable validatePasswordRunnable = new Runnable() {
-        @Override
-        public void run() {
-            validatePassword();
-        }
-    };
+    Runnable validateNameRunnable = this::validateName;
+    Runnable validateEmailRunnable = this::validateEmail;
+    Runnable validatePasswordRunnable = this::validatePassword;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        notificationSettings = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_account_add, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -125,19 +119,20 @@ public class AccountAddFragment extends Fragment {
             }
         });
 
-        go.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                error.setVisibility(View.GONE);
-                InterfaceUtil.hideKeyboard(getActivity());
-
-                if(validateName() && validateEmail() && validatePassword()) {
-                    User toCreate = new User(name.getText().toString(), email.getText().toString(), password.getText().toString());
-
-                    register(toCreate);
+        if(!notificationSettings.getString("token", "").equals("")) {
+            push.setChecked(true);
+        }
+        emailOn.setOnSwitchClickListener(v -> {
+            if(emailOn.isChecked() && emailWrapper.getVisibility() != View.VISIBLE) {
+                emailWrapper.setVisibility(View.VISIBLE);
+            } else if(!emailOn.isChecked()) {
+                if(emailWrapper.getVisibility() != View.GONE) {
+                    emailWrapper.setVisibility(View.GONE);
                 }
+                InterfaceUtil.hideKeyboard(getActivity());
             }
         });
+        go.setOnClickListener(v -> checkForRegister(true));
     }
 
     @Override
@@ -147,6 +142,33 @@ public class AccountAddFragment extends Fragment {
         validatePasswordHandler.removeCallbacksAndMessages(null);
 
         super.onDestroy();
+    }
+
+    private void checkForRegister(boolean warnAboutNotifications) {
+        error.setVisibility(View.GONE);
+        InterfaceUtil.hideKeyboard(getActivity());
+
+        if(validateName() && validatePassword()) {
+            if(warnAboutNotifications && !push.isChecked() && !emailOn.isChecked()) {
+                new AlertDialog.Builder(getContext()).setMessage(R.string.user_validate_notifications)
+                        .setPositiveButton(R.string.yes, (dialog, which) -> checkForRegister(false))
+                        .setNegativeButton(R.string.no, null).show();
+                return;
+            }
+
+            if((!emailOn.isChecked() || validateEmail())) {
+                User toCreate = new User(name.getText().toString(),
+                        emailOn.isChecked() ? email.getText().toString() : "",
+                        password.getText().toString());
+                if(push.isChecked() && !notificationSettings.getString("token", "").equals("")) {
+                    toCreate.setFcmTokens(Collections.singletonList(notificationSettings.getString("token", "")));
+                } else {
+                    toCreate.setFcmTokens(Collections.emptyList());
+                }
+
+                register(toCreate);
+            }
+        }
     }
 
     private boolean validateName() {
@@ -190,12 +212,13 @@ public class AccountAddFragment extends Fragment {
         Call<User> call = APIHelper.getInstance().addUser(user);
         call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     AsyncTask.execute(() -> {
                         AppDatabase.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
+                        notificationSettings.edit().putBoolean("disabled-" + received.getId(), false).apply();
                         if(getActivity() != null && !getActivity().isFinishing()) {
                             getActivity().runOnUiThread(() -> getActivity().finish());
                         }
@@ -210,7 +233,7 @@ public class AccountAddFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 setFieldsEnabled(true);
                 setProgressVisible(false);
 
@@ -224,8 +247,10 @@ public class AccountAddFragment extends Fragment {
 
     private void setFieldsEnabled(boolean enabled) {
         nameWrapper.setEnabled(enabled);
-        emailWrapper.setEnabled(enabled);
         passwordWrapper.setEnabled(enabled);
+        push.setClickable(enabled);
+        emailOn.setClickable(enabled);
+        emailWrapper.setEnabled(enabled);
         go.setEnabled(enabled);
     }
 

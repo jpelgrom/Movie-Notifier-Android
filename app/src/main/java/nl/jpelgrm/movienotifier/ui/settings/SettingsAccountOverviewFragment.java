@@ -20,8 +20,6 @@ import java.util.Collections;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
@@ -32,6 +30,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
+import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -51,11 +50,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
     @BindView(R.id.accountLogout) LinearLayout accountLogout;
     @BindView(R.id.accountDelete) LinearLayout accountDelete;
 
-    @BindView(R.id.notificationsPush) ConstraintLayout notificationsPush;
-    @BindView(R.id.notificationsPushSwitch) SwitchCompat notificationsPushSwitch;
+    @BindView(R.id.notificationsPush) IconSwitchView notificationsPush;
     @BindView(R.id.notificationsPushReset) TextView notificationsPushReset;
-    @BindView(R.id.notificationsEmail) ConstraintLayout notificationsEmail;
-    @BindView(R.id.notificationsEmailSwitch) SwitchCompat notificationsEmailSwitch;
+    @BindView(R.id.notificationsEmail) IconSwitchView notificationsEmail;
     @BindView(R.id.notificationsEmailAddress) DoubleRowIconPreferenceView notificationsEmailAddress;
 
     private User user;
@@ -111,11 +108,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
         accountDelete.setOnClickListener(v -> delete());
         accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
 
-        notificationsPush.setOnClickListener(v -> notificationsPushSwitch.performClick());
-        notificationsPushSwitch.setOnClickListener(v -> togglePushNotifications());
+        notificationsPush.setOnSwitchClickListener(v -> togglePushNotifications());
         notificationsPushReset.setOnClickListener(v -> resetPushNotifications());
-        notificationsEmail.setOnClickListener(v -> notificationsEmailSwitch.performClick());
-        notificationsEmailSwitch.setOnClickListener(v -> toggleEmailNotifications());
+        notificationsEmail.setOnSwitchClickListener(v -> toggleEmailNotifications());
         notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
     }
 
@@ -127,9 +122,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
     private void updateValues() {
         accountSwitch.setVisibility(user.getId().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
         accountName.setValue(user.getName());
-        notificationsPushSwitch.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
+        notificationsPush.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
         notificationsPushReset.setVisibility(BuildConfig.DEBUG && user.getFcmTokens().size() > 0 ? View.VISIBLE : View.GONE);
-        notificationsEmailSwitch.setChecked(!user.getEmail().equals(""));
+        notificationsEmail.setChecked(!user.getEmail().equals(""));
         notificationsEmailAddress.setVisibility(!user.getEmail().equals("") ? View.VISIBLE : View.GONE);
         notificationsEmailAddress.setValue(user.getEmail());
     }
@@ -143,7 +138,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         User toUpdate = new User();
         toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         boolean changed = false;
-        boolean setToEnabled = notificationsPushSwitch.isChecked();
+        boolean setToEnabled = notificationsPush.isChecked();
         if(setToEnabled) {
             if(!toUpdate.getFcmTokens().contains(token)) {
                 changed = toUpdate.getFcmTokens().add(token);
@@ -173,8 +168,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void toggleEmailNotifications() {
-        if(notificationsEmailSwitch.isChecked()) {
-            notificationsEmailSwitch.setChecked(false);
+        if(notificationsEmail.isChecked()) {
+            notificationsEmail.setChecked(false);
             editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
         } else {
             User toUpdate = new User();
@@ -414,10 +409,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
         accountLogout.setClickable(enabled);
 
         notificationsPush.setClickable(enabled);
-        notificationsPushSwitch.setEnabled(enabled);
         notificationsPushReset.setClickable(enabled);
         notificationsEmail.setClickable(enabled);
-        notificationsEmailSwitch.setEnabled(enabled);
         notificationsEmailAddress.setClickable(enabled);
     }
 

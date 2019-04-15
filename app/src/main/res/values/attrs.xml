@@ -6,6 +6,11 @@
         <attr name="detailValue" format="string"/>
     </declare-styleable>
 
+    <declare-styleable name="IconSwitchView">
+        <attr name="switchIcon" format="integer"/>
+        <attr name="switchTitle" format="string"/>
+    </declare-styleable>
+
     <declare-styleable name="LicenseTextView">
         <attr name="licenseTitle" format="string"/>
         <attr name="licenseNotice" format="string"/>
