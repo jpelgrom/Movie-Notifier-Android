@@ -1,9 +1,12 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,7 @@ import java.util.Collections;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
@@ -32,6 +36,7 @@ import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
+import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,6 +57,11 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     @BindView(R.id.notificationsPush) IconSwitchView notificationsPush;
     @BindView(R.id.notificationsPushReset) TextView notificationsPushReset;
+    @BindView(R.id.notificationsPushSystem) TextView notificationsPushSystem;
+    @BindView(R.id.notificationsPushHeadsup) SwitchCompat notificationsPushHeadsup;
+    @BindView(R.id.notificationsPushSound) SwitchCompat notificationsPushSound;
+    @BindView(R.id.notificationsPushVibrate) SwitchCompat notificationsPushVibrate;
+    @BindView(R.id.notificationsPushLights) SwitchCompat notificationsPushLights;
     @BindView(R.id.notificationsEmail) IconSwitchView notificationsEmail;
     @BindView(R.id.notificationsEmailAddress) DoubleRowIconPreferenceView notificationsEmailAddress;
 
@@ -110,6 +120,25 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         notificationsPush.setOnSwitchClickListener(v -> togglePushNotifications());
         notificationsPushReset.setOnClickListener(v -> resetPushNotifications());
+        notificationsPushSystem.setOnClickListener(v -> {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationUtil.createChannelWatchersPush(getContext(), user);
+                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, BuildConfig.APPLICATION_ID)
+                        .putExtra(Settings.EXTRA_CHANNEL_ID, NotificationUtil.NOTIFICATION_CHANNEL_PREFIX + user.getId() + NotificationUtil.NOTIFICATION_CHANNEL_WATCHERS_PUSH);
+                startActivity(intent);
+            }
+        });
+        notificationsPushHeadsup.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("headsup-" + user.getId(), isChecked).apply());
+        notificationsPushSound.setOnCheckedChangeListener((v, isChecked) -> {
+            notificationSettings.edit().putBoolean("sound-" + user.getId(), isChecked).apply();
+            updateValues();
+        });
+        notificationsPushVibrate.setOnCheckedChangeListener((v, isChecked) -> {
+            notificationSettings.edit().putBoolean("vibrate-" + user.getId(), isChecked).apply();
+            updateValues();
+        });
+        notificationsPushLights.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("lights-" + user.getId(), isChecked).apply());
         notificationsEmail.setOnSwitchClickListener(v -> toggleEmailNotifications());
         notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
     }
@@ -124,6 +153,16 @@ public class SettingsAccountOverviewFragment extends Fragment {
         accountName.setValue(user.getName());
         notificationsPush.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
         notificationsPushReset.setVisibility(BuildConfig.DEBUG && user.getFcmTokens().size() > 0 ? View.VISIBLE : View.GONE);
+        notificationsPushSystem.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        notificationsPushSound.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        notificationsPushSound.setChecked(notificationSettings.getBoolean("sound-" + user.getId(), true));
+        notificationsPushVibrate.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        notificationsPushVibrate.setChecked(notificationSettings.getBoolean("vibrate-" + user.getId(), true));
+        notificationsPushLights.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        notificationsPushLights.setChecked(notificationSettings.getBoolean("lights-" + user.getId(), true));
+        notificationsPushHeadsup.setVisibility(notificationsPush.isChecked() && (notificationsPushSound.isChecked() || notificationsPushVibrate.isChecked())
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        notificationsPushHeadsup.setChecked(notificationSettings.getBoolean("headsup-" + user.getId(), true));
         notificationsEmail.setChecked(!user.getEmail().equals(""));
         notificationsEmailAddress.setVisibility(!user.getEmail().equals("") ? View.VISIBLE : View.GONE);
         notificationsEmailAddress.setValue(user.getEmail());
@@ -245,6 +284,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
                     User received = response.body();
                     if(received != null) {
                         AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
+                        if(!user.getName().equals(received.getName())) {
+                            NotificationUtil.createUserGroup(getContext(), received);
+                        }
                         user = received;
                         isCurrentUser = true;
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
@@ -335,6 +377,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         AsyncTask.execute(() -> {
             AppDatabase.getInstance(getContext()).users().delete(user);
+            NotificationUtil.cleanupPreferencesForUser(getContext(), user.getId());
 
             if(getActivity() != null && !getActivity().isFinishing()) {
                 getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
@@ -369,6 +412,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                         }
                         AsyncTask.execute(() -> {
                             AppDatabase.getInstance(getContext()).users().delete(user);
+                            NotificationUtil.cleanupPreferencesForUser(getContext(), user.getId());
 
                             if(getActivity() != null && !getActivity().isFinishing()) {
                                 getActivity().runOnUiThread(() -> ((SettingsActivity) getActivity()).hideUserWithMessage(isThisUser,
@@ -410,6 +454,11 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         notificationsPush.setClickable(enabled);
         notificationsPushReset.setClickable(enabled);
+        notificationsPushSystem.setClickable(enabled);
+        notificationsPushHeadsup.setEnabled(enabled);
+        notificationsPushSound.setEnabled(enabled);
+        notificationsPushVibrate.setEnabled(enabled);
+        notificationsPushLights.setEnabled(enabled);
         notificationsEmail.setClickable(enabled);
         notificationsEmailAddress.setClickable(enabled);
     }

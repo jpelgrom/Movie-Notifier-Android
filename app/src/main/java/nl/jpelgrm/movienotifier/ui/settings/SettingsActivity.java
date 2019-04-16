@@ -32,6 +32,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.util.EmptyLiveData;
+import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import retrofit2.Call;
 import retrofit2.Response;
 

@@ -29,6 +29,7 @@ import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
+import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import nl.jpelgrm.movienotifier.util.UserValidation;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -265,6 +266,9 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 if(response.code() == 200) {
                     User received = response.body();
                     AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
+                    if(!user.getName().equals(received.getName())) {
+                        NotificationUtil.createUserGroup(getContext(), received);
+                    }
                     user = received;
 
                     if(getActivity() != null && !getActivity().isFinishing()) {

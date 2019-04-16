@@ -145,7 +145,12 @@
     <string name="user_settings_security_logout_success">Logged out of account</string>
     <string name="user_settings_notifications_title">Notifications</string>
     <string name="user_settings_notifications_push">Push notifications on this device</string>
-    <string name="user_settings_notifications_pushdebug">Turn push notifications off everywhere</string>
+    <string name="user_settings_notifications_push_debug">Turn push notifications off everywhere</string>
+    <string name="user_settings_notifications_push_system">Push notification settings</string>
+    <string name="user_settings_notifications_push_headsup">Pop on screen</string>
+    <string name="user_settings_notifications_push_sound">Sound</string>
+    <string name="user_settings_notifications_push_vibrate">Vibrate</string>
+    <string name="user_settings_notifications_push_lights">Blink light</string>
     <string name="user_settings_notifications_email">Notifications via email</string>
     <string name="user_settings_update_go">Update</string>
     <string name="user_settings_update_name_success">Username updated</string>
@@ -191,8 +196,8 @@
 \n\n9. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
 \n\nEND OF TERMS AND CONDITIONS</string>
 
-    <string name="notification_channel_watchers_general_title">Watcher notifications</string>
-    <string name="notification_channel_watchers_general_description">Notifications for new matches for watchers you\'ve set up</string>
+    <string name="notification_channel_watchers_push_title">Watcher push notifications</string>
+    <string name="notification_channel_watchers_push_description">Notifications for new showings that are found for your watchers</string>
     <string name="notification_notification_matches">+%d matches</string>
     <string name="notification_notification_matchesandbody"><b>+%1$d matches</b>\n%2$s</string>
     <string name="notification_notification_action_pathe">Open Pathé</string>

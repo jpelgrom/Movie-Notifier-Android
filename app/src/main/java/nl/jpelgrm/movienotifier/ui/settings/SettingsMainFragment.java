@@ -49,6 +49,7 @@ import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.service.CinemaUpdateWorker;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
+import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -74,7 +75,6 @@ public class SettingsMainFragment extends Fragment {
 
     private List<User> users = new ArrayList<>();
     private AccountsAdapter adapter;
-    private int userProgress = 0;
 
     private SharedPreferences settings;
 
@@ -89,7 +89,8 @@ public class SettingsMainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppDatabase.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
+        AppDatabase db = AppDatabase.getInstance(getContext());
+        db.cinemas().getCinemas().observe(this, cinemas -> {
             // Data
             Collections.sort(cinemas, (c1, c2) -> c1.getName().compareTo(c2.getName()));
             this.cinemas = cinemas;
@@ -103,7 +104,11 @@ public class SettingsMainFragment extends Fragment {
             }
             cinemaItems = choices.toArray(new CharSequence[0]);
 
-            updateValues();
+            updateCinemaValues();
+        });
+        db.users().getUsers().observe(this, users -> {
+            this.users = users;
+            updateUsersValues();
         });
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
@@ -223,21 +228,7 @@ public class SettingsMainFragment extends Fragment {
                 && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 ? View.VISIBLE : View.GONE);
 
-        int locationPreference = settings.getInt("prefSelectedCinema", 0);
-        String locationPrefText = "";
-        if(locationPreference == 0) {
-            locationPrefText = getString(R.string.settings_general_location_default);
-        } else {
-            locationPrefText = String.valueOf(locationPreference);
-            if(cinemas != null) {
-                for(Cinema cinema : cinemas) {
-                    if(cinema.getId().equals(locationPreference)) {
-                        locationPrefText = cinema.getName();
-                    }
-                }
-            }
-        }
-        location.setValue(locationPrefText);
+        updateCinemaValues();
 
         if(settings.getLong("cinemasUpdated", -1) != -1) {
             DateFormat format = SimpleDateFormat.getDateInstance(DateFormat.LONG);
@@ -256,6 +247,28 @@ public class SettingsMainFragment extends Fragment {
         autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
         automagic.setChecked(settings.getInt("prefAutomagicLocation", -1) == 1 && granted);
 
+        updateUsersValues();
+    }
+
+    private void updateCinemaValues() {
+        int locationPreference = settings.getInt("prefSelectedCinema", 0);
+        String locationPrefText = "";
+        if(locationPreference == 0) {
+            locationPrefText = getString(R.string.settings_general_location_default);
+        } else {
+            locationPrefText = String.valueOf(locationPreference);
+            if(cinemas != null) {
+                for(Cinema cinema : cinemas) {
+                    if(cinema.getId().equals(locationPreference)) {
+                        locationPrefText = cinema.getName();
+                    }
+                }
+            }
+        }
+        location.setValue(locationPrefText);
+    }
+
+    private void updateUsersValues() {
         int accounts = users.size();
         if(accounts == 0) {
             accountsRecycler.setVisibility(View.GONE);
@@ -331,7 +344,6 @@ public class SettingsMainFragment extends Fragment {
         AsyncTask.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getContext());
             users = db.users().getUsersSynchronous();
-            userProgress = 0;
 
             for(final User user : users) {
                 Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
@@ -340,33 +352,24 @@ public class SettingsMainFragment extends Fragment {
                     if(response.code() == 200) {
                         if(response.body() != null) {
                             db.users().update(response.body());
+                            if(!user.getName().equals(response.body().getName())) {
+                                NotificationUtil.createUserGroup(getContext(), response.body());
+                            }
                         }
                     } else if(response.code() == 401) {
                         // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
                         db.users().delete(user);
+                        NotificationUtil.cleanupPreferencesForUser(getContext(), user.getId());
 
                         if(settings.getString("userID", "").equals(user.getId())) {
                             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                         }
                     } // else: failed with user facing error, but do nothing because it is a background task
-
-                    finishedUserUpdate();
                 } catch(IOException | RuntimeException e) {
                     e.printStackTrace();
-                    finishedUserUpdate();
                 }
             }
         });
-    }
-
-    private void finishedUserUpdate() {
-        userProgress++;
-        if(userProgress >= users.size() && getActivity() != null) {
-            users = AppDatabase.getInstance(getContext()).users().getUsersSynchronous();
-            if(getActivity() != null && !getActivity().isFinishing()) {
-                getActivity().runOnUiThread(this::updateValues);
-            }
-        }
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {

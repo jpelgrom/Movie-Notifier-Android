@@ -19,6 +19,7 @@ import androidx.work.WorkerParameters;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
+import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -48,10 +49,14 @@ public class FcmRefreshWorker extends Worker {
                     if(response.code() == 200) {
                         if(response.body() != null) {
                             db.users().update(response.body());
+                            if(!user.getName().equals(response.body().getName())) {
+                                NotificationUtil.createUserGroup(getApplicationContext(), response.body());
+                            }
                         }
                     } else if(response.code() == 401) {
                         // Authentication failed, which cannot happen unless the user has been deleted, so make sure to delete it here as well
                         db.users().delete(user);
+                        NotificationUtil.cleanupPreferencesForUser(getApplicationContext(), user.getId());
 
                         if(settings.getString("userID", "").equals(user.getId())) {
                             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();

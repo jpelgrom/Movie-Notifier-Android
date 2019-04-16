@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.Uri;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -11,6 +13,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.work.WorkManager;
@@ -59,21 +62,22 @@ public class MessagingService extends FirebaseMessagingService {
                     AppDatabase.getInstance(getApplicationContext()).notifications().add(dbNotification);
 
                     // Notify the user
-                    sendNotification(dbNotification, dbUsers.size() > 1 ? foundUser : null);
+                    sendNotification(dbNotification, foundUser, dbUsers.size() > 1);
                 }
             }
         }
     }
 
-    private void sendNotification(Notification notification, User user) {
+    private void sendNotification(Notification notification, @NonNull User user, boolean showUser) {
         NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         if(manager == null) {
             return;
         }
 
-        NotificationUtil.createChannelWatchersGeneral(getApplicationContext());
+        NotificationUtil.createChannelWatchersPush(getApplicationContext(), user);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NotificationUtil.NOTIFICATION_CHANNEL_WATCHERS_GENERAL)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),
+                NotificationUtil.NOTIFICATION_CHANNEL_PREFIX + user.getId() + NotificationUtil.NOTIFICATION_CHANNEL_WATCHERS_PUSH)
                 .setSmallIcon(R.drawable.ic_movie)
                 .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setContentTitle(notification.getWatchername())
@@ -86,13 +90,27 @@ public class MessagingService extends FirebaseMessagingService {
                 getString(R.string.notification_notification_matchesandbody, notification.getMatches(), notification.getBody())
         ));
 
+        SharedPreferences notificationSettings = getApplicationContext().getSharedPreferences("notifications", Context.MODE_PRIVATE);
+        if(notificationSettings.getBoolean("headsup-" + user.getId(), true)) {
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        }
+        if(notificationSettings.getBoolean("sound-" + user.getId(), true)) {
+            builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
+        if(notificationSettings.getBoolean("vibrate-" + user.getId(), true)) {
+            builder.setVibrate(new long[]{0, 250, 250, 250}); // Android framework default
+        }
+        if(notificationSettings.getBoolean("lights-" + user.getId(), true)) {
+            builder.setLights(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary), 1000, 9000);
+        }
+
         Intent startIntent = new Intent(this, MainActivity.class);
         startIntent.putExtra("tab", "notifications");
         startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent startPendingIntent = PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(startPendingIntent);
 
-        if(user != null) { // Display for which account the notification is, if multiple
+        if(showUser) { // Display for which account the notification is, if multiple
             builder.setSubText(user.getName());
         }
 

@@ -190,7 +190,69 @@
                         android:paddingEnd="?attr/listPreferredItemPaddingRight"
                         android:gravity="center_vertical"
                         style="@style/TextAppearance.AppCompat.Body1"
-                        android:text="@string/user_settings_notifications_pushdebug"
+                        android:text="@string/user_settings_notifications_push_debug"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <TextView
+                        android:id="@+id/notificationsPushSystem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:gravity="center_vertical"
+                        style="@style/TextAppearance.AppCompat.Body1"
+                        android:text="@string/user_settings_notifications_push_system"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/notificationsPushHeadsup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:text="@string/user_settings_notifications_push_headsup"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/notificationsPushSound"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:text="@string/user_settings_notifications_push_sound"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/notificationsPushVibrate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:text="@string/user_settings_notifications_push_vibrate"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/notificationsPushLights"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/listPreferredItemHeightSmall"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingStart="72dp"
+                        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+                        android:text="@string/user_settings_notifications_push_lights"
                         android:visibility="gone"
                         tools:visibility="visible"/>
 

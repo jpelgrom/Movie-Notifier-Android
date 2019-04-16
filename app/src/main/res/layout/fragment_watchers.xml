@@ -32,7 +32,7 @@
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                app:srcCompat="@drawable/ic_notifications"
+                app:srcCompat="@drawable/ic_movie"
                 android:contentDescription="@string/watchers_empty_title"
                 android:layout_marginBottom="8dp"/>
 
