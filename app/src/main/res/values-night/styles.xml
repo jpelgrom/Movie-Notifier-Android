@@ -3,4 +3,8 @@
     <style name="TextMaterialSubheader" parent="TextMaterialSubhaderParent">
         <item name="android:textColor">@color/colorPrimaryLighter</item>
     </style>
+
+    <style name="BottomNavigationTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/colorPrimaryLighter</item>
+    </style>
 </resources>

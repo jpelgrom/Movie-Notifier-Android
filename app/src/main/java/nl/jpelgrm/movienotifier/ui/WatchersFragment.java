@@ -93,14 +93,14 @@ public class WatchersFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_watchers, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // List
         listSwiper.setOnRefreshListener(() -> {
             if(snackbar != null && snackbar.isShown()) {
@@ -337,6 +337,12 @@ public class WatchersFragment extends Fragment {
             } else {
                 listAutomagicSuggestion.setVisibility(View.GONE);
             }
+        }
+    }
+
+    public void scrollListToTop() {
+        if(listRecycler != null && listRecycler.getLayoutManager() instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
         }
     }
 

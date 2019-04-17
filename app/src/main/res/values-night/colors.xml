@@ -8,4 +8,6 @@
     <color name="dialogBackground">#303030</color>
 
     <color name="suggestionBackground">#111111</color>
+
+    <color name="notificationBackground">#3C4043</color>
 </resources>

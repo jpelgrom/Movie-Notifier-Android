@@ -25,9 +25,9 @@ public class NotificationUtil {
             createUserGroup(context, user);
 
             NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_PREFIX + user.getId() + NOTIFICATION_CHANNEL_WATCHERS_PUSH,
-                    context.getString(R.string.notification_channel_watchers_push_title),
+                    context.getString(R.string.notifications_channel_watchers_push_title),
                     NotificationManager.IMPORTANCE_HIGH); // HIGH is 'Urgent' for users and DEFAULT is 'High' for users
-            channel.setDescription(context.getString(R.string.notification_channel_watchers_push_description));
+            channel.setDescription(context.getString(R.string.notifications_channel_watchers_push_description));
             channel.enableLights(true);
             channel.setLightColor(ContextCompat.getColor(context, R.color.colorPrimary));
             channel.enableVibration(true);

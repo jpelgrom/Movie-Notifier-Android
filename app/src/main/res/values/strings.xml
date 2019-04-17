@@ -54,6 +54,7 @@
     <string name="cancel">Cancel</string>
     <string name="dismiss">Dismiss</string>
 
+    <string name="watchers_title">Watchers</string>
     <string name="watchers_empty_title">No watchers found</string>
     <string name="watchers_empty_filters">Change your filter to view other watchers you already have. Create a new watcher using the button in the bottom-right corner.</string>
     <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
@@ -118,6 +119,17 @@
     <string name="watcher_copy">%s copy</string>
     <string name="watcher_delete_confirm">Are you sure that you want to delete this watcher? You will no longer receive notifications for this watcher and it will be removed from your list of watchers.</string>
     <string name="watcher_delete_success">Watcher deleted</string>
+
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty_title">No notifications received</string>
+    <string name="notifications_empty_text">Once you receive push notifications for your watchers, you\'ll see them here.</string>
+    <string name="notifications_channel_watchers_push_title">Watcher push notifications</string>
+    <string name="notifications_channel_watchers_push_description">Notifications for new showings that are found for your watchers</string>
+    <string name="notifications_notification_matches">+%d matches</string>
+    <string name="notifications_notification_matchesandbody">+%1$d matches\n%2$s</string>
+    <string name="notifications_notification_appbody">%1$s\n+%2$d matches\n\n%3$s</string>
+    <string name="notifications_notification_action_pathe">Open Pathé</string>
+    <string name="notifications_notification_action_view">View watcher</string>
 
     <string name="users_title">Users</string>
     <string name="user_active">Active</string>
@@ -195,11 +207,4 @@
 \n\n8. Limitation of Liability. In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
 \n\n9. Accepting Warranty or Additional Liability. While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.
 \n\nEND OF TERMS AND CONDITIONS</string>
-
-    <string name="notification_channel_watchers_push_title">Watcher push notifications</string>
-    <string name="notification_channel_watchers_push_description">Notifications for new showings that are found for your watchers</string>
-    <string name="notification_notification_matches">+%d matches</string>
-    <string name="notification_notification_matchesandbody"><b>+%1$d matches</b>\n%2$s</string>
-    <string name="notification_notification_action_pathe">Open Pathé</string>
-    <string name="notification_notification_action_view">View watcher</string>
 </resources>

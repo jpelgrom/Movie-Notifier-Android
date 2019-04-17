@@ -85,9 +85,9 @@ public class MessagingService extends FirebaseMessagingService {
                 .setWhen(notification.getTime())
                 .setShowWhen(true);
 
-        builder.setContentText(getString(R.string.notification_notification_matches, notification.getMatches()));
+        builder.setContentText(getString(R.string.notifications_notification_matches, notification.getMatches()));
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(
-                getString(R.string.notification_notification_matchesandbody, notification.getMatches(), notification.getBody())
+                getString(R.string.notifications_notification_matchesandbody, notification.getMatches(), notification.getBody())
         ));
 
         SharedPreferences notificationSettings = getApplicationContext().getSharedPreferences("notifications", Context.MODE_PRIVATE);
@@ -105,7 +105,7 @@ public class MessagingService extends FirebaseMessagingService {
         }
 
         Intent startIntent = new Intent(this, MainActivity.class);
-        startIntent.putExtra("tab", "notifications");
+        startIntent.putExtra("tab", MainActivity.NavigationTab.NOTIFICATIONS);
         startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent startPendingIntent = PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(startPendingIntent);
@@ -117,13 +117,13 @@ public class MessagingService extends FirebaseMessagingService {
         Intent patheIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("patheapp://showMovie/" + notification.getWatchermovieid()));
         if(patheIntent.resolveActivity(getPackageManager()) != null) {
             PendingIntent pathePendingIntent = PendingIntent.getActivity(this, 0, patheIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            builder.addAction(R.drawable.ic_exit_to_app, getString(R.string.notification_notification_action_pathe), pathePendingIntent);
+            builder.addAction(R.drawable.ic_exit_to_app, getString(R.string.notifications_notification_action_pathe), pathePendingIntent);
         }
 
         Intent watcherIntent = new Intent(this, WatcherActivity.class);
         watcherIntent.putExtra("id", notification.getWatcherid());
         PendingIntent watcherPendingIntent = PendingIntent.getActivity(this, 0, watcherIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        builder.addAction(R.drawable.ic_eye, getString(R.string.notification_notification_action_view), watcherPendingIntent);
+        builder.addAction(R.drawable.ic_eye, getString(R.string.notifications_notification_action_view), watcherPendingIntent);
 
         manager.notify(notification.getId().hashCode(), builder.build());
     }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/notificationTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/listPreferredItemHeightSmall"
+        android:gravity="center"
+        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        tools:text="Today, 16:15"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+        android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+        <TextView
+            android:id="@+id/notificationText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:background="@drawable/background_notification"
+            android:padding="8dp"
+            android:layout_marginBottom="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:autoLink="web"
+            tools:text="Avengers: Endgame
++9 matches
+
+Tue 23 April 22:00 - 01:17, 3D
+Wed 24 April 09:00 - 12:22, IMAX 3D
+Wed 24 April 13:00 - 16:22, IMAX 3D
+Wed 24 April 17:00 - 20:22, IMAX 3D
+Wed 24 April 21:00 - 00:22, IMAX 3D
+Thu 25 April 09:00 - 12:22, IMAX 3D
+Thu 25 April 13:00 - 16:22, IMAX 3D
+Thu 25 April 17:00 - 20:22, IMAX 3D
+Thu 25 April 21:00 - 00:22, IMAX 3D" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.1"/>
+
+    </LinearLayout>
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="?attr/listPreferredItemPaddingLeft"
+        android:paddingEnd="?attr/listPreferredItemPaddingRight"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/notificationActionPathe"
+            style="@style/Widget.MaterialComponents.Chip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notifications_notification_action_pathe"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/notificationActionView"
+            style="@style/Widget.MaterialComponents.Chip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipIcon="@drawable/ic_eye"
+            android:text="@string/notifications_notification_action_view"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+</LinearLayout>

@@ -2,7 +2,7 @@ package nl.jpelgrm.movienotifier.data;
 
 import java.util.List;
 
-import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -14,8 +14,8 @@ public interface DaoNotifications {
     @Insert
     void add(Notification notification);
 
-    @Query("SELECT * FROM Notifications WHERE UserID = :userid")
-    LiveData<List<Notification>> getNotificationsForUser(String userid);
+    @Query("SELECT * FROM Notifications WHERE UserID = :userid ORDER BY time DESC")
+    DataSource.Factory<Integer, Notification> getNotificationsForUser(String userid);
 
     @Query("SELECT * FROM Notifications WHERE WatcherID = :watcherid")
     List<Notification> getNotificationsForWatcher(String watcherid);

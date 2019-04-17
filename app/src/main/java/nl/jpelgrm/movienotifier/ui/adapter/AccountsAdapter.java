@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -32,8 +33,9 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
         return context;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -42,7 +44,7 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final User user = users.get(position);
         final SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
         final boolean isCurrentUser = settings.getString("userID", "").equals(user.getId());
@@ -50,12 +52,9 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
         holder.name.setText(user.getName());
         holder.status.setVisibility(isCurrentUser ? View.VISIBLE : View.GONE);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(getContext() instanceof SettingsActivity) {
-                    ((SettingsActivity) getContext()).showUser(user.getId(), isCurrentUser);
-                }
+        holder.itemView.setOnClickListener(view -> {
+            if(getContext() instanceof SettingsActivity) {
+                ((SettingsActivity) getContext()).showUser(user.getId(), isCurrentUser);
             }
         });
     }

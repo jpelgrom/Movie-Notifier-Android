@@ -2,6 +2,8 @@ package nl.jpelgrm.movienotifier.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.annotation.NonNull;
 import androidx.emoji.widget.EmojiAppCompatTextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DiffUtil;
@@ -36,8 +38,9 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
         return context;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -46,7 +49,7 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Watcher watcher = watchers.get(position);
 
         holder.name.setText(watcher.getName());
@@ -64,20 +67,12 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
         String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
         holder.subtext.setText(getContext().getString(R.string.watchers_list_subtitle_date, status, startDate, endDate));
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                WatcherBottomSheet sheet = WatcherBottomSheet.newInstance(watcher);
-                sheet.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), sheet.getTag());
+        holder.itemView.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID())));
+        holder.itemView.setOnLongClickListener(view -> {
+            WatcherBottomSheet sheet = WatcherBottomSheet.newInstance(watcher);
+            sheet.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), sheet.getTag());
 
-                return true;
-            }
+            return true;
         });
     }
 

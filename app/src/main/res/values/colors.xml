@@ -16,4 +16,6 @@
     <color name="dialogBackground">#FAFAFA</color>
 
     <color name="suggestionBackground">#EEEEEE</color>
+
+    <color name="notificationBackground">#F1F3F4</color>
 </resources>
