@@ -7,8 +7,8 @@ android {
         applicationId "nl.jpelgrm.movienotifier"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.1"
+        versionCode 10
+        versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "SERVER_BASE_URL", SERVER_BASE_URL
