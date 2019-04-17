@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(savedInstanceState == null) {
             if(getIntent() == null || getIntent().getExtras() == null
-                    || getIntent().getExtras().getSerializable("tab") != NavigationTab.NOTIFICATIONS) {
+                    || !getIntent().getExtras().getString("tab").equals("notifications")) {
                 selectTab(NavigationTab.WATCHERS); // Default tab is watchers, execute action
             } else {
                 bottomnav.setSelectedItemId(R.id.navNotifications);

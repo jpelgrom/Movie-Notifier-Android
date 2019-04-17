@@ -12,4 +12,17 @@
             android:targetClass="nl.jpelgrm.movienotifier.ui.WatcherActivity">
         </intent>
     </shortcut>
+    <shortcut
+        android:shortcutId="shortcutViewNotifications"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_notifications"
+        android:shortcutShortLabel="@string/notifications_title"
+        android:shortcutLongLabel="@string/notifications_title">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="nl.jpelgrm.movienotifier"
+            android:targetClass="nl.jpelgrm.movienotifier.ui.MainActivity">
+            <extra android:name="tab" android:value="notifications"/>
+        </intent>
+    </shortcut>
 </shortcuts>

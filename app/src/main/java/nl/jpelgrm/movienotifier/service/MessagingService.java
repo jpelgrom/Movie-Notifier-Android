@@ -105,7 +105,7 @@ public class MessagingService extends FirebaseMessagingService {
         }
 
         Intent startIntent = new Intent(this, MainActivity.class);
-        startIntent.putExtra("tab", MainActivity.NavigationTab.NOTIFICATIONS);
+        startIntent.putExtra("tab", "notifications");
         startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent startPendingIntent = PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(startPendingIntent);
