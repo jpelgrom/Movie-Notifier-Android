@@ -17,6 +17,9 @@ public interface DaoNotifications {
     @Query("SELECT * FROM Notifications WHERE UserID = :userid")
     LiveData<List<Notification>> getNotificationsForUser(String userid);
 
+    @Query("SELECT * FROM Notifications WHERE WatcherID = :watcherid")
+    List<Notification> getNotificationsForWatcher(String watcherid);
+
     @Update
     void update(Notification notification);
 

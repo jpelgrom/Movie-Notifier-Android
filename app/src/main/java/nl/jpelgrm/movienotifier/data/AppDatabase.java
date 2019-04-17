@@ -75,6 +75,7 @@ public abstract class AppDatabase extends RoomDatabase {
             // Notifications: create new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `Notifications` (`ID` TEXT NOT NULL, `Time` INTEGER NOT NULL, `UserID` TEXT NOT NULL, `WatcherID` TEXT, `WatcherName` TEXT, `WatcherMovieID` INTEGER NOT NULL, `Matches` INTEGER NOT NULL, `Body` TEXT, PRIMARY KEY(`ID`), FOREIGN KEY(`UserID`) REFERENCES `Users`(`ID`) ON UPDATE CASCADE ON DELETE CASCADE )");
             database.execSQL("CREATE  INDEX `index_Notifications_UserID` ON `Notifications` (`UserID`)");
+            database.execSQL("CREATE  INDEX `index_Notifications_WatcherID` ON `Notifications` (`WatcherID`)");
         }
     };
 

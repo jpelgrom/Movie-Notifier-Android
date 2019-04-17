@@ -2,6 +2,7 @@ package nl.jpelgrm.movienotifier.ui;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -60,6 +62,7 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.data.CinemaIDAdapter;
 import nl.jpelgrm.movienotifier.models.Cinema;
+import nl.jpelgrm.movienotifier.models.Notification;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
@@ -519,6 +522,20 @@ public class WatcherActivity extends AppCompatActivity {
                 loaderErrorButton.setEnabled(true);
                 loaderErrorButton.setVisibility(View.VISIBLE);
                 loaderError.setVisibility(View.VISIBLE);
+            }
+        });
+        clearNotifications();
+    }
+
+    private void clearNotifications() {
+        AsyncTask.execute(() -> {
+            List<Notification> notifications = AppDatabase.getInstance(WatcherActivity.this).notifications().getNotificationsForWatcher(id);
+            if(notifications != null && notifications.size() > 0) {
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                if(manager == null) { return; }
+                for(Notification notification : notifications) {
+                    manager.cancel(notification.getId().hashCode());
+                }
             }
         });
     }

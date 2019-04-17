@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "69019f7c555e5f65eed594a839dc5509",
+    "identityHash": "2a38c6aa18cc44daaa0a2b7541720135",
     "entities": [
       {
         "tableName": "Users",
@@ -153,6 +153,14 @@
               "UserID"
             ],
             "createSql": "CREATE  INDEX `index_Notifications_UserID` ON `${TABLE_NAME}` (`UserID`)"
+          },
+          {
+            "name": "index_Notifications_WatcherID",
+            "unique": false,
+            "columnNames": [
+              "WatcherID"
+            ],
+            "createSql": "CREATE  INDEX `index_Notifications_WatcherID` ON `${TABLE_NAME}` (`WatcherID`)"
           }
         ],
         "foreignKeys": [
@@ -173,7 +181,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"69019f7c555e5f65eed594a839dc5509\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2a38c6aa18cc44daaa0a2b7541720135\")"
     ]
   }
 }

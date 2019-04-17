@@ -28,7 +28,7 @@ public class Notification {
     @ColumnInfo(name = "UserID", index = true)
     private String userid = "";
 
-    @ColumnInfo(name = "WatcherID")
+    @ColumnInfo(name = "WatcherID", index = true)
     private String watcherid;
 
     @ColumnInfo(name = "WatcherName")
