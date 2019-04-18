@@ -302,18 +302,18 @@ public class WatchersFragment extends Fragment {
         } else {
             Comparator<Watcher> comparator;
             switch(sort) {
+                case 1: // Begin (start checking)
+                    comparator = (w1, w2) -> Long.compare(w2.getBegin(), w1.getBegin());
+                    break;
                 case 2: // End (stop checking)
-                    comparator = (w1, w2) -> Long.compare(w1.getEnd(), w2.getEnd());
+                    comparator = (w1, w2) -> Long.compare(w2.getEnd(), w1.getEnd());
                     break;
                 case 3: // Start after (first showing)
-                    comparator = (w1, w2) -> Long.compare(w1.getFilters().getStartAfter(), w2.getFilters().getStartAfter());
+                    comparator = (w1, w2) -> Long.compare(w2.getFilters().getStartAfter(), w1.getFilters().getStartAfter());
                     break;
                 case 4: // A-Z
-                    comparator = sortAZ;
-                    break;
-                case 1: // Begin (start checking)
                 default:
-                    comparator = (w1, w2) -> Long.compare(w1.getBegin(), w2.getBegin());
+                    comparator = sortAZ;
                     break;
             }
             Collections.sort(watchersSorted, comparator);
