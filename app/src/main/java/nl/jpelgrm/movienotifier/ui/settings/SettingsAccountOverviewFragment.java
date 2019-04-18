@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +16,19 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
@@ -90,6 +93,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
         notificationSettings = getContext().getSharedPreferences("notifications", Context.MODE_PRIVATE);
+
+        verifyFCMToken();
     }
 
     @Nullable
@@ -180,7 +185,11 @@ public class SettingsAccountOverviewFragment extends Fragment {
         boolean setToEnabled = notificationsPush.isChecked();
         if(setToEnabled) {
             if(!toUpdate.getFcmTokens().contains(token)) {
-                changed = toUpdate.getFcmTokens().add(token);
+                if(!token.equals("")) {
+                    changed = toUpdate.getFcmTokens().add(token);
+                } else {
+                    notificationsPush.setChecked(false);
+                }
             }
         } else {
             if(toUpdate.getFcmTokens().contains(token)) {
@@ -443,6 +452,18 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 }
             });
         }).setNegativeButton(R.string.no, null).show();
+    }
+
+    private void verifyFCMToken() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+            if(task.isSuccessful() && task.getResult() != null) {
+                String storedToken = notificationSettings.getString("token", "");
+                String receivedToken = task.getResult().getToken();
+                if(!storedToken.equals(receivedToken)) {
+                    notificationSettings.edit().putString("token", receivedToken).apply();
+                }
+            }
+        });
     }
 
     private void setFieldsEnabled(boolean enabled) {

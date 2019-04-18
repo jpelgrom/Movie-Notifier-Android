@@ -3,11 +3,6 @@ package nl.jpelgrm.movienotifier.service;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.work.Constraints;
@@ -16,6 +11,11 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
