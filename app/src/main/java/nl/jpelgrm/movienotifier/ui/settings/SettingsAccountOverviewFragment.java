@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+import androidx.work.WorkManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -36,6 +37,7 @@ import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.models.User;
+import nl.jpelgrm.movienotifier.service.FcmRefreshWorker;
 import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
@@ -460,7 +462,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 String storedToken = notificationSettings.getString("token", "");
                 String receivedToken = task.getResult().getToken();
                 if(!storedToken.equals(receivedToken)) {
-                    notificationSettings.edit().putString("token", receivedToken).apply();
+                    WorkManager.getInstance().cancelAllWorkByTag("fcmRefresh");
+                    WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(receivedToken, null));
                 }
             }
         });
