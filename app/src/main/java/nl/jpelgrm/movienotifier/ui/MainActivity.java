@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(savedInstanceState == null) {
-            if(getIntent() == null || getIntent().getExtras() == null
+            if(getIntent() == null || getIntent().getExtras() == null || getIntent().getExtras().getString("tab") == null
                     || !getIntent().getExtras().getString("tab").equals("notifications")) {
                 selectTab(NavigationTab.WATCHERS); // Default tab is watchers, execute action
             } else {
