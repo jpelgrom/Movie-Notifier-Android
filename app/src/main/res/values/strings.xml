@@ -155,6 +155,7 @@
     <string name="user_settings_security_delete_success">Deleted account</string>
     <string name="user_settings_security_logout">Log out from app</string>
     <string name="user_settings_security_logout_success">Logged out of account</string>
+    <string name="user_settings_security_authenticate">We couldn\'t authenticate you, please try again</string>
     <string name="user_settings_notifications_title">Notifications</string>
     <string name="user_settings_notifications_push">Push notifications on this device</string>
     <string name="user_settings_notifications_push_debug">Turn push notifications off everywhere</string>

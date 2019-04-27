@@ -1,5 +1,6 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +47,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.app.Activity.RESULT_OK;
+
 public class SettingsAccountOverviewFragment extends Fragment {
+    public static final int INTENT_AUTHENTICATE_PASSWORD = 160;
+    public static final int INTENT_AUTHENTICATE_DELETE = 161;
+
     @BindView(R.id.accountCoordinator) CoordinatorLayout coordinator;
 
     @BindView(R.id.progress) ProgressBar progress;
@@ -120,7 +125,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         accountSwitch.setOnClickListener(v -> switchToThis());
         accountName.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME));
-        accountPassword.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD));
+        accountPassword.setOnClickListener(v -> editPassword());
         accountLogout.setOnClickListener(v -> logout());
         accountDelete.setOnClickListener(v -> delete());
         accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
@@ -177,6 +182,22 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
         ((SettingsActivity) getActivity()).editUserDetail(user.getId(), mode);
+    }
+
+    private void editPassword() {
+        if(getContext() != null) {
+            KeyguardManager keyguardManager = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
+            if(keyguardManager != null) {
+                Intent authenticationIntent = keyguardManager.createConfirmDeviceCredentialIntent(null, null);
+                if(authenticationIntent != null) {
+                    startActivityForResult(authenticationIntent, INTENT_AUTHENTICATE_PASSWORD);
+                } else {
+                    editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD);
+                }
+            } else {
+                editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD);
+            }
+        }
     }
 
     private void togglePushNotifications() {
@@ -400,6 +421,22 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void delete() {
+        if(getContext() != null) {
+            KeyguardManager keyguardManager = (KeyguardManager) getContext().getSystemService(Context.KEYGUARD_SERVICE);
+            if(keyguardManager != null) {
+                Intent authenticationIntent = keyguardManager.createConfirmDeviceCredentialIntent(null, null);
+                if(authenticationIntent != null) {
+                    startActivityForResult(authenticationIntent, INTENT_AUTHENTICATE_DELETE);
+                } else {
+                    doDelete();
+                }
+            } else {
+                doDelete();
+            }
+        }
+    }
+
+    private void doDelete() {
         error.setVisibility(View.GONE);
 
         new AlertDialog.Builder(getContext()).setMessage(R.string.user_settings_security_delete_confirm).setPositiveButton(R.string.yes, (dialogInterface, i) -> {
@@ -485,6 +522,27 @@ public class SettingsAccountOverviewFragment extends Fragment {
         notificationsPushLights.setEnabled(enabled);
         notificationsEmail.setClickable(enabled);
         notificationsEmailAddress.setClickable(enabled);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode) {
+            case INTENT_AUTHENTICATE_PASSWORD:
+            case INTENT_AUTHENTICATE_DELETE:
+                if(resultCode == RESULT_OK) {
+                    if(requestCode == INTENT_AUTHENTICATE_PASSWORD) {
+                        editDetail(SettingsAccountUpdateFragment.UpdateMode.PASSWORD);
+                    } else {
+                        doDelete();
+                    }
+                } else {
+                    Snackbar.make(coordinator, R.string.user_settings_security_authenticate, Snackbar.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
+        }
     }
 
     private interface OnUpdatedListener {
