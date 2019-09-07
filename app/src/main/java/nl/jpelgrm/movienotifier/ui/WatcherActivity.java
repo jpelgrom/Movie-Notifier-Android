@@ -10,9 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +26,19 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.emoji.widget.EmojiAppCompatEditText;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -42,18 +52,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.emoji.widget.EmojiAppCompatEditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
@@ -158,22 +156,6 @@ public class WatcherActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
             getSupportActionBar().setTitle("");
-        }
-
-        NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if(nfcAdapter != null) {
-            nfcAdapter.setNdefPushMessageCallback(nfcEvent -> {
-                if(id.equals("")) {
-                    return null;
-                } else {
-                    return new NdefMessage(
-                        new NdefRecord[] {
-                                NdefRecord.createUri(BuildConfig.SERVER_BASE_URL + "w/" + id),
-                                NdefRecord.createApplicationRecord(BuildConfig.APPLICATION_ID)
-                        }
-                    );
-                }
-            }, this);
         }
 
         setupSharedInfo();
@@ -368,8 +350,7 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void setupSharedInfo() {
         if((getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_SEND))
-                || (getIntent().getAction() != null && getIntent().getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)
-                || (getIntent().getType() != null && getIntent().getType().equals("text/plain")))
+                || (getIntent().getType() != null && getIntent().getType().equals("text/plain"))
                 || getIntent().getDataString() != null) {
             String data;
 

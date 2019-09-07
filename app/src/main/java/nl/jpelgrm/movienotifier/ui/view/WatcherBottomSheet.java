@@ -1,22 +1,18 @@
 package nl.jpelgrm.movienotifier.ui.view;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.emoji.widget.EmojiAppCompatTextView;
-import androidx.fragment.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.emoji.widget.EmojiAppCompatTextView;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.gson.Gson;
 
 import java.text.DateFormat;
@@ -48,8 +44,6 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
 
     private List<Cinema> cinemas = null;
 
-    private NfcAdapter nfcAdapter;
-
     public static WatcherBottomSheet newInstance(Watcher watcher) {
         WatcherBottomSheet fragment = new WatcherBottomSheet();
         Bundle args = new Bundle();
@@ -68,49 +62,6 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         });
 
         watcher = new Gson().fromJson(getArguments().getString("watcher"), Watcher.class);
-
-        nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
-        if(nfcAdapter != null) {
-            nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
-                @Override
-                public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-                    return new NdefMessage(
-                            new NdefRecord[] {
-                                    NdefRecord.createUri(BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID()),
-                                    NdefRecord.createApplicationRecord(BuildConfig.APPLICATION_ID)
-                            }
-                    );
-                }
-            }, getActivity());
-        }
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        dismissalTask();
-        super.onDismiss(dialog);
-    }
-
-    @Override
-    public void onCancel(DialogInterface dialog) {
-        dismissalTask();
-        super.onCancel(dialog);
-    }
-
-    private void dismissalTask() {
-        if(nfcAdapter != null && getActivity() != null && !getActivity().isFinishing()) {
-            nfcAdapter.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
-                @Override
-                public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-                    return new NdefMessage(
-                            new NdefRecord[] {
-                                    NdefRecord.createUri("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "&feature=beam"),
-                                    NdefRecord.createUri(BuildConfig.APPLICATION_ID)
-                            }
-                    );
-                }
-            }, getActivity()); // Don't keep sharing this watcher when the sheet is dismissed, return something similar to Android Beam default
-        }
     }
 
     @Override
@@ -146,55 +97,41 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         String activeEmoji;
         if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDD34"; // Red Circle ('live', active watcher)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
+            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
         } else if(watcher.getEnd() < System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDCE6"; // Package ('archive', watcher is done and will not be active again)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
+            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
         } else {
             activeEmoji = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
-            active.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
+            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
         }
 
         String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
         String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
-        dates.setText(getContext().getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
+        dates.setText(getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-                getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
+        view.setOnClickListener(view -> {
+            dismiss();
+            getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
+        });
+
+        share.setOnClickListener(view -> {
+            dismiss();
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID());
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
+        });
+
+        delete.setOnClickListener(view -> {
+            dismiss();
+            Fragment search = getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment");
+            if(search != null) {
+                ((WatchersFragment) search).deleteWatcher(watcher.getID());
             }
         });
 
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID());
-                sendIntent.setType("text/plain");
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
-            }
-        });
-
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-                Fragment search = getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment");
-                if(search != null) {
-                    ((WatchersFragment) search).deleteWatcher(watcher.getID());
-                }
-            }
-        });
-
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+        close.setOnClickListener(view -> dismiss());
     }
 }
