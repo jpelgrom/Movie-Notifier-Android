@@ -94,7 +94,7 @@
     <string name="watcher_filter_title_3d">3D</string>
     <string name="watcher_filter_title_4k">4K</string>
     <string name="watcher_filter_title_laser">Laser</string>
-    <string name="watcher_filter_title_hfr">HFR (48 fps)</string>
+    <string name="watcher_filter_title_hfr">HFR</string>
     <string name="watcher_filter_heading_audio">Audio</string>
     <string name="watcher_filter_title_dolbyatmos">Dolby Atmos</string>
     <string name="watcher_filter_title_ov">Original language version</string>
