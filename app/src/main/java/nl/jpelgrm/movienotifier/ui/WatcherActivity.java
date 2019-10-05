@@ -194,72 +194,17 @@ public class WatcherActivity extends AppCompatActivity {
             showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
         });
 
-        setOnPropClickListener(binding.filterIMAX, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setIMAX(value);
-            }
-        });
-        setOnPropClickListener(binding.filterDolbyCinema, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setDolbyCinema(value);
-            }
-        });
-        setOnPropClickListener(binding.filter3D, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().set3D(value);
-            }
-        });
-        setOnPropClickListener(binding.filter4K, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().set4K(value);
-            }
-        });
-        setOnPropClickListener(binding.filterLaser, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setLaser(value);
-            }
-        });
-        setOnPropClickListener(binding.filterHFR, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setHFR(value);
-            }
-        });
-        setOnPropClickListener(binding.filterDolbyAtmos, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setDolbyAtmos(value);
-            }
-        });
-        setOnPropClickListener(binding.filterOV, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setOriginalVersion(value);
-            }
-        });
-        setOnPropClickListener(binding.filterNL, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setDutchVersion(value);
-            }
-        });
-        setOnPropClickListener(binding.filter4DX, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().set4DX(value);
-            }
-        });
-        setOnPropClickListener(binding.filterDBOX, new PropResultListener() {
-            @Override
-            public void gotResult(WatcherFilters.WatcherFilterValue value) {
-                watcher.getFilters().setDBOX(value);
-            }
-        });
+        setOnPropClickListener(binding.filterIMAX, value -> watcher.getFilters().setIMAX(value));
+        setOnPropClickListener(binding.filterDolbyCinema, value -> watcher.getFilters().setDolbyCinema(value));
+        setOnPropClickListener(binding.filter3D, value -> watcher.getFilters().set3D(value));
+        setOnPropClickListener(binding.filter4K, value -> watcher.getFilters().set4K(value));
+        setOnPropClickListener(binding.filterLaser, value -> watcher.getFilters().setLaser(value));
+        setOnPropClickListener(binding.filterHFR, value -> watcher.getFilters().setHFR(value));
+        setOnPropClickListener(binding.filterDolbyAtmos, value -> watcher.getFilters().setDolbyAtmos(value));
+        setOnPropClickListener(binding.filterOV, value -> watcher.getFilters().setOriginalVersion(value));
+        setOnPropClickListener(binding.filterNL, value -> watcher.getFilters().setDutchVersion(value));
+        setOnPropClickListener(binding.filter4DX, value -> watcher.getFilters().set4DX(value));
+        setOnPropClickListener(binding.filterDBOX, value -> watcher.getFilters().setDBOX(value));
 
         binding.fab.setOnClickListener(view -> {
             if(mode == Mode.VIEWING) {
@@ -1003,8 +948,8 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
-    private abstract class PropResultListener {
-        public abstract void gotResult(WatcherFilters.WatcherFilterValue value);
+    private interface PropResultListener {
+        void gotResult(WatcherFilters.WatcherFilterValue value);
     }
 
     private void askForLocation() {
