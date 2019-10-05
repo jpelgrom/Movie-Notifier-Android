@@ -1,30 +1,24 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ActivityAccountBinding;
 
 public class AccountActivity extends AppCompatActivity {
-    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.frame) FrameLayout frame;
+    private ActivityAccountBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_account);
-        ButterKnife.bind(this);
+        binding = ActivityAccountBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
         if(getSupportActionBar() != null) {
             getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

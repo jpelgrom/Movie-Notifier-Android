@@ -10,26 +10,19 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.google.android.material.textfield.TextInputLayout;
-
-import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
+import java.util.Collections;
+
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentAccountAddBinding;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.UserValidation;
@@ -41,19 +34,7 @@ public class AccountAddFragment extends Fragment {
     SharedPreferences settings;
     SharedPreferences notificationSettings;
 
-    @BindView(R.id.progress) ProgressBar progress;
-    @BindView(R.id.error) TextView error;
-
-    @BindView(R.id.nameWrapper) TextInputLayout nameWrapper;
-    @BindView(R.id.name) AppCompatEditText name;
-    @BindView(R.id.passwordWrapper) TextInputLayout passwordWrapper;
-    @BindView(R.id.password) AppCompatEditText password;
-    @BindView(R.id.push) IconSwitchView push;
-    @BindView(R.id.emailOn) IconSwitchView emailOn;
-    @BindView(R.id.emailWrapper) TextInputLayout emailWrapper;
-    @BindView(R.id.email) AppCompatEditText email;
-
-    @BindView(R.id.go) Button go;
+    private FragmentAccountAddBinding binding;
 
     Handler validateNameHandler = new Handler();
     Handler validateEmailHandler = new Handler();
@@ -72,14 +53,13 @@ public class AccountAddFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_account_add, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentAccountAddBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        name.addTextChangedListener(new TextWatcher() {
+        binding.name.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -92,7 +72,7 @@ public class AccountAddFragment extends Fragment {
                 validateNameHandler.postDelayed(validateNameRunnable, 1000);
             }
         });
-        email.addTextChangedListener(new TextWatcher() {
+        binding.email.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -105,7 +85,7 @@ public class AccountAddFragment extends Fragment {
                 validateEmailHandler.postDelayed(validateEmailRunnable, 1000);
             }
         });
-        password.addTextChangedListener(new TextWatcher() {
+        binding.password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -120,19 +100,19 @@ public class AccountAddFragment extends Fragment {
         });
 
         if(!notificationSettings.getString("token", "").equals("")) {
-            push.setChecked(true);
+            binding.push.setChecked(true);
         }
-        emailOn.setOnSwitchClickListener(v -> {
-            if(emailOn.isChecked() && emailWrapper.getVisibility() != View.VISIBLE) {
-                emailWrapper.setVisibility(View.VISIBLE);
-            } else if(!emailOn.isChecked()) {
-                if(emailWrapper.getVisibility() != View.GONE) {
-                    emailWrapper.setVisibility(View.GONE);
+        binding.emailOn.setOnSwitchClickListener(v -> {
+            if(binding.emailOn.isChecked() && binding.emailWrapper.getVisibility() != View.VISIBLE) {
+                binding.emailWrapper.setVisibility(View.VISIBLE);
+            } else if(!binding.emailOn.isChecked()) {
+                if(binding.emailWrapper.getVisibility() != View.GONE) {
+                    binding.emailWrapper.setVisibility(View.GONE);
                 }
                 InterfaceUtil.hideKeyboard(getActivity());
             }
         });
-        go.setOnClickListener(v -> checkForRegister(true));
+        binding.go.setOnClickListener(v -> checkForRegister(true));
     }
 
     @Override
@@ -145,22 +125,22 @@ public class AccountAddFragment extends Fragment {
     }
 
     private void checkForRegister(boolean warnAboutNotifications) {
-        error.setVisibility(View.GONE);
+        binding.error.setVisibility(View.GONE);
         InterfaceUtil.hideKeyboard(getActivity());
 
         if(validateName() && validatePassword()) {
-            if(warnAboutNotifications && !push.isChecked() && !emailOn.isChecked()) {
+            if(warnAboutNotifications && !binding.push.isChecked() && !binding.emailOn.isChecked()) {
                 new AlertDialog.Builder(getContext()).setMessage(R.string.user_validate_notifications)
                         .setPositiveButton(R.string.yes, (dialog, which) -> checkForRegister(false))
                         .setNegativeButton(R.string.no, null).show();
                 return;
             }
 
-            if((!emailOn.isChecked() || validateEmail())) {
-                User toCreate = new User(name.getText().toString(),
-                        emailOn.isChecked() ? email.getText().toString() : "",
-                        password.getText().toString());
-                if(push.isChecked() && !notificationSettings.getString("token", "").equals("")) {
+            if((!binding.emailOn.isChecked() || validateEmail())) {
+                User toCreate = new User(binding.name.getText().toString(),
+                        binding.emailOn.isChecked() ? binding.email.getText().toString() : "",
+                        binding.password.getText().toString());
+                if(binding.push.isChecked() && !notificationSettings.getString("token", "").equals("")) {
                     toCreate.setFcmTokens(Collections.singletonList(notificationSettings.getString("token", "")));
                 } else {
                     toCreate.setFcmTokens(Collections.emptyList());
@@ -172,35 +152,35 @@ public class AccountAddFragment extends Fragment {
     }
 
     private boolean validateName() {
-        if(UserValidation.validateName(name.getText().toString())) {
-            nameWrapper.setErrorEnabled(false);
+        if(UserValidation.validateName(binding.name.getText().toString())) {
+            binding.nameWrapper.setErrorEnabled(false);
             return true;
         } else {
-            nameWrapper.setError(getString(name.getText().toString().length() >= 4 && name.getText().toString().length() <= 16 ?
+            binding.nameWrapper.setError(getString(binding.name.getText().toString().length() >= 4 && binding.name.getText().toString().length() <= 16 ?
                     R.string.user_validate_name_regex : R.string.user_validate_name_length));
-            nameWrapper.setErrorEnabled(true);
+            binding.nameWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private boolean validateEmail() {
-        if(UserValidation.validateEmail(email.getText().toString())) {
-            emailWrapper.setErrorEnabled(false);
+        if(UserValidation.validateEmail(binding.email.getText().toString())) {
+            binding.emailWrapper.setErrorEnabled(false);
             return true;
         } else {
-            emailWrapper.setError(getString(R.string.user_validate_email));
-            emailWrapper.setErrorEnabled(true);
+            binding.emailWrapper.setError(getString(R.string.user_validate_email));
+            binding.emailWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private boolean validatePassword() {
-        if(UserValidation.validatePassword(password.getText().toString())) {
-            passwordWrapper.setErrorEnabled(false);
+        if(UserValidation.validatePassword(binding.password.getText().toString())) {
+            binding.passwordWrapper.setErrorEnabled(false);
             return true;
         } else {
-            passwordWrapper.setError(getString(R.string.user_validate_password));
-            passwordWrapper.setErrorEnabled(true);
+            binding.passwordWrapper.setError(getString(R.string.user_validate_password));
+            binding.passwordWrapper.setErrorEnabled(true);
             return false;
         }
     }
@@ -227,8 +207,8 @@ public class AccountAddFragment extends Fragment {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
 
-                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
-                    error.setVisibility(View.VISIBLE);
+                    binding.error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+                    binding.error.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -239,22 +219,22 @@ public class AccountAddFragment extends Fragment {
 
                 t.printStackTrace();
 
-                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
-                error.setVisibility(View.VISIBLE);
+                binding.error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                binding.error.setVisibility(View.VISIBLE);
             }
         });
     }
 
     private void setFieldsEnabled(boolean enabled) {
-        nameWrapper.setEnabled(enabled);
-        passwordWrapper.setEnabled(enabled);
-        push.setClickable(enabled);
-        emailOn.setClickable(enabled);
-        emailWrapper.setEnabled(enabled);
-        go.setEnabled(enabled);
+        binding.nameWrapper.setEnabled(enabled);
+        binding.passwordWrapper.setEnabled(enabled);
+        binding.push.setClickable(enabled);
+        binding.emailOn.setClickable(enabled);
+        binding.emailWrapper.setEnabled(enabled);
+        binding.go.setEnabled(enabled);
     }
 
     private void setProgressVisible(boolean visible) {
-        progress.setVisibility(visible ? View.VISIBLE : View.GONE);
+        binding.progress.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 }

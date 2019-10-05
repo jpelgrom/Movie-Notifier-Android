@@ -3,13 +3,9 @@ package nl.jpelgrm.movienotifier.ui.view;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
-import androidx.emoji.widget.EmojiAppCompatTextView;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -20,11 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentBottomsheetWatcherBinding;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.WatcherActivity;
@@ -33,14 +28,7 @@ import nl.jpelgrm.movienotifier.ui.WatchersFragment;
 public class WatcherBottomSheet extends BottomSheetDialogFragment {
     private Watcher watcher;
 
-    @BindView(R.id.name) EmojiAppCompatTextView name;
-    @BindView(R.id.location) TextView location;
-    @BindView(R.id.active) EmojiAppCompatTextView active;
-    @BindView(R.id.dates) TextView dates;
-    @BindView(R.id.view) LinearLayout view;
-    @BindView(R.id.share) LinearLayout share;
-    @BindView(R.id.delete) LinearLayout delete;
-    @BindView(R.id.close) Button close;
+    private FragmentBottomsheetWatcherBinding binding;
 
     private List<Cinema> cinemas = null;
 
@@ -67,15 +55,14 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View view = View.inflate(getContext(), R.layout.fragment_bottomsheet_watcher, null);
-        ButterKnife.bind(this, view);
-        dialog.setContentView(view);
+        binding = FragmentBottomsheetWatcherBinding.inflate(LayoutInflater.from(getContext()), null, false);
+        dialog.setContentView(binding.getRoot());
 
         setupViews(false);
     }
 
     private void setupViews(boolean cinemasOnly) {
-        name.setText(watcher.getName());
+        binding.name.setText(watcher.getName());
 
         String foundCinema = "";
         if(cinemas != null) {
@@ -88,7 +75,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         if(foundCinema.equals("")) { // We don't know this cinema ID's display name
             foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
         }
-        location.setText(foundCinema);
+        binding.location.setText(foundCinema);
 
         if(cinemasOnly) { return; }
 
@@ -97,25 +84,25 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         String activeEmoji;
         if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDD34"; // Red Circle ('live', active watcher)
-            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
+            binding.active.setText(getString(R.string.watchers_bottomsheet_watcher_active_now, activeEmoji, format.format(new Date(watcher.getEnd()))));
         } else if(watcher.getEnd() < System.currentTimeMillis()) {
             activeEmoji = "\uD83D\uDCE6"; // Package ('archive', watcher is done and will not be active again)
-            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
+            binding.active.setText(getString(R.string.watchers_bottomsheet_watcher_active_past, activeEmoji, format.format(new Date(watcher.getEnd()))));
         } else {
             activeEmoji = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
-            active.setText(getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
+            binding.active.setText(getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
         }
 
         String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
         String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
-        dates.setText(getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
+        binding.dates.setText(getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
 
-        view.setOnClickListener(view -> {
+        binding.view.setOnClickListener(view -> {
             dismiss();
             getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
         });
 
-        share.setOnClickListener(view -> {
+        binding.share.setOnClickListener(view -> {
             dismiss();
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -124,7 +111,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
         });
 
-        delete.setOnClickListener(view -> {
+        binding.delete.setOnClickListener(view -> {
             dismiss();
             Fragment search = getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment");
             if(search != null) {
@@ -132,6 +119,6 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             }
         });
 
-        close.setOnClickListener(view -> dismiss());
+        binding.close.setOnClickListener(view -> dismiss());
     }
 }

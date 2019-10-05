@@ -10,35 +10,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import java.io.IOException;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.IOException;
+
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.ActivitySettingsBinding;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.util.EmptyLiveData;
 import retrofit2.Call;
 import retrofit2.Response;
 
 public class SettingsActivity extends AppCompatActivity {
-    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    private ActivitySettingsBinding binding;
 
     private SharedPreferences settings;
     private MutableLiveData<String> lastUserID = new MutableLiveData<>();
@@ -47,10 +43,10 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        ButterKnife.bind(this);
+        binding = ActivitySettingsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
         if(getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.settings);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -72,12 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
         lastUserID.setValue(null);
         lastUser.observe(this, user -> updateToolbar());
 
-        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                updateToolbar();
-            }
-        });
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> updateToolbar());
     }
 
     @Override
@@ -114,7 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if(message != null && !message.equals("")) {
-            Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.coordinator, message, Snackbar.LENGTH_SHORT).show();
         }
 
         if(getSupportFragmentManager().findFragmentByTag("settingsAccountOverviewFragment") != null) {
@@ -125,13 +116,13 @@ public class SettingsActivity extends AppCompatActivity {
     public void updatedUser(SettingsAccountUpdateFragment.UpdateMode mode) {
         switch(mode) {
             case NAME:
-                Snackbar.make(coordinator, R.string.user_settings_update_name_success, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(binding.coordinator, R.string.user_settings_update_name_success, Snackbar.LENGTH_SHORT).show();
                 break;
             case EMAIL:
-                Snackbar.make(coordinator, R.string.user_settings_update_email_success, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(binding.coordinator, R.string.user_settings_update_email_success, Snackbar.LENGTH_SHORT).show();
                 break;
             case PASSWORD:
-                Snackbar.make(coordinator, R.string.user_settings_security_password_success, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(binding.coordinator, R.string.user_settings_security_password_success, Snackbar.LENGTH_SHORT).show();
                 break;
         }
 
@@ -170,9 +161,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void showMenuItems(boolean visible) {
-        if(toolbar.getMenu() != null) {
-            for(int i = 0; i < toolbar.getMenu().size(); i++) {
-                toolbar.getMenu().getItem(i).setVisible(visible);
+        if(binding.toolbar.getMenu() != null) {
+            for(int i = 0; i < binding.toolbar.getMenu().size(); i++) {
+                binding.toolbar.getMenu().getItem(i).setVisible(visible);
             }
         }
     }

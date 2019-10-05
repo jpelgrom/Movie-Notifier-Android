@@ -11,17 +11,14 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.google.android.material.chip.Chip;
 
 import androidx.annotation.NonNull;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ListNotificationBinding;
 import nl.jpelgrm.movienotifier.models.Notification;
 import nl.jpelgrm.movienotifier.ui.WatcherActivity;
 
@@ -51,14 +48,14 @@ public class NotificationsAdapter extends PagedListAdapter<Notification, Notific
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Notification notification = getItem(position);
         if(notification != null) {
-            holder.time.setText(DateUtils.getRelativeDateTimeString(getContext(), notification.getTime(), DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0));
+            holder.binding.notificationTime.setText(DateUtils.getRelativeDateTimeString(getContext(), notification.getTime(), DateUtils.DAY_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0));
 
             String bodyText = getContext().getString(R.string.notifications_notification_appbody, notification.getWatchername(), notification.getMatches(), notification.getBody());
             bodyText = bodyText.replace("\n","<br />");
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                holder.text.setText(Html.fromHtml(bodyText, Html.FROM_HTML_MODE_COMPACT));
+                holder.binding.notificationText.setText(Html.fromHtml(bodyText, Html.FROM_HTML_MODE_COMPACT));
             } else {
-                holder.text.setText(Html.fromHtml(bodyText));
+                holder.binding.notificationText.setText(Html.fromHtml(bodyText));
             }
 
             Intent patheIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("patheapp://showMovie/" + notification.getWatchermovieid()));
@@ -66,15 +63,15 @@ public class NotificationsAdapter extends PagedListAdapter<Notification, Notific
             if(patheInfo != null) {
                 try {
                     Drawable icon = getContext().getPackageManager().getApplicationIcon(patheInfo.getPackageName());
-                    holder.actionPathe.setChipIcon(icon);
+                    holder.binding.notificationActionPathe.setChipIcon(icon);
                 } catch(Exception e) { }
-                holder.actionPathe.setOnClickListener(v -> getContext().startActivity(patheIntent));
-                holder.actionPathe.setVisibility(View.VISIBLE);
+                holder.binding.notificationActionPathe.setOnClickListener(v -> getContext().startActivity(patheIntent));
+                holder.binding.notificationActionPathe.setVisibility(View.VISIBLE);
             }
 
             Intent watcherIntent = new Intent(getContext(), WatcherActivity.class);
             watcherIntent.putExtra("id", notification.getWatcherid());
-            holder.actionView.setOnClickListener(v -> getContext().startActivity(watcherIntent));
+            holder.binding.notificationActionView.setOnClickListener(v -> getContext().startActivity(watcherIntent));
         }
     }
 
@@ -92,14 +89,11 @@ public class NotificationsAdapter extends PagedListAdapter<Notification, Notific
             };
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.notificationTime) TextView time;
-        @BindView(R.id.notificationText) TextView text;
-        @BindView(R.id.notificationActionPathe) Chip actionPathe;
-        @BindView(R.id.notificationActionView) Chip actionView;
+        ListNotificationBinding binding;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            binding = ListNotificationBinding.bind(itemView);
         }
     }
 }

@@ -4,34 +4,21 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.core.content.ContextCompat;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.FragmentBottomsheetSortBinding;
 import nl.jpelgrm.movienotifier.ui.WatchersFragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class SortBottomSheet extends BottomSheetDialogFragment {
-    @BindView(R.id.sortAuto) LinearLayout sortAuto;
-    @BindView(R.id.sortAutoText) TextView sortAutoText;
-    @BindView(R.id.sortBegin) LinearLayout sortBegin;
-    @BindView(R.id.sortBeginText) TextView sortBeginText;
-    @BindView(R.id.sortEnd) LinearLayout sortEnd;
-    @BindView(R.id.sortEndText) TextView sortEndText;
-    @BindView(R.id.sortStartAfter) LinearLayout sortStartAfter;
-    @BindView(R.id.sortStartAfterText) TextView sortStartAfterText;
-    @BindView(R.id.sortAZ) LinearLayout sortAZ;
-    @BindView(R.id.sortAZText) TextView sortAZText;
-
-    @BindView(R.id.close) Button close;
+    private FragmentBottomsheetSortBinding binding;
 
     private SharedPreferences settings;
 
@@ -63,9 +50,8 @@ public class SortBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View view = View.inflate(getContext(), R.layout.fragment_bottomsheet_sort, null);
-        ButterKnife.bind(this, view);
-        dialog.setContentView(view);
+        binding = FragmentBottomsheetSortBinding.inflate(LayoutInflater.from(getContext()), null, false);
+        dialog.setContentView(binding.getRoot());
 
         setupViews();
     }
@@ -74,63 +60,43 @@ public class SortBottomSheet extends BottomSheetDialogFragment {
         int pref = settings.getInt("listSort", 0);
         switch(pref) {
             case 1: // Begin (start checking)
-                sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 2: // End (stop checking)
-                sortEndText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortEndText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 3: // Start after (first showing)
-                sortStartAfterText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortStartAfterText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 4: // A-Z
-                sortAZText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortAZText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 0: // Automagic (status, then A-Z)
             default:
-                sortAutoText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortAutoText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
         }
 
-        sortAuto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listSort", 0).apply();
-                dismiss();
-            }
+        binding.sortAuto.setOnClickListener(view -> {
+            settings.edit().putInt("listSort", 0).apply();
+            dismiss();
         });
-        sortBegin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listSort", 1).apply();
-                dismiss();
-            }
+        binding.sortBegin.setOnClickListener(view -> {
+            settings.edit().putInt("listSort", 1).apply();
+            dismiss();
         });
-        sortEnd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listSort", 2).apply();
-                dismiss();
-            }
+        binding.sortEnd.setOnClickListener(view -> {
+            settings.edit().putInt("listSort", 2).apply();
+            dismiss();
         });
-        sortStartAfter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listSort", 3).apply();
-                dismiss();
-            }
+        binding.sortStartAfter.setOnClickListener(view -> {
+            settings.edit().putInt("listSort", 3).apply();
+            dismiss();
         });
-        sortAZ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listSort", 4).apply();
-                dismiss();
-            }
+        binding.sortAZ.setOnClickListener(view -> {
+            settings.edit().putInt("listSort", 4).apply();
+            dismiss();
         });
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+        binding.close.setOnClickListener(view -> dismiss());
     }
 }

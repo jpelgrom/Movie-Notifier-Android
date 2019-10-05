@@ -13,7 +13,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.WorkManager;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -25,30 +37,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.WorkManager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentSettingsMainBinding;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.service.CinemaUpdateWorker;
 import nl.jpelgrm.movienotifier.ui.adapter.AccountsAdapter;
-import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
 import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -58,17 +54,7 @@ public class SettingsMainFragment extends Fragment {
     public static final int PERMISSION_LOCATION_AUTOMAGIC = 152;
     public static final int PERMISSION_LOCATION_DAYNIGHT = 154;
 
-    @BindView(R.id.settingsCoordinator) CoordinatorLayout coordinator;
-
-    @BindView(R.id.dayNight) DoubleRowIconPreferenceView dayNight;
-    @BindView(R.id.dayNightLocation) TextView dayNightLocation;
-    @BindView(R.id.location) DoubleRowIconPreferenceView location;
-    @BindView(R.id.service) DoubleRowIconPreferenceView service;
-    @BindView(R.id.autocomplete) SwitchCompat autocomplete;
-    @BindView(R.id.automagic) SwitchCompat automagic;
-
-    @BindView(R.id.accountsRecycler) RecyclerView accountsRecycler;
-    @BindView(R.id.accountFlow) DoubleRowIconPreferenceView addAccount;
+    private FragmentSettingsMainBinding binding;
 
     private List<Cinema> cinemas = null;
     private CharSequence[] cinemaItems;
@@ -116,15 +102,14 @@ public class SettingsMainFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings_main, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentSettingsMainBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        dayNight.setOnClickListener(view1 -> {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding.dayNight.setOnClickListener(view1 -> {
             CharSequence[] items = { getString(R.string.settings_general_daynight_auto), getString(R.string.settings_general_daynight_day),
                     getString(R.string.settings_general_daynight_night) };
             int currentValueIndex = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
@@ -135,17 +120,17 @@ public class SettingsMainFragment extends Fragment {
                 setDayNight(which);
             }).setNegativeButton(R.string.cancel, null).show();
         });
-        dayNightLocation.setOnClickListener(view2 -> {
+        binding.dayNightLocation.setOnClickListener(view2 -> {
             if(getActivity() != null && !getActivity().isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                             .setAction(R.string.ok, view3 -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT)).show();
                 } else {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
                 }
             }
         });
-        location.setOnClickListener(view4 -> {
+        binding.location.setOnClickListener(view4 -> {
             int currentPreference = settings.getInt("prefSelectedCinema", 0);
             int currentValueIndex = 0;
             if(cinemas != null) {
@@ -167,23 +152,23 @@ public class SettingsMainFragment extends Fragment {
                 }
             }).setNegativeButton(R.string.cancel, null).show();
         });
-        service.setOnClickListener(view5 -> {
-            service.setValue(R.string.settings_general_location_service_updating);
+        binding.service.setOnClickListener(view5 -> {
+            binding.service.setValue(R.string.settings_general_location_service_updating);
             WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
         });
-        autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
-        automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
+        binding.autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
+        binding.automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
 
         adapter = new AccountsAdapter(getContext(), users);
-        accountsRecycler.setAdapter(adapter);
-        accountsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(accountsRecycler.getContext(), LinearLayoutManager.VERTICAL);
-        accountsRecycler.addItemDecoration(dividerItemDecoration);
-        accountsRecycler.setNestedScrollingEnabled(false);
+        binding.accountsRecycler.setAdapter(adapter);
+        binding.accountsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.accountsRecycler.getContext(), LinearLayoutManager.VERTICAL);
+        binding.accountsRecycler.addItemDecoration(dividerItemDecoration);
+        binding.accountsRecycler.setNestedScrollingEnabled(false);
 
         adapter.swapItems(users);
 
-        addAccount.setOnClickListener(view6 -> startActivity(new Intent(getActivity(), AccountActivity.class)));
+        binding.accountFlow.setOnClickListener(view6 -> startActivity(new Intent(getActivity(), AccountActivity.class)));
 
         updateValues();
     }
@@ -211,20 +196,20 @@ public class SettingsMainFragment extends Fragment {
         int dayNightPreference = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
         switch(dayNightPreference) {
             case AppCompatDelegate.MODE_NIGHT_NO:
-                dayNight.setIcon(R.drawable.ic_brightness_day);
-                dayNight.setValue(R.string.settings_general_daynight_day);
+                binding.dayNight.setIcon(R.drawable.ic_brightness_day);
+                binding.dayNight.setValue(R.string.settings_general_daynight_day);
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
-                dayNight.setIcon(R.drawable.ic_brightness_night);
-                dayNight.setValue(R.string.settings_general_daynight_night);
+                binding.dayNight.setIcon(R.drawable.ic_brightness_night);
+                binding.dayNight.setValue(R.string.settings_general_daynight_night);
                 break;
             case AppCompatDelegate.MODE_NIGHT_AUTO:
             default:
-                dayNight.setIcon(R.drawable.ic_brightness_auto);
-                dayNight.setValue(R.string.settings_general_daynight_auto);
+                binding.dayNight.setIcon(R.drawable.ic_brightness_auto);
+                binding.dayNight.setValue(R.string.settings_general_daynight_auto);
                 break;
         }
-        dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO && getContext() != null
+        binding.dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO && getContext() != null
                 && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 ? View.VISIBLE : View.GONE);
 
@@ -232,9 +217,9 @@ public class SettingsMainFragment extends Fragment {
 
         if(settings.getLong("cinemasUpdated", -1) != -1) {
             DateFormat format = SimpleDateFormat.getDateInstance(DateFormat.LONG);
-            service.setValue(getString(R.string.settings_general_location_service_lastupdate, format.format(new Date(settings.getLong("cinemasUpdated", -1)))));
+            binding.service.setValue(getString(R.string.settings_general_location_service_lastupdate, format.format(new Date(settings.getLong("cinemasUpdated", -1)))));
         } else {
-            service.setValue(getString(R.string.settings_general_location_service_lastupdate, getString(R.string.settings_general_location_service_never)));
+            binding.service.setValue(getString(R.string.settings_general_location_service_lastupdate, getString(R.string.settings_general_location_service_never)));
         }
 
         boolean granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -244,8 +229,8 @@ public class SettingsMainFragment extends Fragment {
         if(settings.getInt("prefAutomagicLocation", -1) == 1 && !granted) {
             settings.edit().putInt("prefAutomagicLocation", 0).apply(); // Turn off, we won't get the location anyway
         }
-        autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
-        automagic.setChecked(settings.getInt("prefAutomagicLocation", -1) == 1 && granted);
+        binding.autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
+        binding.automagic.setChecked(settings.getInt("prefAutomagicLocation", -1) == 1 && granted);
 
         updateUsersValues();
     }
@@ -265,15 +250,15 @@ public class SettingsMainFragment extends Fragment {
                 }
             }
         }
-        location.setValue(locationPrefText);
+        binding.location.setValue(locationPrefText);
     }
 
     private void updateUsersValues() {
         int accounts = users.size();
         if(accounts == 0) {
-            accountsRecycler.setVisibility(View.GONE);
+            binding.accountsRecycler.setVisibility(View.GONE);
         } else {
-            accountsRecycler.setVisibility(View.VISIBLE);
+            binding.accountsRecycler.setVisibility(View.VISIBLE);
             adapter.swapItems(users);
         }
     }
@@ -310,11 +295,11 @@ public class SettingsMainFragment extends Fragment {
     }
 
     private void setAutocompleteLocationPreference(boolean on) {
-        setLocationPreference(on, "prefAutocompleteLocation", autocomplete, PERMISSION_LOCATION_AUTOCOMPLETE);
+        setLocationPreference(on, "prefAutocompleteLocation", binding.autocomplete, PERMISSION_LOCATION_AUTOCOMPLETE);
     }
 
     private void setAutomagicLocationPreference(boolean on) {
-        setLocationPreference(on, "prefAutomagicLocation", automagic, PERMISSION_LOCATION_AUTOMAGIC);
+        setLocationPreference(on, "prefAutomagicLocation", binding.automagic, PERMISSION_LOCATION_AUTOMAGIC);
     }
 
     private void setLocationPreference(boolean on, String prefKey, SwitchCompat check, final int requestCode) {
@@ -327,7 +312,7 @@ public class SettingsMainFragment extends Fragment {
                     if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
                         check.setChecked(false); // Wait for result until switch is set
 
-                        Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                        Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                                 .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode)).show();
                     } else {
                         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
@@ -378,7 +363,7 @@ public class SettingsMainFragment extends Fragment {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
                 } else {
-                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply();
                     settings.edit().putInt("prefAutomagicLocation", 0).apply(); // The other one also won't be possible now
                 }
@@ -387,14 +372,14 @@ public class SettingsMainFragment extends Fragment {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutomagicLocation", 1).apply();
                 } else {
-                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
                     settings.edit().putInt("prefAutomagicLocation", 0).apply();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // The other one also won't be possible now
                 }
                 break;
             case PERMISSION_LOCATION_DAYNIGHT:
                 if(grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // These also won't be possible now
                     settings.edit().putInt("prefAutomagicLocation", 0).apply(); // These also won't be possible now
                 } // else if granted is handled by updateValues();

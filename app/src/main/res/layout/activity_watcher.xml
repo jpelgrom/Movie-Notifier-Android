@@ -47,7 +47,7 @@
                 android:animateLayoutChanges="true">
 
                 <TextView
-                    android:id="@+id/error"
+                    android:id="@+id/watcherError"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="72dp"

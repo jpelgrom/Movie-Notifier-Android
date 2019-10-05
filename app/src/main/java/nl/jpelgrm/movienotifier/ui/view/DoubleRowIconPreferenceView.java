@@ -2,20 +2,15 @@ package nl.jpelgrm.movienotifier.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ViewDoublepreferenceBinding;
 
 public class DoubleRowIconPreferenceView extends RelativeLayout {
-    @BindView(R.id.detailIcon) AppCompatImageView icon;
-    @BindView(R.id.detailTitle) TextView title;
-    @BindView(R.id.detailValue) TextView value;
+    ViewDoublepreferenceBinding binding;
 
     public DoubleRowIconPreferenceView(Context context) {
         super(context);
@@ -33,8 +28,7 @@ public class DoubleRowIconPreferenceView extends RelativeLayout {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
-        View view = View.inflate(context, R.layout.view_doublepreference, this);
-        ButterKnife.bind(this, view);
+        binding = ViewDoublepreferenceBinding.inflate(LayoutInflater.from(context), this, true);
 
         if(attrs != null) {
             TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DoubleRowIconPreferenceView, defStyleAttr, 0);
@@ -53,10 +47,10 @@ public class DoubleRowIconPreferenceView extends RelativeLayout {
             }
 
             if(detailIcon != 0) {
-               icon.setVisibility(VISIBLE);
+               binding.detailIcon.setVisibility(VISIBLE);
                setIcon(detailIcon);
             } else {
-                icon.setVisibility(INVISIBLE);
+                binding.detailIcon.setVisibility(INVISIBLE);
             }
             setTitle(detailTitle);
             setValue(detailValue);
@@ -64,23 +58,23 @@ public class DoubleRowIconPreferenceView extends RelativeLayout {
     }
 
     public void setIcon(int drawable) {
-        icon.setImageResource(drawable);
+        binding.detailIcon.setImageResource(drawable);
     }
 
     public void setTitle(int title) {
-        this.title.setText(title);
+        binding.detailTitle.setText(title);
     }
 
     public void setTitle(String title) {
-        this.title.setText(title);
-        icon.setContentDescription(title);
+        binding.detailTitle.setText(title);
+        binding.detailIcon.setContentDescription(title);
     }
 
     public void setValue(int value) {
-        this.value.setText(value);
+        binding.detailValue.setText(value);
     }
 
     public void setValue(String value) {
-        this.value.setText(value);
+        binding.detailValue.setText(value);
     }
 }

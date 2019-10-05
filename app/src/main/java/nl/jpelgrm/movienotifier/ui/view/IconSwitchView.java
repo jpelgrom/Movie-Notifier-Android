@@ -3,20 +3,15 @@ package nl.jpelgrm.movienotifier.ui.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import androidx.appcompat.widget.SwitchCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ViewIconswitchBinding;
 
 public class IconSwitchView extends RelativeLayout {
-    @BindView(R.id.detailIcon) ImageView icon;
-    @BindView(R.id.detailTitle) TextView title;
-    @BindView(R.id.detailSwitch) SwitchCompat onoff;
+    ViewIconswitchBinding binding;
 
     public IconSwitchView(Context context) {
         super(context);
@@ -34,8 +29,7 @@ public class IconSwitchView extends RelativeLayout {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
-        View view = View.inflate(context, R.layout.view_iconswitch, this);
-        ButterKnife.bind(this, view);
+        binding = ViewIconswitchBinding.inflate(LayoutInflater.from(context), this, true);
 
         if(attrs != null) {
             TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IconSwitchView, defStyleAttr, 0);
@@ -52,44 +46,44 @@ public class IconSwitchView extends RelativeLayout {
             }
 
             if(switchIcon != 0) {
-                icon.setVisibility(VISIBLE);
+                binding.detailIcon.setVisibility(VISIBLE);
                 setIcon(switchIcon);
             } else {
-                icon.setVisibility(INVISIBLE);
+                binding.detailIcon.setVisibility(INVISIBLE);
             }
             setTitle(switchTitle);
         }
 
-        this.setOnClickListener(v -> onoff.performClick());
+        this.setOnClickListener(v -> binding.detailSwitch.performClick());
     }
 
     public void setIcon(int drawable) {
-        icon.setImageResource(drawable);
+        binding.detailIcon.setImageResource(drawable);
     }
 
     public void setTitle(int title) {
-        this.title.setText(title);
+        binding.detailTitle.setText(title);
     }
 
     public void setTitle(String title) {
-        this.title.setText(title);
-        icon.setContentDescription(title);
+        binding.detailTitle.setText(title);
+        binding.detailIcon.setContentDescription(title);
     }
 
     public boolean isChecked() {
-        return onoff.isChecked();
+        return binding.detailSwitch.isChecked();
     }
 
     public void setChecked(boolean checked) {
-        onoff.setChecked(checked);
+        binding.detailSwitch.setChecked(checked);
     }
 
     public void setOnSwitchClickListener(View.OnClickListener listener) {
-        onoff.setOnClickListener(listener);
+        binding.detailSwitch.setOnClickListener(listener);
     }
 
     public void setClickable(boolean enabled) {
         super.setClickable(enabled);
-        onoff.setEnabled(enabled);
+        binding.detailSwitch.setEnabled(enabled);
     }
 }

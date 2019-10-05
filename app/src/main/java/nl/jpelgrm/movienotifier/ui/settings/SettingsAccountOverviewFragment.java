@@ -11,16 +11,10 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.work.WorkManager;
 
@@ -30,16 +24,13 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentSettingsAccountOverviewBinding;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.service.FcmRefreshWorker;
-import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
-import nl.jpelgrm.movienotifier.ui.view.IconSwitchView;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.NotificationUtil;
 import okhttp3.ResponseBody;
@@ -53,27 +44,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     public static final int INTENT_AUTHENTICATE_PASSWORD = 160;
     public static final int INTENT_AUTHENTICATE_DELETE = 161;
 
-    @BindView(R.id.accountCoordinator) CoordinatorLayout coordinator;
-
-    @BindView(R.id.progress) ProgressBar progress;
-    @BindView(R.id.main) ScrollView main;
-    @BindView(R.id.error) TextView error;
-
-    @BindView(R.id.accountSwitch) LinearLayout accountSwitch;
-    @BindView(R.id.accountName) DoubleRowIconPreferenceView accountName;
-    @BindView(R.id.accountPassword) LinearLayout accountPassword;
-    @BindView(R.id.accountLogout) LinearLayout accountLogout;
-    @BindView(R.id.accountDelete) LinearLayout accountDelete;
-
-    @BindView(R.id.notificationsPush) IconSwitchView notificationsPush;
-    @BindView(R.id.notificationsPushReset) TextView notificationsPushReset;
-    @BindView(R.id.notificationsPushSystem) TextView notificationsPushSystem;
-    @BindView(R.id.notificationsPushHeadsup) SwitchCompat notificationsPushHeadsup;
-    @BindView(R.id.notificationsPushSound) SwitchCompat notificationsPushSound;
-    @BindView(R.id.notificationsPushVibrate) SwitchCompat notificationsPushVibrate;
-    @BindView(R.id.notificationsPushLights) SwitchCompat notificationsPushLights;
-    @BindView(R.id.notificationsEmail) IconSwitchView notificationsEmail;
-    @BindView(R.id.notificationsEmailAddress) DoubleRowIconPreferenceView notificationsEmailAddress;
+    private FragmentSettingsAccountOverviewBinding binding;
 
     private User user;
     private String id;
@@ -107,9 +78,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings_account_overview, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentSettingsAccountOverviewBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -123,16 +93,16 @@ public class SettingsAccountOverviewFragment extends Fragment {
             }
         });
 
-        accountSwitch.setOnClickListener(v -> switchToThis());
-        accountName.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME));
-        accountPassword.setOnClickListener(v -> editPassword());
-        accountLogout.setOnClickListener(v -> logout());
-        accountDelete.setOnClickListener(v -> delete());
-        accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
+        binding.accountSwitch.setOnClickListener(v -> switchToThis());
+        binding.accountName.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.NAME));
+        binding.accountPassword.setOnClickListener(v -> editPassword());
+        binding.accountLogout.setOnClickListener(v -> logout());
+        binding.accountDelete.setOnClickListener(v -> delete());
+        binding.accountSwitch.setVisibility(isCurrentUser ? View.GONE : View.VISIBLE);
 
-        notificationsPush.setOnSwitchClickListener(v -> togglePushNotifications());
-        notificationsPushReset.setOnClickListener(v -> resetPushNotifications());
-        notificationsPushSystem.setOnClickListener(v -> {
+        binding.notificationsPush.setOnSwitchClickListener(v -> togglePushNotifications());
+        binding.notificationsPushReset.setOnClickListener(v -> resetPushNotifications());
+        binding.notificationsPushSystem.setOnClickListener(v -> {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationUtil.createChannelWatchersPush(getContext(), user);
                 Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
@@ -141,43 +111,43 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        notificationsPushHeadsup.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("headsup-" + user.getId(), isChecked).apply());
-        notificationsPushSound.setOnCheckedChangeListener((v, isChecked) -> {
+        binding.notificationsPushHeadsup.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("headsup-" + user.getId(), isChecked).apply());
+        binding.notificationsPushSound.setOnCheckedChangeListener((v, isChecked) -> {
             notificationSettings.edit().putBoolean("sound-" + user.getId(), isChecked).apply();
             updateValues();
         });
-        notificationsPushVibrate.setOnCheckedChangeListener((v, isChecked) -> {
+        binding.notificationsPushVibrate.setOnCheckedChangeListener((v, isChecked) -> {
             notificationSettings.edit().putBoolean("vibrate-" + user.getId(), isChecked).apply();
             updateValues();
         });
-        notificationsPushLights.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("lights-" + user.getId(), isChecked).apply());
-        notificationsEmail.setOnSwitchClickListener(v -> toggleEmailNotifications());
-        notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
+        binding.notificationsPushLights.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("lights-" + user.getId(), isChecked).apply());
+        binding.notificationsEmail.setOnSwitchClickListener(v -> toggleEmailNotifications());
+        binding.notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
     }
 
     public void updatedUser() {
-        error.setVisibility(View.GONE);
+        binding.error.setVisibility(View.GONE);
         // UI updates are triggered via LiveData which will detect a change
     }
 
     private void updateValues() {
-        accountSwitch.setVisibility(user.getId().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
-        accountName.setValue(user.getName());
-        notificationsPush.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
-        notificationsPushReset.setVisibility(BuildConfig.DEBUG && user.getFcmTokens().size() > 0 ? View.VISIBLE : View.GONE);
-        notificationsPushSystem.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
-        notificationsPushSound.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
-        notificationsPushSound.setChecked(notificationSettings.getBoolean("sound-" + user.getId(), true));
-        notificationsPushVibrate.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
-        notificationsPushVibrate.setChecked(notificationSettings.getBoolean("vibrate-" + user.getId(), true));
-        notificationsPushLights.setVisibility(notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
-        notificationsPushLights.setChecked(notificationSettings.getBoolean("lights-" + user.getId(), true));
-        notificationsPushHeadsup.setVisibility(notificationsPush.isChecked() && (notificationsPushSound.isChecked() || notificationsPushVibrate.isChecked())
+        binding.accountSwitch.setVisibility(user.getId().equals(settings.getString("userID", "")) ? View.GONE : View.VISIBLE);
+        binding.accountName.setValue(user.getName());
+        binding.notificationsPush.setChecked(user.getFcmTokens().contains(notificationSettings.getString("token", "")));
+        binding.notificationsPushReset.setVisibility(BuildConfig.DEBUG && user.getFcmTokens().size() > 0 ? View.VISIBLE : View.GONE);
+        binding.notificationsPushSystem.setVisibility(binding.notificationsPush.isChecked() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        binding.notificationsPushSound.setVisibility(binding.notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        binding.notificationsPushSound.setChecked(notificationSettings.getBoolean("sound-" + user.getId(), true));
+        binding.notificationsPushVibrate.setVisibility(binding.notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        binding.notificationsPushVibrate.setChecked(notificationSettings.getBoolean("vibrate-" + user.getId(), true));
+        binding.notificationsPushLights.setVisibility(binding.notificationsPush.isChecked() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        binding.notificationsPushLights.setChecked(notificationSettings.getBoolean("lights-" + user.getId(), true));
+        binding.notificationsPushHeadsup.setVisibility(binding.notificationsPush.isChecked() && (binding.notificationsPushSound.isChecked() || binding.notificationsPushVibrate.isChecked())
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
-        notificationsPushHeadsup.setChecked(notificationSettings.getBoolean("headsup-" + user.getId(), true));
-        notificationsEmail.setChecked(!user.getEmail().equals(""));
-        notificationsEmailAddress.setVisibility(!user.getEmail().equals("") ? View.VISIBLE : View.GONE);
-        notificationsEmailAddress.setValue(user.getEmail());
+        binding.notificationsPushHeadsup.setChecked(notificationSettings.getBoolean("headsup-" + user.getId(), true));
+        binding.notificationsEmail.setChecked(!user.getEmail().equals(""));
+        binding.notificationsEmailAddress.setVisibility(!user.getEmail().equals("") ? View.VISIBLE : View.GONE);
+        binding.notificationsEmailAddress.setValue(user.getEmail());
     }
 
     private void editDetail(SettingsAccountUpdateFragment.UpdateMode mode) {
@@ -205,13 +175,13 @@ public class SettingsAccountOverviewFragment extends Fragment {
         User toUpdate = new User();
         toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         boolean changed = false;
-        boolean setToEnabled = notificationsPush.isChecked();
+        boolean setToEnabled = binding.notificationsPush.isChecked();
         if(setToEnabled) {
             if(!toUpdate.getFcmTokens().contains(token)) {
                 if(!token.equals("")) {
                     changed = toUpdate.getFcmTokens().add(token);
                 } else {
-                    notificationsPush.setChecked(false);
+                    binding.notificationsPush.setChecked(false);
                 }
             }
         } else {
@@ -239,8 +209,8 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void toggleEmailNotifications() {
-        if(notificationsEmail.isChecked()) {
-            notificationsEmail.setChecked(false);
+        if(binding.notificationsEmail.isChecked()) {
+            binding.notificationsEmail.setChecked(false);
             editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
         } else {
             User toUpdate = new User();
@@ -250,15 +220,15 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void update(User toUpdate, @Nullable OnUpdatedListener listener) {
-        error.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
+        binding.error.setVisibility(View.GONE);
+        binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
         Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
                 if(response.code() == 200) {
@@ -266,12 +236,12 @@ public class SettingsAccountOverviewFragment extends Fragment {
                     AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
                     user = received;
 
-                    Snackbar.make(coordinator, R.string.user_settings_general_success, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.accountCoordinator, R.string.user_settings_general_success, Snackbar.LENGTH_SHORT).show();
                 } else {
-                    error.setVisibility(View.VISIBLE);
-                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+                    binding.error.setVisibility(View.VISIBLE);
+                    binding.error.setText(ErrorUtil.getErrorMessage(getContext(), response));
 
-                    main.smoothScrollTo(0, 0);
+                    binding.main.smoothScrollTo(0, 0);
                 }
 
                 updateValues();
@@ -282,15 +252,15 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
                 t.printStackTrace();
 
-                error.setVisibility(View.VISIBLE);
-                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                binding.error.setVisibility(View.VISIBLE);
+                binding.error.setText(ErrorUtil.getErrorMessage(getContext(), null));
 
-                main.smoothScrollTo(0, 0);
+                binding.main.smoothScrollTo(0, 0);
 
                 updateValues();
                 if(listener != null) {
@@ -301,15 +271,15 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void switchToThis() {
-        error.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
+        binding.error.setVisibility(View.GONE);
+        binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
         Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
                 if(response.code() == 200 && response.body() != null) {
@@ -323,41 +293,41 @@ public class SettingsAccountOverviewFragment extends Fragment {
                         isCurrentUser = true;
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
 
-                        Snackbar.make(coordinator, R.string.user_settings_general_switch_success, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.accountCoordinator, R.string.user_settings_general_switch_success, Snackbar.LENGTH_SHORT).show();
 
                         updateValues();
                     } else {
-                        error.setVisibility(View.VISIBLE);
-                        error.setText(getString(R.string.error_general_server, "N200"));
+                        binding.error.setVisibility(View.VISIBLE);
+                        binding.error.setText(getString(R.string.error_general_server, "N200"));
 
-                        main.smoothScrollTo(0, 0);
+                        binding.main.smoothScrollTo(0, 0);
                     }
                 } else {
-                    error.setVisibility(View.VISIBLE);
-                    error.setText(getString(R.string.error_general_server, "N" + response.code()));
+                    binding.error.setVisibility(View.VISIBLE);
+                    binding.error.setText(getString(R.string.error_general_server, "N" + response.code()));
 
-                    main.smoothScrollTo(0, 0);
+                    binding.main.smoothScrollTo(0, 0);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
                 t.printStackTrace();
 
-                error.setVisibility(View.VISIBLE);
-                error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                binding.error.setVisibility(View.VISIBLE);
+                binding.error.setText(ErrorUtil.getErrorMessage(getContext(), null));
 
-                main.smoothScrollTo(0, 0);
+                binding.main.smoothScrollTo(0, 0);
             }
         });
     }
 
     private void logout() {
-        error.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
+        binding.error.setVisibility(View.GONE);
+        binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
         String token = notificationSettings.getString("token", "");
@@ -370,30 +340,30 @@ public class SettingsAccountOverviewFragment extends Fragment {
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                    progress.setVisibility(View.GONE);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     if(response.code() == 200) {
                         logoutLocal();
                     } else {
-                        error.setVisibility(View.VISIBLE);
-                        error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+                        binding.error.setVisibility(View.VISIBLE);
+                        binding.error.setText(ErrorUtil.getErrorMessage(getContext(), response));
 
-                        main.smoothScrollTo(0, 0);
+                        binding.main.smoothScrollTo(0, 0);
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                    progress.setVisibility(View.GONE);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     t.printStackTrace();
 
-                    error.setVisibility(View.VISIBLE);
-                    error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                    binding.error.setVisibility(View.VISIBLE);
+                    binding.error.setText(ErrorUtil.getErrorMessage(getContext(), null));
 
-                    main.smoothScrollTo(0, 0);
+                    binding.main.smoothScrollTo(0, 0);
                 }
             });
         } else {
@@ -437,10 +407,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void doDelete() {
-        error.setVisibility(View.GONE);
+        binding.error.setVisibility(View.GONE);
 
         new AlertDialog.Builder(getContext()).setMessage(R.string.user_settings_security_delete_confirm).setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-            progress.setVisibility(View.VISIBLE);
+            binding.progress.setVisibility(View.VISIBLE);
             setFieldsEnabled(false);
 
             final boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
@@ -449,7 +419,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                    progress.setVisibility(View.GONE);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     if(response.code() == 200 || response.code() == 401) {
@@ -470,24 +440,24 @@ public class SettingsAccountOverviewFragment extends Fragment {
                             }
                         });
                     } else {
-                        error.setVisibility(View.VISIBLE);
-                        error.setText(getString(R.string.error_general_server, "N" + response.code()));
+                        binding.error.setVisibility(View.VISIBLE);
+                        binding.error.setText(getString(R.string.error_general_server, "N" + response.code()));
 
-                        main.smoothScrollTo(0, 0);
+                        binding.main.smoothScrollTo(0, 0);
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                    progress.setVisibility(View.GONE);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     t.printStackTrace();
 
-                    error.setVisibility(View.VISIBLE);
-                    error.setText(ErrorUtil.getErrorMessage(getContext(), null));
+                    binding.error.setVisibility(View.VISIBLE);
+                    binding.error.setText(ErrorUtil.getErrorMessage(getContext(), null));
 
-                    main.smoothScrollTo(0, 0);
+                    binding.main.smoothScrollTo(0, 0);
                 }
             });
         }).setNegativeButton(R.string.no, null).show();
@@ -507,21 +477,21 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void setFieldsEnabled(boolean enabled) {
-        accountSwitch.setClickable(enabled);
-        accountName.setClickable(enabled);
-        accountPassword.setClickable(enabled);
-        accountDelete.setClickable(enabled);
-        accountLogout.setClickable(enabled);
+        binding.accountSwitch.setClickable(enabled);
+        binding.accountName.setClickable(enabled);
+        binding.accountPassword.setClickable(enabled);
+        binding.accountDelete.setClickable(enabled);
+        binding.accountLogout.setClickable(enabled);
 
-        notificationsPush.setClickable(enabled);
-        notificationsPushReset.setClickable(enabled);
-        notificationsPushSystem.setClickable(enabled);
-        notificationsPushHeadsup.setEnabled(enabled);
-        notificationsPushSound.setEnabled(enabled);
-        notificationsPushVibrate.setEnabled(enabled);
-        notificationsPushLights.setEnabled(enabled);
-        notificationsEmail.setClickable(enabled);
-        notificationsEmailAddress.setClickable(enabled);
+        binding.notificationsPush.setClickable(enabled);
+        binding.notificationsPushReset.setClickable(enabled);
+        binding.notificationsPushSystem.setClickable(enabled);
+        binding.notificationsPushHeadsup.setEnabled(enabled);
+        binding.notificationsPushSound.setEnabled(enabled);
+        binding.notificationsPushVibrate.setEnabled(enabled);
+        binding.notificationsPushLights.setEnabled(enabled);
+        binding.notificationsEmail.setClickable(enabled);
+        binding.notificationsEmailAddress.setClickable(enabled);
     }
 
     @Override
@@ -536,7 +506,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                         doDelete();
                     }
                 } else {
-                    Snackbar.make(coordinator, R.string.user_settings_security_authenticate, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.accountCoordinator, R.string.user_settings_security_authenticate, Snackbar.LENGTH_LONG).show();
                 }
                 break;
             default:

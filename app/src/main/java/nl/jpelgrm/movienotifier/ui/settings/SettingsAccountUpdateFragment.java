@@ -11,21 +11,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentSettingsAccountUpdateBinding;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
@@ -40,15 +34,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
         NAME, EMAIL, PASSWORD
     }
 
-    @BindView(R.id.progress) ProgressBar progress;
-    @BindView(R.id.error) TextView error;
-
-    @BindView(R.id.textWrapper) TextInputLayout textWrapper;
-    @BindView(R.id.text) AppCompatEditText text;
-    @BindView(R.id.passwordWrapper) TextInputLayout passwordWrapper;
-    @BindView(R.id.password) AppCompatEditText password;
-
-    @BindView(R.id.update) Button update;
+    private FragmentSettingsAccountUpdateBinding binding;
 
     private User user;
     private String id;
@@ -83,9 +69,8 @@ public class SettingsAccountUpdateFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings_account_update, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentSettingsAccountUpdateBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -98,8 +83,8 @@ public class SettingsAccountUpdateFragment extends Fragment {
         });
 
         if(mode == UpdateMode.PASSWORD) {
-            textWrapper.setVisibility(View.GONE);
-            password.addTextChangedListener(new TextWatcher() {
+            binding.textWrapper.setVisibility(View.GONE);
+            binding.password.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 }
@@ -112,25 +97,25 @@ public class SettingsAccountUpdateFragment extends Fragment {
                     validatePasswordHandler.postDelayed(validatePasswordRunnable, 1000);
                 }
             });
-            passwordWrapper.setVisibility(View.VISIBLE);
+            binding.passwordWrapper.setVisibility(View.VISIBLE);
 
-            password.requestFocus();
-            InterfaceUtil.showKeyboard(getActivity(), password);
+            binding.password.requestFocus();
+            InterfaceUtil.showKeyboard(getActivity(), binding.password);
         } else {
-            passwordWrapper.setVisibility(View.GONE);
+            binding.passwordWrapper.setVisibility(View.GONE);
 
             switch(mode) {
                 case NAME:
-                    text.setInputType(InputType.TYPE_CLASS_TEXT);
-                    textWrapper.setHint(getString(R.string.user_input_name));
+                    binding.text.setInputType(InputType.TYPE_CLASS_TEXT);
+                    binding.textWrapper.setHint(getString(R.string.user_input_name));
                     break;
                 case EMAIL:
-                    text.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                    textWrapper.setHint(getString(R.string.user_input_email));
+                    binding.text.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    binding.textWrapper.setHint(getString(R.string.user_input_email));
                     break;
             }
             updateDefaultTextValue();
-            text.addTextChangedListener(new TextWatcher() {
+            binding.text.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 }
@@ -152,27 +137,27 @@ public class SettingsAccountUpdateFragment extends Fragment {
                 }
             });
 
-            textWrapper.setVisibility(View.VISIBLE);
+            binding.textWrapper.setVisibility(View.VISIBLE);
 
-            text.requestFocus();
-            InterfaceUtil.showKeyboard(getActivity(), text);
+            binding.text.requestFocus();
+            InterfaceUtil.showKeyboard(getActivity(), binding.text);
         }
 
-        update.setOnClickListener(view1 -> {
-            error.setVisibility(View.GONE);
+        binding.update.setOnClickListener(view1 -> {
+            binding.error.setVisibility(View.GONE);
             InterfaceUtil.hideKeyboard(getActivity());
 
             if(validate()) {
                 User toUpdate = new User();
                 switch(mode) {
                     case NAME:
-                        toUpdate.setName(text.getText().toString());
+                        toUpdate.setName(binding.text.getText().toString());
                         break;
                     case EMAIL:
-                        toUpdate.setEmail(text.getText().toString());
+                        toUpdate.setEmail(binding.text.getText().toString());
                         break;
                     case PASSWORD:
-                        toUpdate.setPassword(password.getText().toString());
+                        toUpdate.setPassword(binding.password.getText().toString());
                         break;
                     default:
                         return;
@@ -186,11 +171,11 @@ public class SettingsAccountUpdateFragment extends Fragment {
         if(user != null) {
             switch(mode) {
                 case NAME:
-                    text.setText(user.getName());
+                    binding.text.setText(user.getName());
                     break;
                 case EMAIL:
                     if(user.getEmail() != null && !user.getEmail().equals("")) {
-                        text.setText(user.getEmail());
+                        binding.text.setText(user.getEmail());
                     }
                     break;
             }
@@ -219,48 +204,48 @@ public class SettingsAccountUpdateFragment extends Fragment {
     }
 
     private boolean validateName() {
-        if(UserValidation.validateName(text.getText().toString())) {
-            textWrapper.setErrorEnabled(false);
+        if(UserValidation.validateName(binding.text.getText().toString())) {
+            binding.textWrapper.setErrorEnabled(false);
             return true;
         } else {
-            textWrapper.setError(getString(text.getText().toString().length() >= 4 && text.getText().toString().length() <= 16 ?
+            binding.textWrapper.setError(getString(binding.text.getText().toString().length() >= 4 && binding.text.getText().toString().length() <= 16 ?
                     R.string.user_validate_name_regex : R.string.user_validate_name_length));
-            textWrapper.setErrorEnabled(true);
+            binding.textWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private boolean validateEmail() {
-        if(UserValidation.validateEmail(text.getText().toString())) {
-            textWrapper.setErrorEnabled(false);
+        if(UserValidation.validateEmail(binding.text.getText().toString())) {
+            binding.textWrapper.setErrorEnabled(false);
             return true;
         } else {
-            textWrapper.setError(getString(R.string.user_validate_email));
-            textWrapper.setErrorEnabled(true);
+            binding.textWrapper.setError(getString(R.string.user_validate_email));
+            binding.textWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private boolean validatePassword() {
-        if(UserValidation.validatePassword(password.getText().toString())) {
-            passwordWrapper.setErrorEnabled(false);
+        if(UserValidation.validatePassword(binding.password.getText().toString())) {
+            binding.passwordWrapper.setErrorEnabled(false);
             return true;
         } else {
-            passwordWrapper.setError(getString(R.string.user_validate_password));
-            passwordWrapper.setErrorEnabled(true);
+            binding.passwordWrapper.setError(getString(R.string.user_validate_password));
+            binding.passwordWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private void update(User toUpdate) {
-        progress.setVisibility(View.VISIBLE);
+        binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
         Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
                 setFieldsEnabled(true);
 
                 if(response.code() == 200) {
@@ -278,8 +263,8 @@ public class SettingsAccountUpdateFragment extends Fragment {
                     setFieldsEnabled(true);
                     setProgressVisible(false);
 
-                    error.setText(ErrorUtil.getErrorMessage(getContext(), response));
-                    error.setVisibility(View.VISIBLE);
+                    binding.error.setText(ErrorUtil.getErrorMessage(getContext(), response));
+                    binding.error.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -290,19 +275,19 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
                 t.printStackTrace();
 
-                error.setText(R.string.error_general_exception);
-                error.setVisibility(View.VISIBLE);
+                binding.error.setText(R.string.error_general_exception);
+                binding.error.setVisibility(View.VISIBLE);
             }
         });
     }
 
     private void setFieldsEnabled(boolean enabled) {
-        textWrapper.setEnabled(enabled);
-        passwordWrapper.setEnabled(enabled);
-        update.setEnabled(enabled);
+        binding.textWrapper.setEnabled(enabled);
+        binding.passwordWrapper.setEnabled(enabled);
+        binding.update.setEnabled(enabled);
     }
 
     private void setProgressVisible(boolean visible) {
-        progress.setVisibility(visible ? View.VISIBLE : View.GONE);
+        binding.progress.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 }

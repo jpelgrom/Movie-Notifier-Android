@@ -20,28 +20,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.emoji.widget.EmojiAppCompatEditText;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.text.WordUtils;
 
@@ -52,20 +40,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.data.CinemaIDAdapter;
+import nl.jpelgrm.movienotifier.databinding.ActivityWatcherBinding;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Notification;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
-import nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView;
-import nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
 import nl.jpelgrm.movienotifier.util.InterfaceUtil;
 import nl.jpelgrm.movienotifier.util.LocationUtil;
@@ -81,45 +66,7 @@ public class WatcherActivity extends AppCompatActivity {
 
     private static final int PERMISSION_LOCATION_AUTOCOMPLETE = 151;
 
-    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
-
-    @BindView(R.id.toolbar) Toolbar toolbar;
-
-    @BindView(R.id.progress) ProgressBar progress;
-    @BindView(R.id.main) ScrollView main;
-    @BindView(R.id.loaderError) LinearLayout loaderError;
-    @BindView(R.id.loaderErrorText) TextView loaderErrorText;
-    @BindView(R.id.loaderErrorAccount) Button loaderErrorAccount;
-    @BindView(R.id.loaderErrorButton) Button loaderErrorButton;
-
-    @BindView(R.id.error) TextView watcherError;
-    @BindView(R.id.watcherNameWrapper) TextInputLayout watcherNameWrapper;
-    @BindView(R.id.watcherName) EmojiAppCompatEditText watcherName;
-    @BindView(R.id.watcherMovieIDWrapper) TextInputLayout watcherMovieIDWrapper;
-    @BindView(R.id.watcherMovieID) AppCompatEditText watcherMovieID;
-    @BindView(R.id.watcherCinemaIDWrapper) TextInputLayout watcherCinemaIDWrapper;
-    @BindView(R.id.watcherCinemaID) InstantAutoComplete watcherCinemaID;
-    @BindView(R.id.autocompleteSuggestion) LinearLayout autocompleteSuggestion;
-    @BindView(R.id.autocompleteSuggestionCancel) AppCompatImageButton autocompleteSuggestionCancel;
-
-    @BindView(R.id.begin) DoubleRowIconPreferenceView begin;
-    @BindView(R.id.end) DoubleRowIconPreferenceView end;
-    @BindView(R.id.filterStartAfter) DoubleRowIconPreferenceView filterStartAfter;
-    @BindView(R.id.filterStartBefore) DoubleRowIconPreferenceView filterStartBefore;
-
-    @BindView(R.id.filterIMAX) DoubleRowIconPreferenceView filterIMAX;
-    @BindView(R.id.filterDolbyCinema) DoubleRowIconPreferenceView filterDolbyCinema;
-    @BindView(R.id.filter3D) DoubleRowIconPreferenceView filter3D;
-    @BindView(R.id.filter4K) DoubleRowIconPreferenceView filter4K;
-    @BindView(R.id.filterLaser) DoubleRowIconPreferenceView filterLaser;
-    @BindView(R.id.filterHFR) DoubleRowIconPreferenceView filterHFR;
-    @BindView(R.id.filterDolbyAtmos) DoubleRowIconPreferenceView filterAtmos;
-    @BindView(R.id.filterOV) DoubleRowIconPreferenceView filterOV;
-    @BindView(R.id.filterNL) DoubleRowIconPreferenceView filterNL;
-    @BindView(R.id.filter4DX) DoubleRowIconPreferenceView filter4DX;
-    @BindView(R.id.filterDBOX) DoubleRowIconPreferenceView filterDBOX;
-
-    @BindView(R.id.fab) FloatingActionButton fab;
+    private ActivityWatcherBinding binding;
 
     private Snackbar snackbar;
 
@@ -146,12 +93,12 @@ public class WatcherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_watcher);
-        ButterKnife.bind(this);
+        binding = ActivityWatcherBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         settings = getSharedPreferences("settings", MODE_PRIVATE);
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
         if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
@@ -169,7 +116,7 @@ public class WatcherActivity extends AppCompatActivity {
             updateViews(true);
         });
 
-        watcherName.addTextChangedListener(new TextWatcher() {
+        binding.watcherName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -184,7 +131,7 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             }
         });
-        watcherMovieID.addTextChangedListener(new TextWatcher() {
+        binding.watcherMovieID.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -200,9 +147,9 @@ public class WatcherActivity extends AppCompatActivity {
             }
         });
         cinemaIDAdapter = new CinemaIDAdapter(this, R.layout.spinner_cinema, cinemas);
-        watcherCinemaID.setAdapter(cinemaIDAdapter);
-        watcherCinemaID.setThreshold(0);
-        watcherCinemaID.addTextChangedListener(new TextWatcher() {
+        binding.watcherCinemaID.setAdapter(cinemaIDAdapter);
+        binding.watcherCinemaID.setThreshold(0);
+        binding.watcherCinemaID.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -217,110 +164,110 @@ public class WatcherActivity extends AppCompatActivity {
         });
 
         if(settings.getInt("prefAutocompleteLocation", -1) == -1) {
-            autocompleteSuggestion.setOnClickListener(view -> askForLocation());
-            autocompleteSuggestionCancel.setOnClickListener(view -> {
+            binding.autocompleteSuggestion.setOnClickListener(view -> askForLocation());
+            binding.autocompleteSuggestionCancel.setOnClickListener(view -> {
                 settings.edit().putInt("prefAutocompleteLocation", 0).apply();
-                autocompleteSuggestion.setVisibility(View.GONE);
+                binding.autocompleteSuggestion.setVisibility(View.GONE);
             });
         } else {
-            autocompleteSuggestion.setVisibility(View.GONE);
+            binding.autocompleteSuggestion.setVisibility(View.GONE);
             if(settings.getInt("prefAutocompleteLocation", -1) == 1) {
                 startLocation();
             }
         }
 
-        begin.setOnClickListener(view -> {
+        binding.begin.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDateTimePicker(true, true, watcher.getBegin());
         });
-        end.setOnClickListener(view -> {
+        binding.end.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDateTimePicker(true, false, watcher.getEnd());
         });
 
-        filterStartAfter.setOnClickListener(view -> {
+        binding.filterStartAfter.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDateTimePicker(false, true, watcher.getFilters().getStartAfter());
         });
-        filterStartBefore.setOnClickListener(view -> {
+        binding.filterStartBefore.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
         });
 
-        setOnPropClickListener(filterIMAX, new PropResultListener() {
+        setOnPropClickListener(binding.filterIMAX, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setIMAX(value);
             }
         });
-        setOnPropClickListener(filterDolbyCinema, new PropResultListener() {
+        setOnPropClickListener(binding.filterDolbyCinema, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setDolbyCinema(value);
             }
         });
-        setOnPropClickListener(filter3D, new PropResultListener() {
+        setOnPropClickListener(binding.filter3D, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().set3D(value);
             }
         });
-        setOnPropClickListener(filter4K, new PropResultListener() {
+        setOnPropClickListener(binding.filter4K, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().set4K(value);
             }
         });
-        setOnPropClickListener(filterLaser, new PropResultListener() {
+        setOnPropClickListener(binding.filterLaser, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setLaser(value);
             }
         });
-        setOnPropClickListener(filterHFR, new PropResultListener() {
+        setOnPropClickListener(binding.filterHFR, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setHFR(value);
             }
         });
-        setOnPropClickListener(filterAtmos, new PropResultListener() {
+        setOnPropClickListener(binding.filterDolbyAtmos, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setDolbyAtmos(value);
             }
         });
-        setOnPropClickListener(filterOV, new PropResultListener() {
+        setOnPropClickListener(binding.filterOV, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setOriginalVersion(value);
             }
         });
-        setOnPropClickListener(filterNL, new PropResultListener() {
+        setOnPropClickListener(binding.filterNL, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setDutchVersion(value);
             }
         });
-        setOnPropClickListener(filter4DX, new PropResultListener() {
+        setOnPropClickListener(binding.filter4DX, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().set4DX(value);
             }
         });
-        setOnPropClickListener(filterDBOX, new PropResultListener() {
+        setOnPropClickListener(binding.filterDBOX, new PropResultListener() {
             @Override
             public void gotResult(WatcherFilters.WatcherFilterValue value) {
                 watcher.getFilters().setDBOX(value);
             }
         });
 
-        fab.setOnClickListener(view -> {
+        binding.fab.setOnClickListener(view -> {
             if(mode == Mode.VIEWING) {
                 mode = Mode.EDITING;
                 updateViews();
 
-                watcherName.requestFocus();
-                InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+                binding.watcherName.requestFocus();
+                InterfaceUtil.showKeyboard(WatcherActivity.this, binding.watcherName);
             } else {
                 InterfaceUtil.hideKeyboard(WatcherActivity.this);
                 if(snackbar != null && snackbar.isShown()) {
@@ -330,17 +277,17 @@ public class WatcherActivity extends AppCompatActivity {
                 if(!settings.getString("userID", "").equals("")) {
                     saveWatcher();
                 } else {
-                    snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
+                    snackbar = Snackbar.make(binding.coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction(R.string.add, view1 -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
                     snackbar.show();
                 }
             }
         });
 
-        loaderErrorAccount.setOnClickListener(view -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
-        loaderErrorButton.setOnClickListener(view -> {
-            loaderErrorButton.setEnabled(false);
-            progress.setVisibility(View.VISIBLE);
+        binding.loaderErrorAccount.setOnClickListener(view -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
+        binding.loaderErrorButton.setOnClickListener(view -> {
+            binding.loaderErrorButton.setEnabled(false);
+            binding.progress.setVisibility(View.VISIBLE);
             setupWatcher();
         });
 
@@ -466,29 +413,29 @@ public class WatcherActivity extends AppCompatActivity {
                     doneLoading();
 
                     if(mode == Mode.EDITING) {
-                        watcherName.requestFocus();
-                        InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+                        binding.watcherName.requestFocus();
+                        InterfaceUtil.showKeyboard(WatcherActivity.this, binding.watcherName);
                     }
                 } else {
-                    progress.setVisibility(View.GONE);
+                    binding.progress.setVisibility(View.GONE);
 
                     if(response.code() == 400) {
-                        loaderErrorText.setText(R.string.error_watcher_400);
-                        loaderErrorButton.setVisibility(View.GONE);
+                        binding.loaderErrorText.setText(R.string.error_watcher_400);
+                        binding.loaderErrorButton.setVisibility(View.GONE);
                     } else {
                         if(response.code() == 401) {
-                            loaderErrorText.setText(R.string.error_watcher_401);
-                            loaderErrorAccount.setVisibility(View.VISIBLE);
+                            binding.loaderErrorText.setText(R.string.error_watcher_401);
+                            binding.loaderErrorAccount.setVisibility(View.VISIBLE);
                         } else {
-                            loaderErrorText.setText(getString(R.string.error_general_server, "H" + response.code()));
-                            loaderErrorAccount.setVisibility(View.GONE);
+                            binding.loaderErrorText.setText(getString(R.string.error_general_server, "H" + response.code()));
+                            binding.loaderErrorAccount.setVisibility(View.GONE);
                         }
 
-                        loaderErrorButton.setEnabled(true);
-                        loaderErrorButton.setVisibility(View.VISIBLE);
+                        binding.loaderErrorButton.setEnabled(true);
+                        binding.loaderErrorButton.setVisibility(View.VISIBLE);
                     }
 
-                    loaderError.setVisibility(View.VISIBLE);
+                    binding.loaderError.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -496,13 +443,13 @@ public class WatcherActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<Watcher> call, @NonNull Throwable t) {
                 t.printStackTrace();
 
-                progress.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
 
-                loaderErrorText.setText(R.string.error_general_exception);
-                loaderErrorAccount.setVisibility(View.GONE);
-                loaderErrorButton.setEnabled(true);
-                loaderErrorButton.setVisibility(View.VISIBLE);
-                loaderError.setVisibility(View.VISIBLE);
+                binding.loaderErrorText.setText(R.string.error_general_exception);
+                binding.loaderErrorAccount.setVisibility(View.GONE);
+                binding.loaderErrorButton.setEnabled(true);
+                binding.loaderErrorButton.setVisibility(View.VISIBLE);
+                binding.loaderError.setVisibility(View.VISIBLE);
             }
         });
         clearNotifications();
@@ -538,125 +485,125 @@ public class WatcherActivity extends AppCompatActivity {
         if(foundCinema.equals("") && watcher.getFilters().getCinemaID() != 0) { // We don't know this cinema ID's display name
             foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
         }
-        watcherCinemaID.setText(foundCinema);
+        binding.watcherCinemaID.setText(foundCinema);
         if(cinemaOnly) { return; }
 
         setFieldsEditable(mode == Mode.EDITING);
 
         // Errors
-        loaderError.setVisibility(View.GONE);
-        watcherError.setVisibility(View.GONE);
+        binding.loaderError.setVisibility(View.GONE);
+        binding.watcherError.setVisibility(View.GONE);
 
         // Input values
-        watcherName.setText(watcher.getName());
-        watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
+        binding.watcherName.setText(watcher.getName());
+        binding.watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
 
-        autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
+        binding.autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
-        begin.setValue(format.format(new Date(watcher.getBegin())));
-        end.setValue(format.format(new Date(watcher.getEnd())));
-        filterStartAfter.setValue(format.format(new Date(watcher.getFilters().getStartAfter())));
-        filterStartBefore.setValue(format.format(new Date(watcher.getFilters().getStartBefore())));
+        binding.begin.setValue(format.format(new Date(watcher.getBegin())));
+        binding.end.setValue(format.format(new Date(watcher.getEnd())));
+        binding.filterStartAfter.setValue(format.format(new Date(watcher.getFilters().getStartAfter())));
+        binding.filterStartBefore.setValue(format.format(new Date(watcher.getFilters().getStartBefore())));
 
         updateViewsFilters();
 
         // Buttons
-        if(toolbar != null && toolbar.getMenu() != null && watcher != null && settings != null) {
-            for(int i = 0; i < toolbar.getMenu().size(); i++) {
-                if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare || toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
-                    toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING && id != null);
-                } else if(toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
-                    toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserID() != null
+        if(binding != null && binding.toolbar != null && binding.toolbar.getMenu() != null && watcher != null && settings != null) {
+            for(int i = 0; i < binding.toolbar.getMenu().size(); i++) {
+                if(binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare || binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
+                    binding.toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING && id != null);
+                } else if(binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
+                    binding.toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserID() != null
                         && watcher.getUserID().equals(settings.getString("userID", "")));
                 }
             }
         }
 
-        fab.setImageResource(mode == Mode.EDITING ? R.drawable.ic_save : R.drawable.ic_edit);
+        binding.fab.setImageResource(mode == Mode.EDITING ? R.drawable.ic_save : R.drawable.ic_edit);
     }
 
     private void updateViewsFilters() {
         if(watcher.getFilters() != null) {
-            filterIMAX.setValue(watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterIMAX.setValue(watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterDolbyCinema.setValue(watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterDolbyCinema.setValue(watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filter3D.setValue(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filter3D.setValue(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filter4K.setValue(watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filter4K.setValue(watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterLaser.setValue(watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterLaser.setValue(watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterHFR.setValue(watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterHFR.setValue(watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterAtmos.setValue(watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterDolbyAtmos.setValue(watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterOV.setValue(watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterOV.setValue(watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            filterDBOX.setValue(watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+            binding.filterDBOX.setValue(watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
-            filterIMAX.setValue(R.string.watcher_filter_value_nopreference);
-            filterDolbyCinema.setValue(R.string.watcher_filter_value_nopreference);
-            filter3D.setValue(R.string.watcher_filter_value_nopreference);
-            filter4K.setValue(R.string.watcher_filter_value_nopreference);
-            filterLaser.setValue(R.string.watcher_filter_value_nopreference);
-            filterHFR.setValue(R.string.watcher_filter_value_nopreference);
-            filterAtmos.setValue(R.string.watcher_filter_value_nopreference);
-            filterOV.setValue(R.string.watcher_filter_value_nopreference);
-            filterNL.setValue(R.string.watcher_filter_value_nopreference);
-            filter4DX.setValue(R.string.watcher_filter_value_nopreference);
-            filterDBOX.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterIMAX.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterDolbyCinema.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filter3D.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filter4K.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterLaser.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterHFR.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterDolbyAtmos.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterOV.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterNL.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filter4DX.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterDBOX.setValue(R.string.watcher_filter_value_nopreference);
         }
     }
 
     private void setFieldsEnabled(boolean enabled) {
-        watcherNameWrapper.setEnabled(enabled);
-        watcherMovieIDWrapper.setEnabled(enabled);
-        watcherCinemaIDWrapper.setEnabled(enabled);
+        binding.watcherNameWrapper.setEnabled(enabled);
+        binding.watcherMovieIDWrapper.setEnabled(enabled);
+        binding.watcherCinemaIDWrapper.setEnabled(enabled);
     }
 
     private void setFieldsEditable(boolean editable) {
-        watcherName.setFocusable(editable);
-        watcherName.setFocusableInTouchMode(editable);
-        watcherName.setCursorVisible(editable);
-        watcherMovieID.setFocusable(editable);
-        watcherMovieID.setFocusableInTouchMode(editable);
-        watcherMovieID.setCursorVisible(editable);
-        watcherCinemaID.setFocusable(editable);
-        watcherCinemaID.setFocusableInTouchMode(editable);
-        watcherCinemaID.setCursorVisible(editable);
+        binding.watcherName.setFocusable(editable);
+        binding.watcherName.setFocusableInTouchMode(editable);
+        binding.watcherName.setCursorVisible(editable);
+        binding.watcherMovieID.setFocusable(editable);
+        binding.watcherMovieID.setFocusableInTouchMode(editable);
+        binding.watcherMovieID.setCursorVisible(editable);
+        binding.watcherCinemaID.setFocusable(editable);
+        binding.watcherCinemaID.setFocusableInTouchMode(editable);
+        binding.watcherCinemaID.setCursorVisible(editable);
 
-        begin.setClickable(editable);
-        end.setClickable(editable);
-        filterStartAfter.setClickable(editable);
-        filterStartBefore.setClickable(editable);
+        binding.begin.setClickable(editable);
+        binding.end.setClickable(editable);
+        binding.filterStartAfter.setClickable(editable);
+        binding.filterStartBefore.setClickable(editable);
 
-        filterIMAX.setClickable(editable);
-        filterDolbyCinema.setClickable(editable);
-        filter3D.setClickable(editable);
-        filter4K.setClickable(editable);
-        filterLaser.setClickable(editable);
-        filterHFR.setClickable(editable);
-        filterAtmos.setClickable(editable);
-        filterOV.setClickable(editable);
-        filterNL.setClickable(editable);
-        filter4DX.setClickable(editable);
-        filterDBOX.setClickable(editable);
+        binding.filterIMAX.setClickable(editable);
+        binding.filterDolbyCinema.setClickable(editable);
+        binding.filter3D.setClickable(editable);
+        binding.filter4K.setClickable(editable);
+        binding.filterLaser.setClickable(editable);
+        binding.filterHFR.setClickable(editable);
+        binding.filterDolbyAtmos.setClickable(editable);
+        binding.filterOV.setClickable(editable);
+        binding.filterNL.setClickable(editable);
+        binding.filter4DX.setClickable(editable);
+        binding.filterDBOX.setClickable(editable);
     }
 
     private void doneLoading() {
-        progress.setVisibility(View.GONE);
-        loaderError.setVisibility(View.GONE);
-        loaderErrorButton.setEnabled(true);
+        binding.progress.setVisibility(View.GONE);
+        binding.loaderError.setVisibility(View.GONE);
+        binding.loaderErrorButton.setEnabled(true);
 
-        main.setVisibility(View.VISIBLE);
-        fab.show();
+        binding.main.setVisibility(View.VISIBLE);
+        binding.fab.show();
     }
 
     private void showDateTimePicker(final boolean checkingValue, final boolean beginValue, long currentValue) {
@@ -697,13 +644,13 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private boolean validateName(boolean forced) {
-        if(watcherName.getText().toString().length() >= 3 && watcherName.getText().toString().length() <= 50) {
-            watcherNameWrapper.setErrorEnabled(false);
+        if(binding.watcherName.getText().toString().length() >= 3 && binding.watcherName.getText().toString().length() <= 50) {
+            binding.watcherNameWrapper.setErrorEnabled(false);
             return true;
         } else {
             if(forced) {
-                watcherNameWrapper.setError(getString(R.string.watcher_validate_name));
-                watcherNameWrapper.setErrorEnabled(true);
+                binding.watcherNameWrapper.setError(getString(R.string.watcher_validate_name));
+                binding.watcherNameWrapper.setErrorEnabled(true);
             }
             return false;
         }
@@ -711,30 +658,30 @@ public class WatcherActivity extends AppCompatActivity {
 
     private boolean validateMovieID(boolean forced) {
         try {
-            if(watcherMovieID.getText().toString().length() > 0 && Integer.parseInt(watcherMovieID.getText().toString()) > 0) {
-                watcherMovieIDWrapper.setErrorEnabled(false);
+            if(binding.watcherMovieID.getText().toString().length() > 0 && Integer.parseInt(binding.watcherMovieID.getText().toString()) > 0) {
+                binding.watcherMovieIDWrapper.setErrorEnabled(false);
                 return true;
             } else {
-                if(watcherMovieID.getText().toString().length() == 0 && !forced) {
+                if(binding.watcherMovieID.getText().toString().length() == 0 && !forced) {
                     return false;
                 }
-                watcherMovieIDWrapper.setError(getString(R.string.watcher_validate_movieid));
-                watcherMovieIDWrapper.setErrorEnabled(true);
+                binding.watcherMovieIDWrapper.setError(getString(R.string.watcher_validate_movieid));
+                binding.watcherMovieIDWrapper.setErrorEnabled(true);
                 return false;
             }
         } catch(NumberFormatException e) {
-            if(watcherMovieID.getText().toString().length() == 0 && !forced) {
+            if(binding.watcherMovieID.getText().toString().length() == 0 && !forced) {
                 return false;
             }
-            watcherMovieIDWrapper.setError(getString(R.string.watcher_validate_movieid));
-            watcherMovieIDWrapper.setErrorEnabled(true);
+            binding.watcherMovieIDWrapper.setError(getString(R.string.watcher_validate_movieid));
+            binding.watcherMovieIDWrapper.setErrorEnabled(true);
             return false;
         }
     }
 
     private boolean validateCinemaID(boolean forced) {
-        if(watcherCinemaID.getText().toString().length() > 0) {
-            String foundName = watcherCinemaID.getText().toString();
+        if(binding.watcherCinemaID.getText().toString().length() > 0) {
+            String foundName = binding.watcherCinemaID.getText().toString();
             int foundID = 0;
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
@@ -746,12 +693,12 @@ public class WatcherActivity extends AppCompatActivity {
             if(foundID != 0) {
                 watcher.getFilters().setCinemaID(foundID);
 
-                watcherCinemaIDWrapper.setErrorEnabled(false);
+                binding.watcherCinemaIDWrapper.setErrorEnabled(false);
                 return true;
             } else {
                 if(forced) {
-                    watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
-                    watcherCinemaIDWrapper.setErrorEnabled(true);
+                    binding.watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
+                    binding.watcherCinemaIDWrapper.setErrorEnabled(true);
                 } else {
                     watcher.getFilters().setCinemaID(0);
                 }
@@ -759,8 +706,8 @@ public class WatcherActivity extends AppCompatActivity {
             }
         } else {
             if(forced) {
-                watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
-                watcherCinemaIDWrapper.setErrorEnabled(true);
+                binding.watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
+                binding.watcherCinemaIDWrapper.setErrorEnabled(true);
             }
             return false;
         }
@@ -778,7 +725,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         if(updatedOther) {
-            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_begin, Snackbar.LENGTH_LONG);
+            snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_begin, Snackbar.LENGTH_LONG);
             snackbar.show();
             updateViews();
         }
@@ -796,7 +743,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         if(updated) {
-            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_end, Snackbar.LENGTH_LONG);
+            snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_end, Snackbar.LENGTH_LONG);
             snackbar.show();
             updateViews();
         }
@@ -814,7 +761,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         if(updated) {
-            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_startafter, Snackbar.LENGTH_LONG);
+            snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_startafter, Snackbar.LENGTH_LONG);
             snackbar.show();
             updateViews();
         }
@@ -832,7 +779,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         if(updated) {
-            snackbar = Snackbar.make(coordinator, R.string.watcher_validate_startbefore, Snackbar.LENGTH_LONG);
+            snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_startbefore, Snackbar.LENGTH_LONG);
             snackbar.show();
             updateViews();
         }
@@ -840,14 +787,14 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void saveWatcher() {
         if(validateName(true) && validateMovieID(true) && validateCinemaID(true)) {
-            fab.setEnabled(false);
-            progress.setVisibility(View.VISIBLE);
-            watcherError.setVisibility(View.GONE);
+            binding.fab.setEnabled(false);
+            binding.progress.setVisibility(View.VISIBLE);
+            binding.watcherError.setVisibility(View.GONE);
             setFieldsEnabled(false);
 
             Watcher toSave = new Watcher();
-            toSave.setName(watcherName.getText().toString());
-            toSave.setMovieID(Integer.parseInt(watcherMovieID.getText().toString()));
+            toSave.setName(binding.watcherName.getText().toString());
+            toSave.setMovieID(Integer.parseInt(binding.watcherMovieID.getText().toString()));
             toSave.setBegin(watcher.getBegin());
             toSave.setEnd(watcher.getEnd());
 
@@ -865,8 +812,8 @@ public class WatcherActivity extends AppCompatActivity {
             call.enqueue(new Callback<Watcher>() {
                 @Override
                 public void onResponse(@NonNull Call<Watcher> call, @NonNull Response<Watcher> response) {
-                    fab.setEnabled(true);
-                    progress.setVisibility(View.GONE);
+                    binding.fab.setEnabled(true);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     if(response.code() == 200) {
@@ -875,7 +822,7 @@ public class WatcherActivity extends AppCompatActivity {
 
                         mode = Mode.VIEWING;
 
-                        snackbar = Snackbar.make(coordinator, R.string.watcher_saved, Snackbar.LENGTH_SHORT);
+                        snackbar = Snackbar.make(binding.coordinator, R.string.watcher_saved, Snackbar.LENGTH_SHORT);
                         snackbar.show();
 
                         updateViews();
@@ -883,10 +830,10 @@ public class WatcherActivity extends AppCompatActivity {
                     } else {
                         setFieldsEditable(true);
 
-                        watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, response));
-                        watcherError.setVisibility(View.VISIBLE);
+                        binding.watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, response));
+                        binding.watcherError.setVisibility(View.VISIBLE);
 
-                        main.smoothScrollTo(0, 0);
+                        binding.main.smoothScrollTo(0, 0);
                     }
                 }
 
@@ -894,23 +841,23 @@ public class WatcherActivity extends AppCompatActivity {
                 public void onFailure(@NonNull Call<Watcher> call, @NonNull Throwable t) {
                     t.printStackTrace();
 
-                    fab.setEnabled(true);
-                    progress.setVisibility(View.GONE);
+                    binding.fab.setEnabled(true);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
-                    watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, null));
-                    watcherError.setVisibility(View.VISIBLE);
+                    binding.watcherError.setText(ErrorUtil.getErrorMessage(WatcherActivity.this, null));
+                    binding.watcherError.setVisibility(View.VISIBLE);
 
-                    main.smoothScrollTo(0, 0);
+                    binding.main.smoothScrollTo(0, 0);
                 }
             });
         }
     }
 
     private void deleteWatcher() {
-        fab.setEnabled(false);
-        progress.setVisibility(View.VISIBLE);
-        watcherError.setVisibility(View.GONE);
+        binding.fab.setEnabled(false);
+        binding.progress.setVisibility(View.VISIBLE);
+        binding.watcherError.setVisibility(View.GONE);
         setFieldsEnabled(false);
 
         Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
@@ -920,19 +867,19 @@ public class WatcherActivity extends AppCompatActivity {
                 if(response.code() == 200) {
                     WatcherActivity.this.finish();
                 } else {
-                    fab.setEnabled(true);
-                    progress.setVisibility(View.GONE);
+                    binding.fab.setEnabled(true);
+                    binding.progress.setVisibility(View.GONE);
                     setFieldsEnabled(true);
 
                     if(response.code() == 400) {
-                        watcherError.setText(R.string.error_watcher_400);
+                        binding.watcherError.setText(R.string.error_watcher_400);
                     } else if(response.code() == 401) {
-                        watcherError.setText(R.string.error_watcher_401);
+                        binding.watcherError.setText(R.string.error_watcher_401);
                     } else {
-                        watcherError.setText(getString(R.string.error_general_server, "H" + response.code()));
+                        binding.watcherError.setText(getString(R.string.error_general_server, "H" + response.code()));
                     }
 
-                    watcherError.setVisibility(View.VISIBLE);
+                    binding.watcherError.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -940,10 +887,10 @@ public class WatcherActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 t.printStackTrace();
 
-                fab.setEnabled(true);
-                progress.setVisibility(View.GONE);
-                watcherError.setText(R.string.error_general_exception);
-                watcherError.setVisibility(View.VISIBLE);
+                binding.fab.setEnabled(true);
+                binding.progress.setVisibility(View.GONE);
+                binding.watcherError.setText(R.string.error_general_exception);
+                binding.watcherError.setVisibility(View.VISIBLE);
                 setFieldsEnabled(true);
             }
         });
@@ -958,22 +905,22 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void duplicateWatcher() {
-        progress.setVisibility(View.VISIBLE);
-        watcherError.setVisibility(View.GONE);
+        binding.progress.setVisibility(View.VISIBLE);
+        binding.watcherError.setVisibility(View.GONE);
 
-        snackbar = Snackbar.make(coordinator, R.string.watcher_duplicate, Snackbar.LENGTH_INDEFINITE);
+        snackbar = Snackbar.make(binding.coordinator, R.string.watcher_duplicate, Snackbar.LENGTH_INDEFINITE);
         snackbar.show();
 
         watcher.setName(getString(R.string.watcher_copy, watcher.getName()));
 
         id = null;
         mode = Mode.EDITING;
-        main.smoothScrollTo(0, 0);
+        binding.main.smoothScrollTo(0, 0);
         doneLoading();
         updateViews();
 
-        watcherName.requestFocus();
-        InterfaceUtil.showKeyboard(WatcherActivity.this, watcherName);
+        binding.watcherName.requestFocus();
+        InterfaceUtil.showKeyboard(WatcherActivity.this, binding.watcherName);
     }
 
     private void setOnPropClickListener(final View click, final PropResultListener callback) {
@@ -1063,12 +1010,12 @@ public class WatcherActivity extends AppCompatActivity {
     private void askForLocation() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             settings.edit().putInt("prefAutocompleteLocation", 1).apply();
-            autocompleteSuggestion.setVisibility(View.GONE);
+            binding.autocompleteSuggestion.setVisibility(View.GONE);
             startLocation();
         } else {
             if(!isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                             .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE));
                     snackbar.show();
                 } else {
@@ -1105,11 +1052,11 @@ public class WatcherActivity extends AppCompatActivity {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
                     startLocation();
                 } else {
-                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
                     snackbar.show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply();
                 }
-                autocompleteSuggestion.setVisibility(View.GONE);
+                binding.autocompleteSuggestion.setVisibility(View.GONE);
                 break;
             }
             default:

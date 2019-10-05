@@ -4,37 +4,21 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.emoji.widget.EmojiAppCompatTextView;
-import androidx.core.content.ContextCompat;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.FragmentBottomsheetFilterBinding;
 import nl.jpelgrm.movienotifier.ui.WatchersFragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class FilterBottomSheet extends BottomSheetDialogFragment {
-    @BindView(R.id.filterAll) LinearLayout filterAll;
-    @BindView(R.id.filterAllIndicator) EmojiAppCompatTextView filterAllIndicator;
-    @BindView(R.id.filterAllText) TextView filterAllText;
-    @BindView(R.id.filterPast) LinearLayout filterPast;
-    @BindView(R.id.filterPastIndicator) EmojiAppCompatTextView filterPastIndicator;
-    @BindView(R.id.filterPastText) TextView filterPastText;
-    @BindView(R.id.filterNow) LinearLayout filterNow;
-    @BindView(R.id.filterNowIndicator) EmojiAppCompatTextView filterNowIndicator;
-    @BindView(R.id.filterNowText) TextView filterNowText;
-    @BindView(R.id.filterFuture) LinearLayout filterFuture;
-    @BindView(R.id.filterFutureIndicator) EmojiAppCompatTextView filterFutureIndicator;
-    @BindView(R.id.filterFutureText) TextView filterFutureText;
-
-    @BindView(R.id.close) Button close;
+    private FragmentBottomsheetFilterBinding binding;
 
     private SharedPreferences settings;
 
@@ -66,70 +50,52 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
     @Override
     public void setupDialog(Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View view = View.inflate(getContext(), R.layout.fragment_bottomsheet_filter, null);
-        ButterKnife.bind(this, view);
-        dialog.setContentView(view);
+        binding = FragmentBottomsheetFilterBinding.inflate(LayoutInflater.from(getContext()), null, false);
+        dialog.setContentView(binding.getRoot());
 
         setupViews();
     }
 
     private void setupViews() {
         // Setting these in XML seems to cause crashes on some older devices
-        filterAllIndicator.setText("\uD83D\uDCDA");
-        filterPastIndicator.setText("\uD83D\uDCE6"); // Package ('archive', watcher is done and will not be active again)
-        filterNowIndicator.setText("\uD83D\uDD34"); // Red Circle ('live', active watcher)
-        filterFutureIndicator.setText("⏰"); // Alarm Clock ('planned', watcher will become active in the future)
+        binding.filterAllIndicator.setText("\uD83D\uDCDA");
+        binding.filterPastIndicator.setText("\uD83D\uDCE6"); // Package ('archive', watcher is done and will not be active again)
+        binding.filterNowIndicator.setText("\uD83D\uDD34"); // Red Circle ('live', active watcher)
+        binding.filterFutureIndicator.setText("⏰"); // Alarm Clock ('planned', watcher will become active in the future)
 
         int pref = settings.getInt("listFilter", 0);
         switch(pref) {
             case 1: // Past
-                filterPastText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterPastText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 2: // Now
-                filterNowText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterNowText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 3: // Future
-                filterFutureText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterFutureText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
             case 0: // All
             default:
-                filterAllText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterAllText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 break;
         }
 
-        filterAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listFilter", 0).apply();
-                dismiss();
-            }
+        binding.filterAll.setOnClickListener(view -> {
+            settings.edit().putInt("listFilter", 0).apply();
+            dismiss();
         });
-        filterPast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listFilter", 1).apply();
-                dismiss();
-            }
+        binding.filterPast.setOnClickListener(view -> {
+            settings.edit().putInt("listFilter", 1).apply();
+            dismiss();
         });
-        filterNow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listFilter", 2).apply();
-                dismiss();
-            }
+        binding.filterNow.setOnClickListener(view -> {
+            settings.edit().putInt("listFilter", 2).apply();
+            dismiss();
         });
-        filterFuture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings.edit().putInt("listFilter", 3).apply();
-                dismiss();
-            }
+        binding.filterFuture.setOnClickListener(view -> {
+            settings.edit().putInt("listFilter", 3).apply();
+            dismiss();
         });
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
+        binding.close.setOnClickListener(view -> dismiss());
     }
 }

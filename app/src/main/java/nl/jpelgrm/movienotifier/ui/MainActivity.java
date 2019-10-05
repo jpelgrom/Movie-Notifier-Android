@@ -6,23 +6,19 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ActivityMainBinding;
 import nl.jpelgrm.movienotifier.ui.settings.SettingsActivity;
 import nl.jpelgrm.movienotifier.ui.view.FilterBottomSheet;
 import nl.jpelgrm.movienotifier.ui.view.SortBottomSheet;
 
 public class MainActivity extends AppCompatActivity {
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.bottomnav) BottomNavigationView bottomnav;
+    private ActivityMainBinding binding;
 
     int dayNightPreference;
     SharedPreferences settings;
@@ -35,14 +31,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
 
         dayNightPreference = getSharedPreferences("settings", MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
-        bottomnav.setOnNavigationItemSelectedListener(menuItem -> {
+        binding.bottomnav.setOnNavigationItemSelectedListener(menuItem -> {
             switch(menuItem.getItemId()) {
                 case R.id.navWatchers:
                     selectTab(NavigationTab.WATCHERS);
@@ -54,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                     return false;
             }
         });
-        bottomnav.setOnNavigationItemReselectedListener(menuItem -> {
+        binding.bottomnav.setOnNavigationItemReselectedListener(menuItem -> {
             switch(menuItem.getItemId()) {
                 case R.id.navWatchers:
                     if(getSupportFragmentManager().findFragmentByTag("watchersFragment") != null) {
@@ -74,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     || !getIntent().getExtras().getString("tab").equals("notifications")) {
                 selectTab(NavigationTab.WATCHERS); // Default tab is watchers, execute action
             } else {
-                bottomnav.setSelectedItemId(R.id.navNotifications);
+                binding.bottomnav.setSelectedItemId(R.id.navNotifications);
             }
         }
 

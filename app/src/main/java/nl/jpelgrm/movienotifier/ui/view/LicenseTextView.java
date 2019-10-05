@@ -3,18 +3,14 @@ package nl.jpelgrm.movienotifier.ui.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
+import nl.jpelgrm.movienotifier.databinding.ViewLicensetextviewBinding;
 
 public class LicenseTextView extends LinearLayout {
-    @BindView(R.id.licenseTitle) TextView title;
-    @BindView(R.id.licenseNotice) TextView notice;
-    @BindView(R.id.licenseLicense) TextView license;
+    ViewLicensetextviewBinding binding;
 
     public LicenseTextView(Context context) {
         super(context);
@@ -32,8 +28,7 @@ public class LicenseTextView extends LinearLayout {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
-        View view = View.inflate(context, R.layout.view_licensetextview, this);
-        ButterKnife.bind(this, view);
+        binding = ViewLicensetextviewBinding.inflate(LayoutInflater.from(context), this, true);
 
         if(attrs != null) {
             TypedArray array = context.getTheme().obtainStyledAttributes(attrs, R.styleable.LicenseTextView, defStyleAttr, 0);
@@ -51,9 +46,9 @@ public class LicenseTextView extends LinearLayout {
                 array.recycle();
             }
 
-            title.setText(licenseTitle);
-            notice.setText(licenseNotice);
-            license.setText(licenseLicense);
+            binding.licenseTitle.setText(licenseTitle);
+            binding.licenseNotice.setText(licenseNotice);
+            binding.licenseLicense.setText(licenseLicense);
         }
     }
 }

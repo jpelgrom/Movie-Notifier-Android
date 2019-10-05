@@ -11,11 +11,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -23,23 +28,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
+import nl.jpelgrm.movienotifier.databinding.FragmentWatchersBinding;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
@@ -55,19 +47,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class WatchersFragment extends Fragment {
     public static final int PERMISSION_LOCATION_AUTOMAGIC = 153;
 
-    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
-
-    @BindView(R.id.progress) ProgressBar progress;
-
-    @BindView(R.id.emptyView) LinearLayout emptyView;
-    @BindView(R.id.emptyText) TextView emptyText;
-
-    @BindView(R.id.listSwiper) SwipeRefreshLayout listSwiper;
-    @BindView(R.id.automagicSuggestion) LinearLayout listAutomagicSuggestion;
-    @BindView(R.id.automagicSuggestionCancel) AppCompatImageButton listAutomagicSuggestionCancel;
-    @BindView(R.id.listRecycler) RecyclerView listRecycler;
-
-    @BindView(R.id.fab) FloatingActionButton fab;
+    private FragmentWatchersBinding binding;
 
     private List<Watcher> watchers = new ArrayList<>();
     private List<Watcher> watchersSorted = new ArrayList<>();
@@ -94,15 +74,14 @@ public class WatchersFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_watchers, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        binding = FragmentWatchersBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // List
-        listSwiper.setOnRefreshListener(() -> {
+        binding.listSwiper.setOnRefreshListener(() -> {
             if(snackbar != null && snackbar.isShown()) {
                 snackbar.dismiss();
             }
@@ -112,18 +91,18 @@ public class WatchersFragment extends Fragment {
             }
         });
         adapter = new WatchersAdapter(getContext(), watchers);
-        listRecycler.setAdapter(adapter);
-        listRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listRecycler.getContext(), LinearLayoutManager.VERTICAL);
-        listRecycler.addItemDecoration(dividerItemDecoration);
+        binding.listRecycler.setAdapter(adapter);
+        binding.listRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.listRecycler.getContext(), LinearLayoutManager.VERTICAL);
+        binding.listRecycler.addItemDecoration(dividerItemDecoration);
 
-        fab.setOnClickListener(view1 -> startActivity(new Intent(getContext(), WatcherActivity.class)));
+        binding.fab.setOnClickListener(view1 -> startActivity(new Intent(getContext(), WatcherActivity.class)));
 
         if(settings.getInt("prefAutomagicLocation", -1) == -1) {
-            listAutomagicSuggestion.setOnClickListener(view2 -> askForLocation());
-            listAutomagicSuggestionCancel.setOnClickListener(view3 -> {
+            binding.automagicSuggestion.setOnClickListener(view2 -> askForLocation());
+            binding.automagicSuggestionCancel.setOnClickListener(view3 -> {
                 settings.edit().putInt("prefAutomagicLocation", 0).apply();
-                listAutomagicSuggestion.setVisibility(View.GONE);
+                binding.automagicSuggestion.setVisibility(View.GONE);
             });
         } else {
             if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
@@ -159,15 +138,15 @@ public class WatchersFragment extends Fragment {
     }
 
     private void refreshList(final boolean userTriggered, final boolean showError) {
-        listSwiper.post(() -> {
-            listSwiper.setRefreshing(true);
+        binding.listSwiper.post(() -> {
+            binding.listSwiper.setRefreshing(true);
 
             if(!settings.getString("userID", "").equals("")) {
                 Call<List<Watcher>> call = APIHelper.getInstance().getWatchers(settings.getString("userAPIKey", ""));
                 call.enqueue(new Callback<List<Watcher>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<Watcher>> call, @NonNull Response<List<Watcher>> response) {
-                        listSwiper.setRefreshing(false);
+                        binding.listSwiper.setRefreshing(false);
 
                         if(response.code() == 200) {
                             watchers = response.body();
@@ -175,12 +154,12 @@ public class WatchersFragment extends Fragment {
                         } else {
                             if(showError) {
                                 if(response.code() == 401) {
-                                    snackbar = Snackbar.make(coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
+                                    snackbar = Snackbar.make(binding.coordinator, R.string.error_general_401, Snackbar.LENGTH_INDEFINITE);
                                     snackbar.setAction(R.string.ok, view -> startActivity(new Intent(getActivity(), AccountActivity.class)));
                                 } else if(response.code() >= 500 && response.code() < 600){
-                                    snackbar = Snackbar.make(coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
+                                    snackbar = Snackbar.make(binding.coordinator, R.string.error_watchers_500, Snackbar.LENGTH_INDEFINITE);
                                 } else {
-                                    snackbar = Snackbar.make(coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
+                                    snackbar = Snackbar.make(binding.coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
                                 }
                                 snackbar.show();
                             }
@@ -191,10 +170,10 @@ public class WatchersFragment extends Fragment {
                     public void onFailure(@NonNull Call<List<Watcher>> call, @NonNull Throwable t) {
                         t.printStackTrace();
 
-                        listSwiper.setRefreshing(false);
+                        binding.listSwiper.setRefreshing(false);
 
                         if(showError) {
-                            snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
+                            snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
                             snackbar.show();
                         }
                     }
@@ -204,7 +183,7 @@ public class WatchersFragment extends Fragment {
                 showEmptyView();
 
                 if(userTriggered) {
-                    snackbar = Snackbar.make(coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
+                    snackbar = Snackbar.make(binding.coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction(R.string.add, view -> startActivity(new Intent(getActivity(), AccountActivity.class)));
                     snackbar.show();
                 }
@@ -322,40 +301,40 @@ public class WatchersFragment extends Fragment {
         // Show
         adapter.swapItems(watchersSorted);
         if(scrollToTop) {
-            ((LinearLayoutManager) listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+            ((LinearLayoutManager) binding.listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
         }
 
         // Ensure the correct state is shown
         if(watchersSorted.size() == 0) {
             showEmptyView();
         } else {
-            emptyView.setVisibility(View.GONE);
-            listRecycler.setVisibility(View.VISIBLE);
+            binding.emptyView.setVisibility(View.GONE);
+            binding.listRecycler.setVisibility(View.VISIBLE);
 
             if(sort == 0 && settings.getInt("prefAutomagicLocation", -1) == -1) {
-                listAutomagicSuggestion.setVisibility(View.VISIBLE);
+                binding.automagicSuggestion.setVisibility(View.VISIBLE);
             } else {
-                listAutomagicSuggestion.setVisibility(View.GONE);
+                binding.automagicSuggestion.setVisibility(View.GONE);
             }
         }
     }
 
     public void scrollListToTop() {
-        if(listRecycler != null && listRecycler.getLayoutManager() instanceof LinearLayoutManager) {
-            ((LinearLayoutManager) listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+        if(binding != null && binding.listRecycler != null && binding.listRecycler.getLayoutManager() instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) binding.listRecycler.getLayoutManager()).scrollToPositionWithOffset(0, 0);
         }
     }
 
     private void showEmptyView() {
-        listSwiper.setRefreshing(false);
-        listAutomagicSuggestion.setVisibility(View.GONE);
-        listRecycler.setVisibility(View.GONE);
+        binding.listSwiper.setRefreshing(false);
+        binding.automagicSuggestion.setVisibility(View.GONE);
+        binding.listRecycler.setVisibility(View.GONE);
 
-        emptyView.setVisibility(View.VISIBLE);
+        binding.emptyView.setVisibility(View.VISIBLE);
         if(watchers.size() != 0 && watchersSorted.size() == 0) {
-            emptyText.setText(R.string.watchers_empty_filters);
+            binding.emptyText.setText(R.string.watchers_empty_filters);
         } else {
-            emptyText.setText(R.string.watchers_empty_add);
+            binding.emptyText.setText(R.string.watchers_empty_add);
         }
     }
 
@@ -363,15 +342,15 @@ public class WatchersFragment extends Fragment {
         new AlertDialog.Builder(getContext()).setMessage(R.string.watcher_delete_confirm).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                progress.setVisibility(View.VISIBLE);
-                listRecycler.setClickable(false);
+                binding.progress.setVisibility(View.VISIBLE);
+                binding.listRecycler.setClickable(false);
 
                 Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                        progress.setVisibility(View.GONE);
-                        listRecycler.setClickable(true);
+                        binding.progress.setVisibility(View.GONE);
+                        binding.listRecycler.setClickable(true);
 
                         String message;
                         if(response.code() == 200) {
@@ -386,7 +365,7 @@ public class WatchersFragment extends Fragment {
                             }
                         }
 
-                        snackbar = Snackbar.make(coordinator, message, Snackbar.LENGTH_SHORT);
+                        snackbar = Snackbar.make(binding.coordinator, message, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         refreshList(false, false);
                     }
@@ -395,10 +374,10 @@ public class WatchersFragment extends Fragment {
                     public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                         t.printStackTrace();
 
-                        progress.setVisibility(View.GONE);
-                        listRecycler.setClickable(true);
+                        binding.progress.setVisibility(View.GONE);
+                        binding.listRecycler.setClickable(true);
 
-                        snackbar = Snackbar.make(coordinator, R.string.error_general_exception, Snackbar.LENGTH_SHORT);
+                        snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         refreshList(false, false);
                     }
@@ -410,12 +389,12 @@ public class WatchersFragment extends Fragment {
     private void askForLocation() {
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             settings.edit().putInt("prefAutomagicLocation", 1).apply();
-            listAutomagicSuggestion.setVisibility(View.GONE);
+            binding.automagicSuggestion.setVisibility(View.GONE);
             startLocation();
         } else {
             if(!getActivity().isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
                             .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC));
                     snackbar.show();
                 } else {
@@ -432,7 +411,7 @@ public class WatchersFragment extends Fragment {
                 @Override
                 public void onLocationReceived(Location location, boolean isCachedResult) {
                     locationUser = location;
-                    if(!isCachedResult && !listSwiper.isRefreshing()) {
+                    if(!isCachedResult && !binding.listSwiper.isRefreshing()) {
                         filterAndSort(true);
                     }
                 }
@@ -453,11 +432,11 @@ public class WatchersFragment extends Fragment {
                     settings.edit().putInt("prefAutomagicLocation", 1).apply();
                     startLocation();
                 } else {
-                    snackbar = Snackbar.make(coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
                     snackbar.show();
                     settings.edit().putInt("prefAutomagicLocation", 0).apply();
                 }
-                listAutomagicSuggestion.setVisibility(View.GONE);
+                binding.automagicSuggestion.setVisibility(View.GONE);
                 break;
         }
     }

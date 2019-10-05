@@ -5,17 +5,15 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.AccountListDiffCallback;
+import nl.jpelgrm.movienotifier.databinding.ListAccountBinding;
 import nl.jpelgrm.movienotifier.models.User;
 import nl.jpelgrm.movienotifier.ui.settings.SettingsActivity;
 
@@ -49,8 +47,8 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
         final SharedPreferences settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
         final boolean isCurrentUser = settings.getString("userID", "").equals(user.getId());
 
-        holder.name.setText(user.getName());
-        holder.status.setVisibility(isCurrentUser ? View.VISIBLE : View.GONE);
+        holder.binding.accountName.setText(user.getName());
+        holder.binding.accountStatus.setVisibility(isCurrentUser ? View.VISIBLE : View.GONE);
 
         holder.itemView.setOnClickListener(view -> {
             if(getContext() instanceof SettingsActivity) {
@@ -77,12 +75,11 @@ public class AccountsAdapter extends RecyclerView.Adapter<AccountsAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.accountName) TextView name;
-        @BindView(R.id.accountStatus) TextView status;
+        ListAccountBinding binding;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            binding = ListAccountBinding.bind(itemView);
         }
     }
 }
