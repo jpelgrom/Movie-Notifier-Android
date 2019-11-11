@@ -365,14 +365,6 @@
                     app:detailTitle="@string/watcher_filter_title_4dx"
                     app:detailValue="@string/watcher_filter_value_nopreference"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterDBOX"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/logo_dbox"
-                    app:detailTitle="@string/watcher_filter_title_dbox"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
-
             </LinearLayout>
 
         </ScrollView>

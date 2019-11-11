@@ -204,7 +204,6 @@ public class WatcherActivity extends AppCompatActivity {
         setOnPropClickListener(binding.filterOV, value -> watcher.getFilters().setOriginalVersion(value));
         setOnPropClickListener(binding.filterNL, value -> watcher.getFilters().setDutchVersion(value));
         setOnPropClickListener(binding.filter4DX, value -> watcher.getFilters().set4DX(value));
-        setOnPropClickListener(binding.filterDBOX, value -> watcher.getFilters().setDBOX(value));
 
         binding.fab.setOnClickListener(view -> {
             if(mode == Mode.VIEWING) {
@@ -490,8 +489,6 @@ public class WatcherActivity extends AppCompatActivity {
                     (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterDBOX.setValue(watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isDBOX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
             binding.filterIMAX.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterDolbyCinema.setValue(R.string.watcher_filter_value_nopreference);
@@ -503,7 +500,6 @@ public class WatcherActivity extends AppCompatActivity {
             binding.filterOV.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterNL.setValue(R.string.watcher_filter_value_nopreference);
             binding.filter4DX.setValue(R.string.watcher_filter_value_nopreference);
-            binding.filterDBOX.setValue(R.string.watcher_filter_value_nopreference);
         }
     }
 
@@ -539,7 +535,6 @@ public class WatcherActivity extends AppCompatActivity {
         binding.filterOV.setClickable(editable);
         binding.filterNL.setClickable(editable);
         binding.filter4DX.setClickable(editable);
-        binding.filterDBOX.setClickable(editable);
     }
 
     private void doneLoading() {

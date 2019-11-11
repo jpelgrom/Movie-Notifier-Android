@@ -101,7 +101,6 @@
     <string name="watcher_filter_title_nl">Dutch language version</string>
     <string name="watcher_filter_heading_additionalexperiences">Additional experiences</string>
     <string name="watcher_filter_title_4dx">4DX</string>
-    <string name="watcher_filter_title_dbox">D-BOX</string>
     <string name="watcher_filter_value_yes">Required</string>
     <string name="watcher_filter_value_nopreference">No preference</string>
     <string name="watcher_filter_value_no">Absolutely not</string>

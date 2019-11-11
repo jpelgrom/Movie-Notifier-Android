@@ -52,9 +52,6 @@ public class WatcherFilters {
     private WatcherFilterValue _4dx = WatcherFilterValue.NOPREFERENCE;
 
     @Expose
-    private WatcherFilterValue dbox = WatcherFilterValue.NOPREFERENCE;
-
-    @Expose
     private WatcherFilterValue dolbycinema = WatcherFilterValue.NOPREFERENCE;
 
     @Expose
@@ -146,14 +143,6 @@ public class WatcherFilters {
 
     public void set4DX(WatcherFilterValue _4dx) {
         this._4dx = _4dx;
-    }
-
-    public WatcherFilterValue isDBOX() {
-        return dbox;
-    }
-
-    public void setDBOX(WatcherFilterValue dbox) {
-        this.dbox = dbox;
     }
 
     public WatcherFilterValue isDolbyCinema() {
