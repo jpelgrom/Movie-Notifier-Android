@@ -170,10 +170,12 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/watcherCinemaIDWrapper"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_toEndOf="@+id/watcherCinemaIDIcon">
+                        android:layout_toEndOf="@+id/watcherCinemaIDIcon"
+                        app:endIconMode="none">
 
                         <nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete
                             android:id="@+id/watcherCinemaID"

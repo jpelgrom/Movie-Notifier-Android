@@ -58,7 +58,7 @@
     <string name="watchers_empty_title">No watchers found</string>
     <string name="watchers_empty_filters">Change your filter to view other watchers you already have. Create a new watcher using the button in the bottom-right corner.</string>
     <string name="watchers_empty_add">Add one now using the button in the bottom-right corner to get instant notifications when tickets go on sale.</string>
-    <string name="watchers_empty_account">Sorry, you need an account to do that.</string>
+    <string name="watchers_empty_account">Sorry, you need an account to do that</string>
     <string name="watchers_list_subtitle_date">%s Showings %s – %s</string>
     <string name="watchers_bottomsheet_watcher_dates">Showings %s – %s</string>
     <string name="watchers_bottomsheet_watcher_active_future">%s Watcher is planned to start on %s</string>
@@ -176,8 +176,10 @@
     <string name="error_watcher_401">Sorry, you are not allowed to view or edit this watcher.</string>
     <string name="error_general_401">Please log in to an account or register.</string>
     <string name="error_general_exception">Oops! We encountered an error. Please make sure you have a working network connection and try again.</string>
+    <string name="error_general_exception_short">Oops! Check your connection and try again.</string>
     <string name="error_general_message">Oops! We encountered an issue. Please try again. You may find this information useful:\n%1$s</string>
     <string name="error_general_server">Oops! The server encountered an error. Please try again. You may find this information useful:\n%1$s</string>
+    <string name="error_general_server_short">Oops! Please try again (%1$s).</string>
 
     <string name="license_intro">Movie Notifier Android uses the following open source libraries.</string>
     <string name="license_apache" translatable="false">Apache License\nVersion 2.0, January 2004\nhttp://www.apache.org/licenses/
