@@ -33,13 +33,6 @@
             <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:licenseTitle="Butter Knife"
-                app:licenseNotice="Copyright 2013 Jake Wharton"
-                app:licenseLicense="@string/license_apache" />
-
-            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 app:licenseTitle="Gson"
                 app:licenseNotice="Copyright 2008 Google Inc."
                 app:licenseLicense="@string/license_apache" />
