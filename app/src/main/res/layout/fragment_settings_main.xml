@@ -23,26 +23,12 @@
                 style="@style/TextMaterialSubheader"/>
 
             <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                android:id="@+id/dayNight"
+                android:id="@+id/darkTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:detailIcon="@drawable/ic_brightness_auto"
-                app:detailTitle="@string/settings_general_daynight_title"
-                app:detailValue="@string/settings_general_daynight_auto"/>
-
-            <TextView
-                android:id="@+id/dayNightLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/listPreferredItemHeight"
-                android:background="?attr/selectableItemBackground"
-                android:paddingStart="72dp"
-                android:paddingEnd="?attr/listPreferredItemPaddingRight"
-                android:gravity="center_vertical"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:text="@string/settings_general_daynight_location"
-                android:visibility="gone"
-                tools:visibility="visible"/>
+                app:detailIcon="@drawable/ic_dark_theme"
+                app:detailTitle="@string/settings_general_darktheme_title"
+                app:detailValue="@string/settings_general_darktheme_system"/>
 
             <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                 android:id="@+id/location"

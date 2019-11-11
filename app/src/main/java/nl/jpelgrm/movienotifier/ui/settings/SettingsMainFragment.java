@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +53,6 @@ import retrofit2.Response;
 public class SettingsMainFragment extends Fragment {
     public final static int PERMISSION_LOCATION_AUTOCOMPLETE = 150;
     public static final int PERMISSION_LOCATION_AUTOMAGIC = 152;
-    public static final int PERMISSION_LOCATION_DAYNIGHT = 154;
 
     private FragmentSettingsMainBinding binding;
 
@@ -109,26 +109,18 @@ public class SettingsMainFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.dayNight.setOnClickListener(view1 -> {
-            CharSequence[] items = { getString(R.string.settings_general_daynight_auto), getString(R.string.settings_general_daynight_day),
-                    getString(R.string.settings_general_daynight_night) };
-            int currentValueIndex = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
+        binding.darkTheme.setOnClickListener(view1 -> {
+            CharSequence[] items = { getString(R.string.settings_general_darktheme_light), getString(R.string.settings_general_darktheme_dark),
+                    getString(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? R.string.settings_general_darktheme_system : R.string.settings_general_darktheme_batterysaver) };
+            int currentPreference = settings.getInt("prefDarkTheme",
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+            int currentValueIndex = (currentPreference == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM || currentPreference == AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY) ? 2 : (currentPreference - 1);
 
-            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_daynight_title)
+            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_darktheme_title)
                     .setSingleChoiceItems(items, currentValueIndex, (dialogInterface, which) -> {
                 dialogInterface.dismiss();
-                setDayNight(which);
+                setDarkTheme(which);
             }).setNegativeButton(R.string.cancel, null).show();
-        });
-        binding.dayNightLocation.setOnClickListener(view2 -> {
-            if(getActivity() != null && !getActivity().isFinishing()) {
-                if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.ok, view3 -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT)).show();
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_DAYNIGHT);
-                }
-            }
         });
         binding.location.setOnClickListener(view4 -> {
             int currentPreference = settings.getInt("prefSelectedCinema", 0);
@@ -193,25 +185,23 @@ public class SettingsMainFragment extends Fragment {
     }
 
     private void updateValues() {
-        int dayNightPreference = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
-        switch(dayNightPreference) {
+        int darkThemePreference = settings.getInt("prefDarkTheme",
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+        switch(darkThemePreference) {
             case AppCompatDelegate.MODE_NIGHT_NO:
-                binding.dayNight.setIcon(R.drawable.ic_brightness_day);
-                binding.dayNight.setValue(R.string.settings_general_daynight_day);
+                binding.darkTheme.setValue(R.string.settings_general_darktheme_light);
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
-                binding.dayNight.setIcon(R.drawable.ic_brightness_night);
-                binding.dayNight.setValue(R.string.settings_general_daynight_night);
+                binding.darkTheme.setValue(R.string.settings_general_darktheme_dark);
                 break;
-            case AppCompatDelegate.MODE_NIGHT_AUTO:
+            case AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY:
+                binding.darkTheme.setValue(R.string.settings_general_darktheme_batterysaver);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
             default:
-                binding.dayNight.setIcon(R.drawable.ic_brightness_auto);
-                binding.dayNight.setValue(R.string.settings_general_daynight_auto);
+                binding.darkTheme.setValue(R.string.settings_general_darktheme_system);
                 break;
         }
-        binding.dayNightLocation.setVisibility((dayNightPreference == AppCompatDelegate.MODE_NIGHT_AUTO && getContext() != null
-                && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                ? View.VISIBLE : View.GONE);
 
         updateCinemaValues();
 
@@ -263,17 +253,26 @@ public class SettingsMainFragment extends Fragment {
         }
     }
 
-    private void setDayNight(int value) {
-        int currentValue = settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
-
-        settings.edit().putInt("prefDayNight", value).apply();
-        AppCompatDelegate.setDefaultNightMode(value);
-
-        if(value != currentValue) {
-            getActivity().recreate();
-        } else {
-            updateValues();
+    private void setDarkTheme(int ordinal) {
+        int currentValue = settings.getInt("prefDarkTheme",
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+        int newValue = 0;
+        switch(ordinal) {
+            case 0:
+                newValue = AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case 1:
+                newValue = AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case 2:
+                newValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY;
+                break;
         }
+
+        settings.edit().putInt("prefDarkTheme", newValue).apply();
+        AppCompatDelegate.setDefaultNightMode(newValue);
+
+        updateValues();
     }
 
     private void setCinemaPreference(int value) {
@@ -376,13 +375,6 @@ public class SettingsMainFragment extends Fragment {
                     settings.edit().putInt("prefAutomagicLocation", 0).apply();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // The other one also won't be possible now
                 }
-                break;
-            case PERMISSION_LOCATION_DAYNIGHT:
-                if(grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
-                    settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // These also won't be possible now
-                    settings.edit().putInt("prefAutomagicLocation", 0).apply(); // These also won't be possible now
-                } // else if granted is handled by updateValues();
                 break;
         }
         updateValues();

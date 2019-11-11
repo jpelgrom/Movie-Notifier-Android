@@ -1,28 +1,13 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
         <item name="popupMenuStyle">@style/PropPopupMenu</item>
-
-        <!-- New MaterialComponents attributes. -->
-        <item name="scrimBackground">@color/mtrl_scrim_color</item>
-        <item name="textAppearanceHeadline1">@style/TextAppearance.MaterialComponents.Headline1</item>
-        <item name="textAppearanceHeadline2">@style/TextAppearance.MaterialComponents.Headline2</item>
-        <item name="textAppearanceHeadline3">@style/TextAppearance.MaterialComponents.Headline3</item>
-        <item name="textAppearanceHeadline4">@style/TextAppearance.MaterialComponents.Headline4</item>
-        <item name="textAppearanceHeadline5">@style/TextAppearance.MaterialComponents.Headline5</item>
-        <item name="textAppearanceHeadline6">@style/TextAppearance.MaterialComponents.Headline6</item>
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.MaterialComponents.Subtitle1</item>
-        <item name="textAppearanceSubtitle2">@style/TextAppearance.MaterialComponents.Subtitle2</item>
-        <item name="textAppearanceBody1">@style/TextAppearance.MaterialComponents.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
-        <item name="textAppearanceCaption">@style/TextAppearance.MaterialComponents.Caption</item>
-        <item name="textAppearanceButton">@style/TextAppearance.MaterialComponents.Button</item>
-        <item name="textAppearanceOverline">@style/TextAppearance.MaterialComponents.Overline</item>
     </style>
 
     <style name="AppThemeVersions" parent="AppTheme" />
@@ -32,11 +17,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
-    <style name="ClosableToolbar" parent="Base.Widget.AppCompat.Light.ActionBar">
+    <style name="ClosableToolbar" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="android:background">@color/toolbarBackgroundTransparent</item>
         <item name="homeAsUpIndicator">@drawable/ic_close_black</item>
     </style>
@@ -45,20 +30,20 @@
         <item name="android:textColor">@color/textError</item>
     </style>
 
-    <style name="TextMaterialSubhaderParent">
+    <style name="TextMaterialSubheaderParent">
         <item name="android:minHeight">?attr/listPreferredItemHeightSmall</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Overline</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.0892857143</item> <!-- 1.25 from TextAppearance.MaterialComponents.Button -->
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="TextMaterialSubheader" parent="TextMaterialSubhaderParent">
+    <style name="TextMaterialSubheader" parent="TextMaterialSubheaderParent">
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
-    <style name="PropPopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+    <style name="PropPopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">
         <item name="android:dropDownHorizontalOffset">72dp</item>
     </style>
 

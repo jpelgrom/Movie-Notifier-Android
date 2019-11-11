@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#6200EA</color>
-    <color name="colorPrimaryDark">#3E00AA</color>
-    <color name="colorPrimaryLighter">#6A00FF</color>
-    <color name="colorAccent">#C1185B</color>
+    <color name="colorPrimaryDark">#0A00B6</color>
+    <color name="colorPrimaryLighter">#9D46FF</color>
+    <color name="colorSecondary">#C1185B</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
 
     <color name="textDelete">@android:color/holo_red_dark</color>
     <color name="textError">#F4511E</color>

@@ -239,7 +239,6 @@ public class SettingsActivity extends AppCompatActivity {
         switch(requestCode) {
             case SettingsMainFragment.PERMISSION_LOCATION_AUTOCOMPLETE:
             case SettingsMainFragment.PERMISSION_LOCATION_AUTOMAGIC:
-            case SettingsMainFragment.PERMISSION_LOCATION_DAYNIGHT:
                 if(getSupportFragmentManager().findFragmentByTag("settingsMainFragment") != null) {
                     getSupportFragmentManager().findFragmentByTag("settingsMainFragment").onRequestPermissionsResult(requestCode, permissions, grantResults);
                 }

@@ -66,17 +66,17 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
         int pref = settings.getInt("listFilter", 0);
         switch(pref) {
             case 1: // Past
-                binding.filterPastText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterPastText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 2: // Now
-                binding.filterNowText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterNowText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 3: // Future
-                binding.filterFutureText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterFutureText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 0: // All
             default:
-                binding.filterAllText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.filterAllText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
         }
 

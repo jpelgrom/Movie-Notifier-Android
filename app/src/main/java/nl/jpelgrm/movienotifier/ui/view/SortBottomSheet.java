@@ -60,20 +60,20 @@ public class SortBottomSheet extends BottomSheetDialogFragment {
         int pref = settings.getInt("listSort", 0);
         switch(pref) {
             case 1: // Begin (start checking)
-                binding.sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortBeginText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 2: // End (stop checking)
-                binding.sortEndText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortEndText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 3: // Start after (first showing)
-                binding.sortStartAfterText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortStartAfterText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 4: // A-Z
-                binding.sortAZText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortAZText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
             case 0: // Automagic (status, then A-Z)
             default:
-                binding.sortAutoText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                binding.sortAutoText.setTextColor(ContextCompat.getColor(getContext(), R.color.colorSecondary));
                 break;
         }
 

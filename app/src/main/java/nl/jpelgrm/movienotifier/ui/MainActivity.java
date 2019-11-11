@@ -8,7 +8,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
 import nl.jpelgrm.movienotifier.R;
@@ -20,7 +19,6 @@ import nl.jpelgrm.movienotifier.ui.view.SortBottomSheet;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
-    int dayNightPreference;
     SharedPreferences settings;
 
     public enum NavigationTab {
@@ -35,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
-
-        dayNightPreference = getSharedPreferences("settings", MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO);
 
         binding.bottomnav.setOnNavigationItemSelectedListener(menuItem -> {
             switch(menuItem.getItemId()) {
@@ -98,14 +94,6 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
         selectedTab = tab;
         invalidateOptionsMenu();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(settings.getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO) != dayNightPreference) {
-            recreate();
-        }
     }
 
     @Override

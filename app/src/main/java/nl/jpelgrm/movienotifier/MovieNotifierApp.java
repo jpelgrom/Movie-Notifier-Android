@@ -1,6 +1,8 @@
 package nl.jpelgrm.movienotifier;
 
 import android.app.Application;
+import android.os.Build;
+
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.provider.FontRequest;
@@ -21,7 +23,8 @@ public class MovieNotifierApp extends Application {
         super.onCreate();
         StethoUtil.install(this);
 
-        AppCompatDelegate.setDefaultNightMode(getSharedPreferences("settings", MODE_PRIVATE).getInt("prefDayNight", AppCompatDelegate.MODE_NIGHT_AUTO));
+        AppCompatDelegate.setDefaultNightMode(getSharedPreferences("settings", MODE_PRIVATE)
+                .getInt("prefDarkTheme", Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY));
 
         FontRequest fontRequest = new FontRequest(
                 "com.google.android.gms.fonts",
