@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TextMaterialSubheader" parent="TextMaterialSubheaderParent">
-        <item name="android:textColor">@color/colorPrimaryLighter</item>
-    </style>
-
-    <style name="BottomNavigationTheme" parent="AppTheme">
+    <style name="AppTheme.Base" parent="AppTheme">
         <item name="colorPrimary">@color/colorPrimaryLighter</item>
     </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 </resources>

@@ -3,16 +3,21 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="colorError">@color/textError</item>
+
         <item name="popupMenuStyle">@style/PropPopupMenu</item>
     </style>
 
-    <style name="AppThemeVersions" parent="AppTheme" />
+    <style name="AppTheme.Base" parent="AppTheme">
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppThemeVersions">
+    <style name="AppTheme.Versions" parent="AppTheme.Base"/>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme.Versions">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -40,7 +45,7 @@
     </style>
 
     <style name="TextMaterialSubheader" parent="TextMaterialSubheaderParent">
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">?colorPrimary</item>
     </style>
 
     <style name="PropPopupMenu" parent="@style/Widget.MaterialComponents.PopupMenu">

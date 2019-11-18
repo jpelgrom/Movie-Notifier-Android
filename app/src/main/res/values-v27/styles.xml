@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppThemeVersions" parent="AppTheme">
+    <style name="AppTheme.Versions" parent="AppTheme.Base">
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:navigationBarColor">@android:color/white</item>
         <item name="android:navigationBarDividerColor">#dcdcdc</item>

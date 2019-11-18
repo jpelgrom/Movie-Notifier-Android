@@ -173,7 +173,7 @@ public class WatchersFragment extends Fragment {
                         binding.listSwiper.setRefreshing(false);
 
                         if(showError) {
-                            snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception, Snackbar.LENGTH_INDEFINITE);
+                            snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception_short, Snackbar.LENGTH_INDEFINITE);
                             snackbar.show();
                         }
                     }
@@ -361,7 +361,7 @@ public class WatchersFragment extends Fragment {
                             } else if(response.code() == 401) {
                                 message = getString(R.string.error_watcher_401);
                             } else {
-                                message = getString(R.string.error_general_server, "H" + response.code());
+                                message = getString(R.string.error_general_server_short, "H" + response.code());
                             }
                         }
 
@@ -377,7 +377,7 @@ public class WatchersFragment extends Fragment {
                         binding.progress.setVisibility(View.GONE);
                         binding.listRecycler.setClickable(true);
 
-                        snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception, Snackbar.LENGTH_SHORT);
+                        snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception_short, Snackbar.LENGTH_SHORT);
                         snackbar.show();
                         refreshList(false, false);
                     }
