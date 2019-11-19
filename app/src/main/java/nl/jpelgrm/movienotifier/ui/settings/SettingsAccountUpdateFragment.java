@@ -3,6 +3,7 @@ package nl.jpelgrm.movienotifier.ui.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
 import nl.jpelgrm.movienotifier.R;
@@ -76,6 +78,14 @@ public class SettingsAccountUpdateFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
+                return insets;
+            });
+            ViewCompat.requestApplyInsets(binding.main);
+        }
 
         AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
             this.user = user;

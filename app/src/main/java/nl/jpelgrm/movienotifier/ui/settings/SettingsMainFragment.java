@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -109,6 +110,14 @@ public class SettingsMainFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
+                return insets;
+            });
+            ViewCompat.requestApplyInsets(binding.main);
+        }
+
         binding.darkTheme.setOnClickListener(view1 -> {
             CharSequence[] items = { getString(R.string.settings_general_darktheme_light), getString(R.string.settings_general_darktheme_dark),
                     getString(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? R.string.settings_general_darktheme_system : R.string.settings_general_darktheme_batterysaver) };

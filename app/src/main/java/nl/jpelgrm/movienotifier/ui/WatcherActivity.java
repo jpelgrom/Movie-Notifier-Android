@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -26,8 +27,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -95,6 +98,27 @@ public class WatcherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityWatcherBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.getRoot().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+
+            ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
+                v.setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), 0);
+                return insets;
+            });
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
+                return insets;
+            });
+            ViewCompat.setOnApplyWindowInsetsListener(binding.fab, (v, insets) -> {
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) v.getLayoutParams();
+                int margin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+                params.setMargins(0, 0, margin, margin + insets.getSystemWindowInsetBottom());
+                v.setLayoutParams(params);
+                return insets;
+            });
+        }
 
         settings = getSharedPreferences("settings", MODE_PRIVATE);
 
