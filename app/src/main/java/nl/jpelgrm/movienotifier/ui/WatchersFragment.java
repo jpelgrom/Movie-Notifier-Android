@@ -161,6 +161,7 @@ public class WatchersFragment extends Fragment {
                                 } else {
                                     snackbar = Snackbar.make(binding.coordinator, R.string.error_watchers_400, Snackbar.LENGTH_INDEFINITE);
                                 }
+                                snackbar.setAnchorView(binding.fab);
                                 snackbar.show();
                             }
                         }
@@ -174,6 +175,7 @@ public class WatchersFragment extends Fragment {
 
                         if(showError) {
                             snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception_short, Snackbar.LENGTH_INDEFINITE);
+                            snackbar.setAnchorView(binding.fab);
                             snackbar.show();
                         }
                     }
@@ -185,6 +187,7 @@ public class WatchersFragment extends Fragment {
                 if(userTriggered) {
                     snackbar = Snackbar.make(binding.coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction(R.string.add, view -> startActivity(new Intent(getActivity(), AccountActivity.class)));
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                 }
             }
@@ -366,6 +369,7 @@ public class WatchersFragment extends Fragment {
                         }
 
                         snackbar = Snackbar.make(binding.coordinator, message, Snackbar.LENGTH_SHORT);
+                        snackbar.setAnchorView(binding.fab);
                         snackbar.show();
                         refreshList(false, false);
                     }
@@ -378,6 +382,7 @@ public class WatchersFragment extends Fragment {
                         binding.listRecycler.setClickable(true);
 
                         snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception_short, Snackbar.LENGTH_SHORT);
+                        snackbar.setAnchorView(binding.fab);
                         snackbar.show();
                         refreshList(false, false);
                     }
@@ -394,8 +399,9 @@ public class WatchersFragment extends Fragment {
         } else {
             if(!getActivity().isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC));
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG);
+                    snackbar.setAction(R.string.ok, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC));
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                 } else {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC);
@@ -433,6 +439,7 @@ public class WatchersFragment extends Fragment {
                     startLocation();
                 } else {
                     snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                     settings.edit().putInt("prefAutomagicLocation", 0).apply();
                 }

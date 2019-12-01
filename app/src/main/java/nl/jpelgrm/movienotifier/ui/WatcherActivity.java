@@ -247,6 +247,7 @@ public class WatcherActivity extends AppCompatActivity {
                 } else {
                     snackbar = Snackbar.make(binding.coordinator, R.string.watchers_empty_account, Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction(R.string.add, view1 -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                 }
             }
@@ -690,6 +691,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         if(updatedOther) {
             snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_begin, Snackbar.LENGTH_LONG);
+            snackbar.setAnchorView(binding.fab);
             snackbar.show();
             updateViews();
         }
@@ -708,6 +710,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         if(updated) {
             snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_end, Snackbar.LENGTH_LONG);
+            snackbar.setAnchorView(binding.fab);
             snackbar.show();
             updateViews();
         }
@@ -726,6 +729,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         if(updated) {
             snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_startafter, Snackbar.LENGTH_LONG);
+            snackbar.setAnchorView(binding.fab);
             snackbar.show();
             updateViews();
         }
@@ -744,6 +748,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         if(updated) {
             snackbar = Snackbar.make(binding.coordinator, R.string.watcher_validate_startbefore, Snackbar.LENGTH_LONG);
+            snackbar.setAnchorView(binding.fab);
             snackbar.show();
             updateViews();
         }
@@ -787,6 +792,7 @@ public class WatcherActivity extends AppCompatActivity {
                         mode = Mode.VIEWING;
 
                         snackbar = Snackbar.make(binding.coordinator, R.string.watcher_saved, Snackbar.LENGTH_SHORT);
+                        snackbar.setAnchorView(binding.fab);
                         snackbar.show();
 
                         updateViews();
@@ -873,6 +879,7 @@ public class WatcherActivity extends AppCompatActivity {
         binding.watcherError.setVisibility(View.GONE);
 
         snackbar = Snackbar.make(binding.coordinator, R.string.watcher_duplicate, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAnchorView(binding.fab);
         snackbar.show();
 
         watcher.setName(getString(R.string.watcher_copy, watcher.getName()));
@@ -979,8 +986,9 @@ public class WatcherActivity extends AppCompatActivity {
         } else {
             if(!isFinishing()) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.ok, view -> ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE));
+                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_rationale, Snackbar.LENGTH_LONG);
+                    snackbar.setAction(R.string.ok, view -> ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE));
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                 } else {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE);
@@ -1017,6 +1025,7 @@ public class WatcherActivity extends AppCompatActivity {
                     startLocation();
                 } else {
                     snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                    snackbar.setAnchorView(binding.fab);
                     snackbar.show();
                     settings.edit().putInt("prefAutocompleteLocation", 0).apply();
                 }
