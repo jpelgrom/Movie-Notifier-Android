@@ -4,7 +4,10 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -52,13 +55,13 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         watcher = new Gson().fromJson(getArguments().getString("watcher"), Watcher.class);
     }
 
+    @Nullable
     @Override
-    public void setupDialog(Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-        binding = FragmentBottomsheetWatcherBinding.inflate(LayoutInflater.from(getContext()), null, false);
-        dialog.setContentView(binding.getRoot());
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentBottomsheetWatcherBinding.inflate(inflater, container, false);
         setupViews(false);
+
+        return binding.getRoot();
     }
 
     private void setupViews(boolean cinemasOnly) {
@@ -118,7 +121,5 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
                 ((WatchersFragment) search).deleteWatcher(watcher.getID());
             }
         });
-
-        binding.close.setOnClickListener(view -> dismiss());
     }
 }

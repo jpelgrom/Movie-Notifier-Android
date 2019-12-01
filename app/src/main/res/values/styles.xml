@@ -9,6 +9,8 @@
         <item name="colorError">@color/textError</item>
 
         <item name="popupMenuStyle">@style/PropPopupMenu</item>
+        <item name="bottomSheetDialogTheme">@style/Widget.AppTheme.BottomSheet</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AppTheme.LargeComponent</item>
     </style>
 
     <style name="AppTheme.Base" parent="AppTheme">
@@ -29,6 +31,18 @@
     <style name="ClosableToolbar" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="android:background">@color/toolbarBackgroundTransparent</item>
         <item name="homeAsUpIndicator">@drawable/ic_close_black</item>
+    </style>
+
+    <style name="ShapeAppearance.AppTheme.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/bottomsheet_radius</item>
+    </style>
+
+    <style name="Widget.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item> <!-- This is important -->
+        <item name="android:statusBarColor">@android:color/transparent</item> <!-- And then this will be needed -->
+        <item name="android:navigationBarColor">@color/dialogBackground</item>
+        <item name="android:colorBackground">@color/dialogBackground</item>
     </style>
 
     <style name="TextError">

@@ -37,7 +37,6 @@
             android:id="@+id/bottomnav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/dialogBackground"
             app:menu="@menu/menu_bottomnav"
             app:elevation="16dp"/>
 

@@ -1,11 +1,13 @@
 package nl.jpelgrm.movienotifier.ui.view;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
@@ -30,13 +32,13 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         dismissalTask();
         super.onDismiss(dialog);
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
+    public void onCancel(@NonNull DialogInterface dialog) {
         dismissalTask();
         super.onCancel(dialog);
     }
@@ -47,13 +49,13 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
+    @Nullable
     @Override
-    public void setupDialog(Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-        binding = FragmentBottomsheetFilterBinding.inflate(LayoutInflater.from(getContext()), null, false);
-        dialog.setContentView(binding.getRoot());
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentBottomsheetFilterBinding.inflate(inflater, container, false);
         setupViews();
+
+        return binding.getRoot();
     }
 
     private void setupViews() {
@@ -96,6 +98,5 @@ public class FilterBottomSheet extends BottomSheetDialogFragment {
             settings.edit().putInt("listFilter", 3).apply();
             dismiss();
         });
-        binding.close.setOnClickListener(view -> dismiss());
     }
 }
