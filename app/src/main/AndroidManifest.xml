@@ -60,7 +60,7 @@
         </activity>
         <activity
             android:name=".ui.settings.AccountActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.ClosableActionBar">
         </activity>
 
         <service

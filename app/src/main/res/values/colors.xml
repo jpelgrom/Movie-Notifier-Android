@@ -10,7 +10,7 @@
     <color name="textError">#F4511E</color>
     <color name="textEmptyState">#676767</color>
 
-    <color name="toolbarBackgroundTransparent">@color/background_material_light</color>
+    <color name="toolbarBackgroundTransparent">#FFFFFF</color>
 
     <color name="shortcutBackground">#FFF5F5F5</color>
 

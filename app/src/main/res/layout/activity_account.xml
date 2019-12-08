@@ -10,8 +10,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="0dp"
-        android:theme="@style/ClosableToolbar"
+        android:theme="@style/ClosableToolbar.Base"
         android:fitsSystemWindows="true">
 
         <androidx.appcompat.widget.Toolbar
