@@ -55,7 +55,7 @@ public class NotificationUtil {
                 .remove("headsup-" + userId)
                 .remove("sound-" + userId)
                 .remove("vibrate-" + userId)
-                .remove("light-" + userId)
+                .remove("lights-" + userId)
                 .apply();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
