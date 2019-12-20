@@ -51,11 +51,19 @@ public class WatcherFilters {
     @Expose
     private WatcherFilterValue _4dx = WatcherFilterValue.NOPREFERENCE;
 
+    @SerializedName("screenx")
+    @Expose
+    private WatcherFilterValue screenx = WatcherFilterValue.NOPREFERENCE;
+
     @Expose
     private WatcherFilterValue dolbycinema = WatcherFilterValue.NOPREFERENCE;
 
     @Expose
     private WatcherFilterValue dolbyatmos = WatcherFilterValue.NOPREFERENCE;
+
+    @SerializedName("regularshowing")
+    @Expose
+    private WatcherFilterValue regularshowing = WatcherFilterValue.NOPREFERENCE;
 
     public int getCinemaID() {
         return cinemaid;
@@ -145,6 +153,14 @@ public class WatcherFilters {
         this._4dx = _4dx;
     }
 
+    public WatcherFilterValue isScreenX() {
+        return screenx;
+    }
+
+    public void setScreenX(WatcherFilterValue screenx) {
+        this.screenx = screenx;
+    }
+
     public WatcherFilterValue isDolbyCinema() {
         return dolbycinema;
     }
@@ -159,5 +175,13 @@ public class WatcherFilters {
 
     public void setDolbyAtmos(WatcherFilterValue dolbyatmos) {
         this.dolbyatmos = dolbyatmos;
+    }
+
+    public WatcherFilterValue isRegularShowing() {
+        return regularshowing;
+    }
+
+    public void setRegularShowing(WatcherFilterValue regularshowing) {
+        this.regularshowing = regularshowing;
     }
 }

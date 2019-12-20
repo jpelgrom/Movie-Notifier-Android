@@ -219,8 +219,11 @@ public class WatcherActivity extends AppCompatActivity {
             showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
         });
 
+        setOnPropClickListener(binding.filterRegularShowing, value -> watcher.getFilters().setRegularShowing(value));
         setOnPropClickListener(binding.filterIMAX, value -> watcher.getFilters().setIMAX(value));
         setOnPropClickListener(binding.filterDolbyCinema, value -> watcher.getFilters().setDolbyCinema(value));
+        setOnPropClickListener(binding.filter4DX, value -> watcher.getFilters().set4DX(value));
+        setOnPropClickListener(binding.filterScreenX, value -> watcher.getFilters().setScreenX(value));
         setOnPropClickListener(binding.filter3D, value -> watcher.getFilters().set3D(value));
         setOnPropClickListener(binding.filter4K, value -> watcher.getFilters().set4K(value));
         setOnPropClickListener(binding.filterLaser, value -> watcher.getFilters().setLaser(value));
@@ -228,7 +231,6 @@ public class WatcherActivity extends AppCompatActivity {
         setOnPropClickListener(binding.filterDolbyAtmos, value -> watcher.getFilters().setDolbyAtmos(value));
         setOnPropClickListener(binding.filterOV, value -> watcher.getFilters().setOriginalVersion(value));
         setOnPropClickListener(binding.filterNL, value -> watcher.getFilters().setDutchVersion(value));
-        setOnPropClickListener(binding.filter4DX, value -> watcher.getFilters().set4DX(value));
 
         binding.fab.setOnClickListener(view -> {
             if(mode == Mode.VIEWING) {
@@ -495,10 +497,16 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void updateViewsFilters() {
         if(watcher.getFilters() != null) {
+            binding.filterRegularShowing.setValue(watcher.getFilters().isRegularShowing() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isRegularShowing() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filterIMAX.setValue(watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filterDolbyCinema.setValue(watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterScreenX.setValue(watcher.getFilters().isScreenX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().isScreenX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filter3D.setValue(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filter4K.setValue(watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
@@ -513,11 +521,12 @@ public class WatcherActivity extends AppCompatActivity {
                     (watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
             binding.filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
                     (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filter4DX.setValue(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
+            binding.filterRegularShowing.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterIMAX.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterDolbyCinema.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filter4DX.setValue(R.string.watcher_filter_value_nopreference);
+            binding.filterScreenX.setValue(R.string.watcher_filter_value_nopreference);
             binding.filter3D.setValue(R.string.watcher_filter_value_nopreference);
             binding.filter4K.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterLaser.setValue(R.string.watcher_filter_value_nopreference);
@@ -525,7 +534,6 @@ public class WatcherActivity extends AppCompatActivity {
             binding.filterDolbyAtmos.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterOV.setValue(R.string.watcher_filter_value_nopreference);
             binding.filterNL.setValue(R.string.watcher_filter_value_nopreference);
-            binding.filter4DX.setValue(R.string.watcher_filter_value_nopreference);
         }
     }
 
@@ -551,8 +559,11 @@ public class WatcherActivity extends AppCompatActivity {
         binding.filterStartAfter.setClickable(editable);
         binding.filterStartBefore.setClickable(editable);
 
+        binding.filterRegularShowing.setClickable(editable);
         binding.filterIMAX.setClickable(editable);
         binding.filterDolbyCinema.setClickable(editable);
+        binding.filter4DX.setClickable(editable);
+        binding.filterScreenX.setClickable(editable);
         binding.filter3D.setClickable(editable);
         binding.filter4K.setClickable(editable);
         binding.filterLaser.setClickable(editable);
@@ -560,7 +571,6 @@ public class WatcherActivity extends AppCompatActivity {
         binding.filterDolbyAtmos.setClickable(editable);
         binding.filterOV.setClickable(editable);
         binding.filterNL.setClickable(editable);
-        binding.filter4DX.setClickable(editable);
     }
 
     private void doneLoading() {
