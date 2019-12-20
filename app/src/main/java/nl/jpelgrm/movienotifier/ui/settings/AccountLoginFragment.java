@@ -147,11 +147,11 @@ public class AccountLoginFragment extends Fragment {
                     AsyncTask.execute(() -> {
                         AppDatabase.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
-                        if(getActivity() != null && !getActivity().isFinishing()) {
+                        if(getActivity() != null && !getActivity().isFinishing() && getContext() != null) {
                             SharedPreferences notificationSettings = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE);
                             notificationSettings.edit().putBoolean("disabled-" + received.getId(), false).apply();
                             String token = notificationSettings.getString("token", "");
-                            WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, received.getId()));
+                            WorkManager.getInstance(getContext()).enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, received.getId()));
                             getActivity().runOnUiThread(() -> getActivity().finish());
                         }
                     });

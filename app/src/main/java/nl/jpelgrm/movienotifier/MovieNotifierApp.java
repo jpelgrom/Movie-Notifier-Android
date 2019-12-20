@@ -47,13 +47,13 @@ public class MovieNotifierApp extends Application {
                     .setConstraints(updateConstraints)
                     .addTag("cinemasListUpdate")
                     .build();
-            WorkManager.getInstance().cancelAllWorkByTag("cinemasListUpdate"); // 'Replace' any existing jobs
-            WorkManager.getInstance().enqueue(updateWork);
+            WorkManager.getInstance(this).cancelAllWorkByTag("cinemasListUpdate"); // 'Replace' any existing jobs
+            WorkManager.getInstance(this).enqueue(updateWork);
         }
 
         // Also run immediately if the list has never been updated
         if(lastUpdated == -1) {
-            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
+            WorkManager.getInstance(this).enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
         }
     }
 }

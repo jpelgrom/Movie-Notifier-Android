@@ -27,43 +27,41 @@ import nl.jpelgrm.movienotifier.util.NotificationUtil;
 
 public class MessagingService extends FirebaseMessagingService {
     @Override
-    public void onNewToken(String token) {
+    public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, null));
+        WorkManager.getInstance(this).enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(token, null));
     }
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        if(remoteMessage.getData() != null) {
-            // Add to database
-            String userID = remoteMessage.getData().get("user.id");
-            String watcherID = remoteMessage.getData().get("watcher.id");
-            String watcherName = remoteMessage.getData().get("watcher.name");
-            String body = remoteMessage.getData().get("body");
+        // Add to database
+        String userID = remoteMessage.getData().get("user.id");
+        String watcherID = remoteMessage.getData().get("watcher.id");
+        String watcherName = remoteMessage.getData().get("watcher.name");
+        String body = remoteMessage.getData().get("body");
 
-            String sMovieID = remoteMessage.getData().get("watcher.movieid");
-            String sMatches = remoteMessage.getData().get("matches.count");
-            int movieID, matches;
-            if(userID != null && sMovieID != null && sMatches != null) {
-                movieID = Integer.parseInt(sMovieID);
-                matches = Integer.parseInt(sMatches);
+        String sMovieID = remoteMessage.getData().get("watcher.movieid");
+        String sMatches = remoteMessage.getData().get("matches.count");
+        int movieID, matches;
+        if(userID != null && sMovieID != null && sMatches != null) {
+            movieID = Integer.parseInt(sMovieID);
+            matches = Integer.parseInt(sMatches);
 
-                List<User> dbUsers = AppDatabase.getInstance(getApplicationContext()).users().getUsersSynchronous();
-                User foundUser = null;
-                for(User dbUser: dbUsers) {
-                    if(dbUser.getId().equals(userID)) {
-                        foundUser = dbUser;
-                        break;
-                    }
+            List<User> dbUsers = AppDatabase.getInstance(getApplicationContext()).users().getUsersSynchronous();
+            User foundUser = null;
+            for(User dbUser: dbUsers) {
+                if(dbUser.getId().equals(userID)) {
+                    foundUser = dbUser;
+                    break;
                 }
-                if(foundUser != null) {
-                    Notification dbNotification = new Notification(remoteMessage.getSentTime(), userID, watcherID, watcherName, movieID, matches, body);
-                    AppDatabase.getInstance(getApplicationContext()).notifications().add(dbNotification);
+            }
+            if(foundUser != null) {
+                Notification dbNotification = new Notification(remoteMessage.getSentTime(), userID, watcherID, watcherName, movieID, matches, body);
+                AppDatabase.getInstance(getApplicationContext()).notifications().add(dbNotification);
 
-                    // Notify the user
-                    sendNotification(dbNotification, foundUser, dbUsers.size() > 1);
-                }
+                // Notify the user
+                sendNotification(dbNotification, foundUser, dbUsers.size() > 1);
             }
         }
     }

@@ -477,9 +477,9 @@ public class SettingsAccountOverviewFragment extends Fragment {
             if(task.isSuccessful() && task.getResult() != null) {
                 String storedToken = notificationSettings.getString("token", "");
                 String receivedToken = task.getResult().getToken();
-                if(!storedToken.equals(receivedToken)) {
-                    WorkManager.getInstance().cancelAllWorkByTag("fcmRefresh");
-                    WorkManager.getInstance().enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(receivedToken, null));
+                if(!storedToken.equals(receivedToken) && getContext() != null) {
+                    WorkManager.getInstance(getContext()).cancelAllWorkByTag("fcmRefresh");
+                    WorkManager.getInstance(getContext()).enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(receivedToken, null));
                 }
             }
         });

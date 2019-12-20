@@ -155,7 +155,7 @@ public class SettingsMainFragment extends Fragment {
         });
         binding.service.setOnClickListener(view5 -> {
             binding.service.setValue(R.string.settings_general_location_service_updating);
-            WorkManager.getInstance().enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
+            WorkManager.getInstance(getContext()).enqueue(CinemaUpdateWorker.getRequestToUpdateImmediately());
         });
         binding.autocomplete.setOnCheckedChangeListener((buttonView, isChecked) -> setAutocompleteLocationPreference(isChecked));
         binding.automagic.setOnCheckedChangeListener((buttonView, isChecked) -> setAutomagicLocationPreference(isChecked));
