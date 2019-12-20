@@ -871,6 +871,7 @@ public class WatcherActivity extends AppCompatActivity {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + id);
+        sendIntent.putExtra(Intent.EXTRA_TITLE, watcher.getName());
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
     }

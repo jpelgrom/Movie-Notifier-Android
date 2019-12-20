@@ -110,6 +110,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID());
+            sendIntent.putExtra(Intent.EXTRA_TITLE, watcher.getName());
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
         });
