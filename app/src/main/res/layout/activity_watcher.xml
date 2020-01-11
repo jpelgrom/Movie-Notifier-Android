@@ -271,43 +271,82 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterRegularShowing"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filtergroupExperience"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:detailTitle="@string/watcher_filter_title_regularshowing"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?listPreferredItemPaddingRight">
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterIMAX"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/logo_imax"
-                    app:detailTitle="@string/watcher_filter_title_imax"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filterRegularShowing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipIcon="@drawable/ic_experience_regularshowing"
+                        app:chipIconVisible="true"
+                        android:text="@string/watcher_filter_title_regularshowing"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterDolbyCinema"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/logo_dolby"
-                    app:detailTitle="@string/watcher_filter_title_dolbycinema"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filterIMAX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipIcon="@drawable/ic_experience_imax"
+                        app:chipIconVisible="true"
+                        android:text="@string/watcher_filter_title_imax"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filter4DX"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/logo_4dx"
-                    app:detailTitle="@string/watcher_filter_title_4dx"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filterDolbyCinema"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipIcon="@drawable/ic_experience_dolbycinema"
+                        app:chipIconVisible="true"
+                        android:text="@string/watcher_filter_title_dolbycinema"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterScreenX"
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filter4DX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipIcon="@drawable/ic_experience_4dx"
+                        app:chipIconVisible="true"
+                        android:text="@string/watcher_filter_title_4dx"/>
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filterScreenX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipIcon="@drawable/ic_experience_screenx"
+                        app:chipIconVisible="true"
+                        android:text="@string/watcher_filter_title_screenx"/>
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/filtergroup3D"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:detailTitle="@string/watcher_filter_title_screenx"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?listPreferredItemPaddingRight">
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filter2D"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/watcher_filter_title_2d"/>
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/filter3D"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/watcher_filter_title_3d"/>
+
+                </com.google.android.material.chip.ChipGroup>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -316,13 +355,6 @@
                     android:paddingStart="72dp"
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
-
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filter3D"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailTitle="@string/watcher_filter_title_3d"
-                    app:detailValue="@string/watcher_filter_value_nopreference"/>
 
                 <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
                     android:id="@+id/filter4K"

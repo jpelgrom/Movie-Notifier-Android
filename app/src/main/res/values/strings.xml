@@ -88,13 +88,14 @@
     <string name="watcher_filter_title_startafter">Search for showings that start after</string>
     <string name="watcher_filter_title_startbefore">Search for showings that start before</string>
     <string name="watcher_filter_heading_experience">Experience</string>
-    <string name="watcher_filter_title_regularshowing">Regular</string>
+    <string name="watcher_filter_title_regularshowing">Normal</string>
     <string name="watcher_filter_title_imax">IMAX</string>
     <string name="watcher_filter_title_dolbycinema">Dolby Cinema</string>
     <string name="watcher_filter_title_4dx">4DX</string>
     <string name="watcher_filter_title_screenx">ScreenX</string>
-    <string name="watcher_filter_heading_projection">Projection</string>
+    <string name="watcher_filter_title_2d">2D</string>
     <string name="watcher_filter_title_3d">3D</string>
+    <string name="watcher_filter_heading_projection">Projection</string>
     <string name="watcher_filter_title_4k">4K</string>
     <string name="watcher_filter_title_laser">Laser</string>
     <string name="watcher_filter_title_hfr">HFR</string>

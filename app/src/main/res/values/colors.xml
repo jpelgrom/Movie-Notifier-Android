@@ -10,6 +10,12 @@
     <color name="textError">#F4511E</color>
     <color name="textEmptyState">#676767</color>
 
+    <color name="experienceRegularShowing">#FFC426</color>
+    <color name="experienceIMAX">#0072CE</color>
+    <color name="experienceDolbyCinema">#16ACBC</color>
+    <color name="experience4DX">#DA0611</color>
+    <color name="experienceScreenX">#F15A29</color>
+
     <color name="toolbarBackgroundTransparent">#FFFFFF</color>
 
     <color name="shortcutBackground">#FFF5F5F5</color>
