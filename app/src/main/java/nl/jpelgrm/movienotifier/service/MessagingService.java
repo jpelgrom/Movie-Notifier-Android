@@ -121,7 +121,7 @@ public class MessagingService extends FirebaseMessagingService {
         Intent watcherIntent = new Intent(this, WatcherActivity.class);
         watcherIntent.putExtra("id", notification.getWatcherid());
         PendingIntent watcherPendingIntent = PendingIntent.getActivity(this, 0, watcherIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        builder.addAction(R.drawable.ic_eye, getString(R.string.notifications_notification_action_view), watcherPendingIntent);
+        builder.addAction(R.drawable.ic_visibility, getString(R.string.notifications_notification_action_view), watcherPendingIntent);
 
         manager.notify(notification.getId().hashCode(), builder.build());
     }

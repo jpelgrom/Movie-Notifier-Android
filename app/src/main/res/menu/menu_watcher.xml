@@ -9,7 +9,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/watcherMenuDuplicate"
-        android:icon="@drawable/ic_content_copy"
+        android:icon="@drawable/ic_file_copy"
         android:title="@string/copy"
         android:visible="false"
         app:showAsAction="ifRoom" />

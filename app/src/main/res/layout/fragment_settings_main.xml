@@ -36,7 +36,7 @@
                 android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:detailIcon="@drawable/ic_location"
+                app:detailIcon="@drawable/ic_room"
                 app:detailTitle="@string/settings_general_location_title"
                 app:detailValue="@string/settings_general_location_default"/>
 

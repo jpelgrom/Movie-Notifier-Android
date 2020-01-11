@@ -168,7 +168,7 @@
                         android:layout_marginEnd="28dp"
                         android:contentDescription="@string/watcher_basics_cinemaid"
                         android:layout_centerVertical="true"
-                        app:srcCompat="@drawable/ic_location"/>
+                        app:srcCompat="@drawable/ic_room"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/watcherCinemaIDWrapper"
