@@ -5,12 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <RelativeLayout
+        android:id="@+id/chooser_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:text="@string/watchers_bottomsheet_sort_title"/>
+        android:elevation="1dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/drag"
+            android:layout_width="24dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="@dimen/bottomsheet_handle_margin"
+            android:layout_marginBottom="@dimen/bottomsheet_handle_margin"
+            android:tint="@color/dialogHandleTint"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            app:srcCompat="@drawable/ic_drag_handle" />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/watchers_bottomsheet_sort_title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:gravity="center"
+            android:paddingBottom="@dimen/bottomsheet_title_padding"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:layout_below="@id/drag"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/sortAuto"

@@ -72,7 +72,4 @@
         <item name="android:dropDownHorizontalOffset">72dp</item>
     </style>
 
-    <style name="BottomNavigationTheme" parent="AppTheme">
-    </style>
-
 </resources>

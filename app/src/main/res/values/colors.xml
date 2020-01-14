@@ -16,11 +16,14 @@
     <color name="experience4DX">#DA0611</color>
     <color name="experienceScreenX">#F15A29</color>
 
+    <color name="divider">#1E000000</color>
+
     <color name="toolbarBackgroundTransparent">#FFFFFF</color>
 
     <color name="shortcutBackground">#FFF5F5F5</color>
 
     <color name="dialogBackground">#FFFFFF</color>
+    <color name="dialogHandleTint">#DDDDDD</color>
 
     <color name="suggestionBackground">#EEEEEE</color>
 

@@ -6,46 +6,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@drawable/background_bottomsheet_watcher">
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/drag"
+            android:layout_width="24dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="@dimen/bottomsheet_handle_margin"
+            android:layout_marginBottom="@dimen/bottomsheet_handle_margin"
+            android:tint="@color/dialogHandleTint"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            app:srcCompat="@drawable/ic_drag_handle" />
 
         <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/name"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@android:color/white"
-            tools:text="Murder On The Orient Express"/>
+            android:layout_width="wrap_content"
+            tools:text="Weathering with You"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:gravity="center"
+            android:paddingBottom="8dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:layout_below="@id/drag"
+            android:layout_centerHorizontal="true"/>
 
-        <TextView
-            android:id="@+id/location"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/locationWrapper"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#c1c1c1"
-            android:layout_marginTop="8dp"
-            tools:text="Arnhem"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingBottom="@dimen/bottomsheet_title_padding"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:layout_below="@id/name"
+            android:layout_centerHorizontal="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="14sp"
+                android:tint="?android:textColorPrimary"
+                app:srcCompat="@drawable/ic_room"
+                android:adjustViewBounds="true"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                tools:text="Pathé Delft"/>
+
+        </LinearLayout>
 
         <androidx.emoji.widget.EmojiAppCompatTextView
             android:id="@+id/active"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#c1c1c1"
-            android:layout_marginTop="32dp"
-            tools:text="Starts checking Oct 9, 2017 11:27"/>
+            android:layout_below="@id/locationWrapper"
+            android:paddingTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            tools:text="Starts checking Jan 13, 2020 7:53"/>
 
         <TextView
             android:id="@+id/dates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#c1c1c1"
-            android:layout_marginTop="8dp"
-            tools:text="Showings Nov 1, 2017 18:27 – Nov 14, 2017 21:00"/>
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_below="@id/active"
+            tools:text="Showings Jan 23, 2020 18:00 - Feb 2, 2020 22:00"/>
 
-    </LinearLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"/>
 
     <LinearLayout
         android:id="@+id/view"

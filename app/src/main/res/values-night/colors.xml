@@ -3,6 +3,8 @@
     <color name="textDelete">@android:color/holo_red_light</color>
     <color name="textEmptyState">#BDBDBD</color>
 
+    <color name="divider">#1EFFFFFF</color>
+
     <color name="toolbarBackgroundTransparent">@color/background_material_dark</color>
 
     <color name="dialogBackground">#353535</color>

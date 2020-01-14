@@ -2,4 +2,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="scroll_padding">16dp</dimen>
     <dimen name="bottomsheet_radius">8dp</dimen>
+    <dimen name="bottomsheet_handle_margin">16dp</dimen>
+    <dimen name="bottomsheet_title_padding">18dp</dimen>
 </resources>
