@@ -16,12 +16,4 @@
         <attr name="licenseNotice" format="string"/>
         <attr name="licenseLicense" format="string"/>
     </declare-styleable>
-
-    <!-- TODO https://issuetracker.google.com/issues/136103084 -->
-    <attr name="flow_horizontalSeparator"/>
-    <attr name="flow_verticalSeparator"/>
-    <attr name="motionProgress"/>
-    <attr name="waveDecay"/>
-    <attr name="motionPathRotate"/>
-    <attr name="duration"/>
 </resources>
