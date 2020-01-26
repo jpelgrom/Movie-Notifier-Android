@@ -120,23 +120,33 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        binding.notificationsPushHeadsup.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("headsup-" + user.getId(), isChecked).apply());
+        binding.notificationsPushHeadsup.setOnCheckedChangeListener((v, isChecked) -> {
+            if(user == null) { return; }
+            notificationSettings.edit().putBoolean("headsup-" + user.getId(), isChecked).apply();
+        });
         binding.notificationsPushSound.setOnCheckedChangeListener((v, isChecked) -> {
+            if(user == null) { return; }
             notificationSettings.edit().putBoolean("sound-" + user.getId(), isChecked).apply();
             updateValues();
         });
         binding.notificationsPushVibrate.setOnCheckedChangeListener((v, isChecked) -> {
+            if(user == null) { return; }
             notificationSettings.edit().putBoolean("vibrate-" + user.getId(), isChecked).apply();
             updateValues();
         });
-        binding.notificationsPushLights.setOnCheckedChangeListener((v, isChecked) -> notificationSettings.edit().putBoolean("lights-" + user.getId(), isChecked).apply());
+        binding.notificationsPushLights.setOnCheckedChangeListener((v, isChecked) -> {
+            if(user == null) { return; }
+            notificationSettings.edit().putBoolean("lights-" + user.getId(), isChecked).apply();
+        });
         binding.notificationsEmail.setOnSwitchClickListener(v -> toggleEmailNotifications());
         binding.notificationsEmailAddress.setOnClickListener(v -> editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL));
     }
 
-    public void updatedUser() {
-        binding.error.setVisibility(View.GONE);
-        // UI updates are triggered via LiveData which will detect a change
+    void updatedUser() {
+        if(binding != null) {
+            binding.error.setVisibility(View.GONE);
+            // UI updates are triggered via LiveData which will detect a change
+        }
     }
 
     private void updateValues() {
@@ -180,6 +190,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void togglePushNotifications() {
+        if(user == null) { return; }
         String token = notificationSettings.getString("token", "");
         User toUpdate = new User();
         toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
@@ -218,6 +229,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void toggleEmailNotifications() {
+        if(user == null) { return; }
         if(binding.notificationsEmail.isChecked()) {
             binding.notificationsEmail.setChecked(false);
             editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
