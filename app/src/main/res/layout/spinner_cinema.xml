@@ -4,17 +4,17 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="48dp"
     android:gravity="center_vertical"
-    style="?attr/spinnerDropDownItemStyle">
+    android:padding="16dp">
 
-    <CheckedTextView
+    <TextView
         android:id="@+id/name"
         android:singleLine="true"
         android:layout_width="0dp"
         android:layout_weight="1.0"
         android:layout_height="wrap_content"
-        android:ellipsize="marquee"
+        android:ellipsize="end"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
         tools:text="Arnhem" />
 
     <TextView
@@ -22,7 +22,9 @@
         android:singleLine="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="marquee"
+        android:ellipsize="end"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:layout_marginStart="4dp"
         android:visibility="gone"
         tools:visibility="visible"
         tools:text="20 km" />

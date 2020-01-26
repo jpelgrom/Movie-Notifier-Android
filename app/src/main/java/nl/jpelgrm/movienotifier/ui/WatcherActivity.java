@@ -475,6 +475,10 @@ public class WatcherActivity extends AppCompatActivity {
         binding.watcherName.setText(watcher.getName());
         binding.watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
 
+        if(!binding.watcherNameWrapper.isHintAnimationEnabled()) { binding.watcherNameWrapper.setHintAnimationEnabled(true); }
+        if(!binding.watcherMovieIDWrapper.isHintAnimationEnabled()) { binding.watcherMovieIDWrapper.setHintAnimationEnabled(true); }
+        if(!binding.watcherCinemaIDWrapper.isHintAnimationEnabled()) { binding.watcherCinemaIDWrapper.setHintAnimationEnabled(true); }
+
         binding.autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
 
         DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);

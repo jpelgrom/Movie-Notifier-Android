@@ -90,10 +90,12 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/watcherNameWrapper"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_toEndOf="@+id/watcherNameIcon">
+                        android:layout_toEndOf="@+id/watcherNameIcon"
+                        app:hintAnimationEnabled="false">
 
                         <androidx.emoji.widget.EmojiAppCompatEditText
                             android:id="@+id/watcherName"
@@ -131,10 +133,12 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/watcherMovieIDWrapper"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_toEndOf="@id/watcherMovieIDIcon">
+                        android:layout_toEndOf="@id/watcherMovieIDIcon"
+                        app:hintAnimationEnabled="false">
 
                         <androidx.appcompat.widget.AppCompatEditText
                             android:id="@+id/watcherMovieID"
@@ -177,6 +181,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:layout_toEndOf="@+id/watcherCinemaIDIcon"
+                        app:hintAnimationEnabled="false"
                         app:endIconMode="none">
 
                         <nl.jpelgrm.movienotifier.ui.view.InstantAutoComplete

@@ -2,11 +2,12 @@ package nl.jpelgrm.movienotifier.ui.view;
 
 import android.content.Context;
 import android.graphics.Rect;
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import android.util.AttributeSet;
 
+import com.google.android.material.textview.MaterialAutoCompleteTextView;
+
 // Based on https://stackoverflow.com/a/5783983
-public class InstantAutoComplete extends AppCompatAutoCompleteTextView {
+public class InstantAutoComplete extends MaterialAutoCompleteTextView {
 
     public InstantAutoComplete(Context context) {
         super(context);
