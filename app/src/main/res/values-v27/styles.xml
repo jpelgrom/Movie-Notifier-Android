@@ -4,4 +4,8 @@
         <item name="android:navigationBarColor">@android:color/white</item>
         <item name="android:navigationBarDividerColor">#dcdcdc</item>
     </style>
+
+    <style name="Widget.AppTheme.BottomSheet.Versions" parent="Widget.AppTheme.BottomSheet.Base">
+        <item name="android:navigationBarColor">@color/dialogBackground</item>
+    </style>
 </resources>

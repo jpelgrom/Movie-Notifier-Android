@@ -9,8 +9,10 @@
         <item name="colorError">@color/textError</item>
 
         <item name="popupMenuStyle">@style/PropPopupMenu</item>
-        <item name="bottomSheetDialogTheme">@style/Widget.AppTheme.BottomSheet</item>
+        <item name="bottomSheetDialogTheme">@style/Widget.AppTheme.BottomSheet.Versions</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AppTheme.LargeComponent</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.Base" parent="AppTheme">
@@ -44,12 +46,13 @@
         <item name="cornerSize">@dimen/bottomsheet_radius</item>
     </style>
 
-    <style name="Widget.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+    <style name="Widget.AppTheme.BottomSheet.Base" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item> <!-- This is important -->
         <item name="android:statusBarColor">@android:color/transparent</item> <!-- And then this will be needed -->
-        <item name="android:navigationBarColor">@color/dialogBackground</item>
         <item name="android:colorBackground">@color/dialogBackground</item>
     </style>
+
+    <style name="Widget.AppTheme.BottomSheet.Versions" parent="Widget.AppTheme.BottomSheet.Base" />
 
     <style name="TextError">
         <item name="android:textColor">@color/textError</item>

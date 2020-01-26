@@ -102,11 +102,14 @@ public class WatcherActivity extends AppCompatActivity {
         binding = ActivityWatcherBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        int systemUiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            binding.getRoot().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            systemUiFlags = systemUiFlags | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        }
+        binding.getRoot().setSystemUiVisibility(systemUiFlags);
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
                 v.setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), 0);
                 return insets;
