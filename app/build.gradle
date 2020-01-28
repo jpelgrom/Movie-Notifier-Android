@@ -61,17 +61,16 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:17.0.0'
 
-    implementation 'com.google.firebase:firebase-core:17.2.2'
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
-    implementation 'androidx.work:work-runtime:2.2.0'
-    implementation 'androidx.work:work-gcm:2.2.0'
+    implementation 'androidx.work:work-runtime:2.3.0'
+    implementation 'androidx.work:work-gcm:2.3.0'
 
-    implementation 'org.apache.commons:commons-text:1.6'
+    implementation 'org.apache.commons:commons-text:1.8'
 
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.squareup.retrofit2:retrofit:2.6.2'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.2'
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
 
     debugImplementation 'com.facebook.stetho:stetho:1.5.1'
     debugImplementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
