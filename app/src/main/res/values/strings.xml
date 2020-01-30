@@ -179,6 +179,7 @@
     <string name="error_general_401">Please log in to an account or register.</string>
     <string name="error_general_exception">Oops! We encountered an error. Please make sure you have a working network connection and try again.</string>
     <string name="error_general_exception_short">Oops! Check your connection and try again.</string>
+    <string name="error_general_exception_settings">Settings</string>
     <string name="error_general_message">Oops! We encountered an issue. Please try again. You may find this information useful:\n%1$s</string>
     <string name="error_general_server">Oops! The server encountered an error. Please try again. You may find this information useful:\n%1$s</string>
     <string name="error_general_server_short">Oops! Please try again (%1$s).</string>

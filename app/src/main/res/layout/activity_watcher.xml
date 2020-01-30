@@ -438,15 +438,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/user_add_title"
-                android:visibility="gone"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/loaderErrorSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/error_general_exception_settings"
+                android:layout_marginBottom="8dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             <Button
                 android:id="@+id/loaderErrorButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/retry"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+                android:text="@string/retry"/>
 
         </LinearLayout>
 

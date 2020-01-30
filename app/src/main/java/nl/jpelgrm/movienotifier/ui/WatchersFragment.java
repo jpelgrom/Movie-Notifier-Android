@@ -1,13 +1,16 @@
 package nl.jpelgrm.movienotifier.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +49,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class WatchersFragment extends Fragment {
     public static final int PERMISSION_LOCATION_AUTOMAGIC = 153;
+    public static final int INTENT_CONNECTIVITYPANEL_LIST = 170;
 
     private FragmentWatchersBinding binding;
 
@@ -176,6 +180,10 @@ public class WatchersFragment extends Fragment {
                         if(showError) {
                             snackbar = Snackbar.make(binding.coordinator, R.string.error_general_exception_short, Snackbar.LENGTH_INDEFINITE);
                             snackbar.setAnchorView(binding.fab);
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                snackbar.setAction(R.string.error_general_exception_settings,
+                                        view -> startActivityForResult(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY), INTENT_CONNECTIVITYPANEL_LIST));
+                            }
                             snackbar.show();
                         }
                     }
@@ -431,20 +439,29 @@ public class WatchersFragment extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == INTENT_CONNECTIVITYPANEL_LIST) {
+            if (resultCode == Activity.RESULT_OK) {
+                refreshList(false, true);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case PERMISSION_LOCATION_AUTOMAGIC:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    settings.edit().putInt("prefAutomagicLocation", 1).apply();
-                    startLocation();
-                } else {
-                    snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
-                    snackbar.setAnchorView(binding.fab);
-                    snackbar.show();
-                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
-                }
-                binding.automagicSuggestion.setVisibility(View.GONE);
-                break;
+        if (requestCode == PERMISSION_LOCATION_AUTOMAGIC) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                settings.edit().putInt("prefAutomagicLocation", 1).apply();
+                startLocation();
+            } else {
+                snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+                snackbar.setAnchorView(binding.fab);
+                snackbar.show();
+                settings.edit().putInt("prefAutomagicLocation", 0).apply();
+            }
+            binding.automagicSuggestion.setVisibility(View.GONE);
         }
     }
 }

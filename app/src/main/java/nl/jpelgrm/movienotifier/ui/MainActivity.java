@@ -144,15 +144,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case WatchersFragment.PERMISSION_LOCATION_AUTOMAGIC:
-                if(getSupportFragmentManager().findFragmentByTag("watchersFragment") != null) {
-                    getSupportFragmentManager().findFragmentByTag("watchersFragment").onRequestPermissionsResult(requestCode, permissions, grantResults);
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                break;
+        if (requestCode == WatchersFragment.PERMISSION_LOCATION_AUTOMAGIC) {
+            if (getSupportFragmentManager().findFragmentByTag("watchersFragment") != null) {
+                getSupportFragmentManager().findFragmentByTag("watchersFragment").onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

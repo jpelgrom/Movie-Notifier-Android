@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -264,6 +265,13 @@ public class WatcherActivity extends AppCompatActivity {
         });
 
         binding.loaderErrorAccount.setOnClickListener(view -> startActivity(new Intent(WatcherActivity.this, AccountActivity.class)));
+        binding.loaderErrorSettings.setOnClickListener(view -> {
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+            } else {
+                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+            }
+        });
         binding.loaderErrorButton.setOnClickListener(view -> {
             binding.loaderErrorButton.setEnabled(false);
             binding.progress.setVisibility(View.VISIBLE);
@@ -397,8 +405,10 @@ public class WatcherActivity extends AppCompatActivity {
                     }
                 } else {
                     binding.progress.setVisibility(View.GONE);
+                    binding.loaderErrorSettings.setVisibility(View.GONE);
 
                     if(response.code() == 400) {
+                        binding.loaderErrorAccount.setVisibility(View.GONE);
                         binding.loaderErrorText.setText(R.string.error_watcher_400);
                         binding.loaderErrorButton.setVisibility(View.GONE);
                     } else {
@@ -426,6 +436,7 @@ public class WatcherActivity extends AppCompatActivity {
 
                 binding.loaderErrorText.setText(R.string.error_general_exception);
                 binding.loaderErrorAccount.setVisibility(View.GONE);
+                binding.loaderErrorSettings.setVisibility(View.VISIBLE);
                 binding.loaderErrorButton.setEnabled(true);
                 binding.loaderErrorButton.setVisibility(View.VISIBLE);
                 binding.loaderError.setVisibility(View.VISIBLE);
