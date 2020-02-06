@@ -1,7 +1,7 @@
 package nl.jpelgrm.movienotifier.ui;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -31,15 +31,28 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.text.WordUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -208,22 +221,45 @@ public class WatcherActivity extends AppCompatActivity {
             }
         }
 
-        binding.begin.setOnClickListener(view -> {
+        binding.watcherStart.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showDateTimePicker(true, true, watcher.getBegin());
+            showDatePicker(false);
         });
-        binding.end.setOnClickListener(view -> {
+        binding.startAfterDate.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showDateTimePicker(true, false, watcher.getEnd());
+            showDatePicker(false);
         });
-
-        binding.filterStartAfter.setOnClickListener(view -> {
+        binding.startAfterTime.setOnClickListener(v -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showDateTimePicker(false, true, watcher.getFilters().getStartAfter());
+            showTimePicker(false, true, watcher.getFilters().getStartAfter());
         });
-        binding.filterStartBefore.setOnClickListener(view -> {
+        binding.startBeforeDate.setOnClickListener(view -> {
             InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showDateTimePicker(false, false, watcher.getFilters().getStartBefore());
+            showDatePicker(false);
+        });
+        binding.startBeforeTime.setOnClickListener(v -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showTimePicker(false, false, watcher.getFilters().getStartBefore());
+        });
+        binding.active.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDatePicker(true);
+        });
+        binding.beginDate.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDatePicker(true);
+        });
+        binding.beginTime.setOnClickListener(v -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showTimePicker(true, true, watcher.getBegin());
+        });
+        binding.endDate.setOnClickListener(view -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showDatePicker(true);
+        });
+        binding.endTime.setOnClickListener(v -> {
+            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            showTimePicker(true, false, watcher.getEnd());
         });
 
         binding.filterRegularShowing.setOnCheckedChangeListener((buttonView, isChecked) -> validateAndUpdateExperiences());
@@ -278,7 +314,7 @@ public class WatcherActivity extends AppCompatActivity {
             setupWatcher();
         });
 
-        // Al ready to go!
+        // All ready to go!
         setupWatcher();
     }
 
@@ -322,6 +358,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NewApi")
     private void setupWatcher() {
         if(getIntent().getExtras() != null && !getIntent().getExtras().getString("id", "").equals("")) {
             id = getIntent().getExtras().getString("id");
@@ -340,11 +377,20 @@ public class WatcherActivity extends AppCompatActivity {
             if(sharedMovieID != null && sharedMovieID > 0) {
                 watcher.setMovieID(sharedMovieID);
             }
+
             watcher.setBegin(System.currentTimeMillis());
-            watcher.setEnd(System.currentTimeMillis() + oneWeek);
+            LocalDate nextMonday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+            LocalTime ninePm = LocalTime.of(21, 0);
+            watcher.setEnd(LocalDateTime.of(nextMonday, ninePm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
+
             watcher.getFilters().setCinemaID(settings.getInt("prefSelectedCinema", 0));
-            watcher.getFilters().setStartAfter(System.currentTimeMillis() + oneWeek);
-            watcher.getFilters().setStartBefore(System.currentTimeMillis() + oneWeek + oneWeek);
+
+            LocalDate nextWednesday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
+            LocalDate nextNextWednesday = nextWednesday.with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
+            LocalTime tenAm = LocalTime.of(10, 0);
+            LocalTime elevenPm = LocalTime.of(23, 0);
+            watcher.getFilters().setStartAfter(LocalDateTime.of(nextWednesday, tenAm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
+            watcher.getFilters().setStartBefore(LocalDateTime.of(nextNextWednesday, elevenPm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
 
             mode = Mode.EDITING;
 
@@ -492,11 +538,20 @@ public class WatcherActivity extends AppCompatActivity {
 
         binding.autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
 
-        DateFormat format = SimpleDateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT);
-        binding.begin.setValue(format.format(new Date(watcher.getBegin())));
-        binding.end.setValue(format.format(new Date(watcher.getEnd())));
-        binding.filterStartAfter.setValue(format.format(new Date(watcher.getFilters().getStartAfter())));
-        binding.filterStartBefore.setValue(format.format(new Date(watcher.getFilters().getStartBefore())));
+        DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+        DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
+        Date watcherBegin = new Date(watcher.getBegin());
+        Date watcherEnd = new Date(watcher.getEnd());
+        binding.beginDate.setText(dateFormat.format(watcherBegin));
+        binding.beginTime.setText(timeFormat.format(watcherBegin));
+        binding.endDate.setText(dateFormat.format(watcherEnd));
+        binding.endTime.setText(timeFormat.format(watcherEnd));
+        Date watcherStartAfter = new Date(watcher.getFilters().getStartAfter());
+        Date watcherStartBefore = new Date(watcher.getFilters().getStartBefore());
+        binding.startAfterDate.setText(dateFormat.format(watcherStartAfter));
+        binding.startAfterTime.setText(timeFormat.format(watcherStartAfter));
+        binding.startBeforeDate.setText(dateFormat.format(watcherStartBefore));
+        binding.startBeforeTime.setText(timeFormat.format(watcherStartBefore));
 
         updateViewsFilters();
 
@@ -584,10 +639,16 @@ public class WatcherActivity extends AppCompatActivity {
         binding.watcherCinemaID.setFocusableInTouchMode(editable);
         binding.watcherCinemaID.setCursorVisible(editable);
 
-        binding.begin.setClickable(editable);
-        binding.end.setClickable(editable);
-        binding.filterStartAfter.setClickable(editable);
-        binding.filterStartBefore.setClickable(editable);
+        binding.watcherStart.setClickable(editable);
+        binding.startAfterDate.setClickable(editable);
+        binding.startAfterTime.setClickable(editable);
+        binding.startBeforeDate.setClickable(editable);
+        binding.startBeforeTime.setClickable(editable);
+        binding.active.setClickable(editable);
+        binding.beginDate.setClickable(editable);
+        binding.beginTime.setClickable(editable);
+        binding.endDate.setClickable(editable);
+        binding.endTime.setClickable(editable);
 
         binding.filterRegularShowing.setClickable(editable);
         binding.filterRegularShowing.setVisibility(editable ? View.VISIBLE : (binding.filterRegularShowing.isChecked() ? View.VISIBLE : View.GONE));
@@ -627,41 +688,91 @@ public class WatcherActivity extends AppCompatActivity {
         binding.fab.show();
     }
 
-    private void showDateTimePicker(final boolean checkingValue, final boolean beginValue, long currentValue) {
-        final Calendar current = Calendar.getInstance();
+    @SuppressLint("NewApi")
+    private void showDatePicker(boolean checkingValue) {
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
+        Pair<Long, Long> selectedRange;
+        if(checkingValue) {
+            selectedRange = new Pair<>(watcher.getBegin(), watcher.getEnd());
+        } else {
+            selectedRange = new Pair<>(watcher.getFilters().getStartAfter(), watcher.getFilters().getStartBefore());
+        }
+
+        long startOfFirstDateInMillis = ZonedDateTime.ofInstant(Instant.ofEpochSecond(selectedRange.first/1000), ZoneId.systemDefault())
+                .with(ChronoField.HOUR_OF_DAY, 0).with(ChronoField.MINUTE_OF_DAY, 0).with(ChronoField.SECOND_OF_MINUTE, 0)
+                .toEpochSecond() * 1000L;
+        long startOfTodayInMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault())
+                .toEpochSecond() * 1000L;
+
+        builder.setSelection(selectedRange);
+        builder.setCalendarConstraints(new CalendarConstraints.Builder()
+                .setStart(Math.min(System.currentTimeMillis() - 1000L, selectedRange.first))
+                .setOpenAt(selectedRange.first)
+                .setValidator(DateValidatorPointForward.from(Math.min(startOfFirstDateInMillis, startOfTodayInMillis)))
+                .build());
+        builder.setTitleText(checkingValue ? R.string.watcher_date_title_dialog : R.string.watcher_filter_title_startafter_dialog);
+        MaterialDatePicker picker = builder.build();
+        picker.addOnPositiveButtonClickListener(selection -> {
+            LocalTime startTime, endTime;
+            if(checkingValue) {
+                startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getBegin()), ZoneId.systemDefault()).toLocalTime();
+                endTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getEnd()), ZoneId.systemDefault()).toLocalTime();
+            } else {
+                startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartAfter()), ZoneId.systemDefault()).toLocalTime();
+                endTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartBefore()), ZoneId.systemDefault()).toLocalTime();
+            }
+
+            Pair<Long, Long> newDates = (Pair<Long, Long>) selection;
+            LocalDate startDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(newDates.first), ZoneId.systemDefault()).toLocalDate();
+            LocalDate endDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(newDates.second), ZoneId.systemDefault()).toLocalDate();
+
+            long newStart = LocalDateTime.of(startDate, startTime).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
+            long newEnd = LocalDateTime.of(endDate, endTime).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
+
+            if(checkingValue) {
+                watcher.setBegin(newStart);
+                watcher.setEnd(newEnd);
+                validateAndFixEnd();
+            } else {
+                watcher.getFilters().setStartAfter(newStart);
+                watcher.getFilters().setStartBefore(newEnd);
+                validateAndFixStartBefore();
+            }
+
+            updateViews();
+        });
+        picker.show(getSupportFragmentManager(), checkingValue ? "watcherActivePicker" : "watcherStartPicker");
+    }
+
+    private void showTimePicker(boolean checkingValue, boolean beginValue, long currentValue) {
+        Calendar current = Calendar.getInstance();
         current.setTimeInMillis(currentValue);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (datePicker, year, month, day) -> {
-            final int mYear = year;
-            final int mMonth = month;
-            final int mDay = day;
-            TimePickerDialog timePickerDialog = new TimePickerDialog(WatcherActivity.this, (timePicker, hour, minute) -> {
-                Calendar setTo = Calendar.getInstance();
-                setTo.set(mYear, mMonth, mDay, hour, minute, 0);
-                if(checkingValue) {
-                    if(beginValue) {
-                        watcher.setBegin(setTo.getTimeInMillis());
-                        validateAndFixEnd();
-                    } else {
-                        watcher.setEnd(setTo.getTimeInMillis());
-                        validateAndFixBegin();
-                    }
+        TimePickerDialog picker = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+            Calendar setTo = Calendar.getInstance();
+            setTo.setTimeInMillis(currentValue);
+            setTo.set(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, 0);
+            if(checkingValue) {
+                if(beginValue) {
+                    watcher.setBegin(setTo.getTimeInMillis());
+                    validateAndFixEnd();
                 } else {
-                    if(beginValue) {
-                        watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
-                        validateAndFixStartBefore();
-                    } else {
-                        watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
-                        validateAndFixStartAfter();
-                    }
+                    watcher.setEnd(setTo.getTimeInMillis());
+                    validateAndFixBegin();
                 }
+            } else {
+                if(beginValue) {
+                    watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
+                    validateAndFixStartBefore();
+                } else {
+                    watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
+                    validateAndFixStartAfter();
+                }
+            }
 
-                updateViews();
-            }, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), android.text.format.DateFormat.is24HourFormat(WatcherActivity.this));
-            timePickerDialog.show();
-        }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000L);
-        datePickerDialog.show();
+            updateViews();
+        }, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), android.text.format.DateFormat.is24HourFormat(this));
+        picker.show();
     }
 
     private boolean validateName(boolean forced) {
@@ -811,7 +922,7 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private boolean validateAndUpdate3D() {
-        if(updatingViews) {
+        if(updatingViews || watcher == null) {
             return false;
         }
         if(watcher.getFilters() == null) {
@@ -828,7 +939,7 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private boolean validateAndUpdateExperiences() {
-        if(updatingViews) {
+        if(updatingViews || watcher == null) {
             return false;
         }
 

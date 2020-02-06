@@ -240,33 +240,185 @@
                     android:paddingEnd="?listPreferredItemPaddingRight"
                     style="@style/TextMaterialSubheader"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/begin"
+                <LinearLayout
+                    android:id="@+id/watcherStart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_notifications_active"
-                    app:detailTitle="@string/watcher_date_title_begin"/>
+                    android:minHeight="?attr/listPreferredItemHeightSmall"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/end"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_notifications_off"
-                    app:detailTitle="@string/watcher_date_title_end"/>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="32dp"
+                        app:srcCompat="@drawable/ic_event"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterStartAfter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_today"
-                    app:detailTitle="@string/watcher_filter_title_startafter"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.AppCompat.Body1"
+                        android:text="@string/watcher_filter_title_startafter"/>
 
-                <nl.jpelgrm.movienotifier.ui.view.DoubleRowIconPreferenceView
-                    android:id="@+id/filterStartBefore"
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/listPreferredItemHeightSmall"
+                    android:gravity="center_vertical"
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                    <TextView
+                        android:id="@+id/startAfterDate"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="Jan 5, 2020"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/startAfterTime"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <TextView
+                        android:id="@+id/startAfterTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="48dp"
+                        android:gravity="end|center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="10:00"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/listPreferredItemHeightSmall"
+                    android:gravity="center_vertical"
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                    <TextView
+                        android:id="@+id/startBeforeDate"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="Jan 12, 2020"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/startBeforeTime"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <TextView
+                        android:id="@+id/startBeforeTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="48dp"
+                        android:gravity="end|center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="22:00"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/active"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:detailIcon="@drawable/ic_event"
-                    app:detailTitle="@string/watcher_filter_title_startbefore"/>
+                    android:minHeight="?attr/listPreferredItemHeightSmall"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingStart="?attr/listPreferredItemPaddingLeft"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="32dp"
+                        app:srcCompat="@drawable/ic_notifications_active"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.AppCompat.Body1"
+                        android:text="@string/watcher_date_title_begin"/>
+
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/listPreferredItemHeightSmall"
+                    android:gravity="center_vertical"
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                    <TextView
+                        android:id="@+id/beginDate"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="Jan 5, 2020"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/beginTime"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <TextView
+                        android:id="@+id/beginTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="48dp"
+                        android:gravity="end|center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="10:00"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/listPreferredItemHeightSmall"
+                    android:gravity="center_vertical"
+                    android:paddingStart="72dp"
+                    android:paddingEnd="?attr/listPreferredItemPaddingRight">
+
+                    <TextView
+                        android:id="@+id/endDate"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="Jan 12, 2020"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/endTime"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <TextView
+                        android:id="@+id/endTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:minWidth="48dp"
+                        android:gravity="end|center_vertical"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        tools:text="22:00"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
                     android:layout_width="match_parent"

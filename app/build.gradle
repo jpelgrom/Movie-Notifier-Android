@@ -37,6 +37,7 @@ android {
                 files("$projectDir/schemas".toString())
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -46,9 +47,12 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.4'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "androidx.core:core:1.2.0"
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
     implementation 'androidx.emoji:emoji-appcompat:1.0.0'
@@ -63,8 +67,8 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
-    implementation 'androidx.work:work-runtime:2.3.0'
-    implementation 'androidx.work:work-gcm:2.3.0'
+    implementation 'androidx.work:work-runtime:2.3.1'
+    implementation 'androidx.work:work-gcm:2.3.1'
 
     implementation 'org.apache.commons:commons-text:1.8'
 
