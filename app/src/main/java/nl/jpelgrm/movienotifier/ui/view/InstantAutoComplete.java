@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 
-import com.google.android.material.textview.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 // Based on https://stackoverflow.com/a/5783983
 public class InstantAutoComplete extends MaterialAutoCompleteTextView {

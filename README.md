@@ -6,6 +6,6 @@ An Android front end application for interacting with a [Movie Notifier](https:/
 
 ## Building
 
- - *Requires* Android Studio 4.0 Canary 9 or newer.
+ - *Requires* Android Studio 4.2 Canary 10 or newer.
  - Add the `google-services.json` file from your Firebase project to the `app` module.
  - Make sure to add a `gradle.properties` file in the root of the project. An example of the file is [included](https://github.com/jpelgrom/Movie-Notifier-Android/blob/master/gradle.properties.example).
