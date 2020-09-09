@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <queries>
+        <package android:name="net.sharewire.Pathe2" />
+    </queries>
+
     <application
         android:name=".MovieNotifierApp"
         android:allowBackup="true"
