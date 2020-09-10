@@ -88,6 +88,7 @@ public class WatcherActivity extends AppCompatActivity {
     private ActivityWatcherBinding binding;
 
     private Snackbar snackbar;
+    private boolean snackbarForPermission = false;
 
     private SharedPreferences settings;
 
@@ -208,7 +209,9 @@ public class WatcherActivity extends AppCompatActivity {
             }
         });
 
-        if(settings.getInt("prefAutocompleteLocation", -1) == -1) {
+        int autocompletePref = settings.getInt("prefAutocompleteLocation", -1);
+        if(autocompletePref == -1 || (autocompletePref == 1 && !isFinishing()
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             binding.autocompleteSuggestion.setOnClickListener(view -> askForLocation());
             binding.autocompleteSuggestionCancel.setOnClickListener(view -> {
                 settings.edit().putInt("prefAutocompleteLocation", 0).apply();
@@ -216,7 +219,7 @@ public class WatcherActivity extends AppCompatActivity {
             });
         } else {
             binding.autocompleteSuggestion.setVisibility(View.GONE);
-            if(settings.getInt("prefAutocompleteLocation", -1) == 1) {
+            if(autocompletePref == 1) {
                 startLocation();
             }
         }
@@ -409,9 +412,10 @@ public class WatcherActivity extends AppCompatActivity {
         super.onResume();
         settings = getSharedPreferences("settings", MODE_PRIVATE);
 
-        if(snackbar != null && snackbar.isShown()) {
+        if(snackbar != null && snackbar.isShown() && !snackbarForPermission) {
             snackbar.dismiss();
         }
+        snackbarForPermission = false;
     }
 
     @Override
@@ -536,7 +540,10 @@ public class WatcherActivity extends AppCompatActivity {
         if(!binding.watcherMovieIDWrapper.isHintAnimationEnabled()) { binding.watcherMovieIDWrapper.setHintAnimationEnabled(true); }
         if(!binding.watcherCinemaIDWrapper.isHintAnimationEnabled()) { binding.watcherCinemaIDWrapper.setHintAnimationEnabled(true); }
 
-        binding.autocompleteSuggestion.setVisibility((mode == Mode.EDITING && settings.getInt("prefAutocompleteLocation", -1) == -1) ? View.VISIBLE : View.GONE);
+        int autocompletePref = settings.getInt("prefAutocompleteLocation", -1);
+        boolean autocompleteShouldBeShown = (autocompletePref == -1 || (autocompletePref == 1 && !isFinishing()
+            && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED));
+        binding.autocompleteSuggestion.setVisibility((mode == Mode.EDITING && autocompleteShouldBeShown) ? View.VISIBLE : View.GONE);
 
         DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
         DateFormat timeFormat = SimpleDateFormat.getTimeInstance(DateFormat.SHORT);
@@ -1234,13 +1241,21 @@ public class WatcherActivity extends AppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
                     startLocation();
+                    binding.autocompleteSuggestion.setVisibility(View.GONE);
                 } else {
+                    snackbarForPermission = true;
                     snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.fab);
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> ActivityCompat.requestPermissions(WatcherActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOCOMPLETE));
+                    } else {
+                        Intent settingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+                        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> startActivity(settingsIntent));
+                    }
                     snackbar.show();
-                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
+                    binding.autocompleteSuggestion.setVisibility(settings.getInt("prefAutocompleteLocation", -1) == 0 ? View.GONE : View.VISIBLE);
                 }
-                binding.autocompleteSuggestion.setVisibility(View.GONE);
                 break;
             }
             default:

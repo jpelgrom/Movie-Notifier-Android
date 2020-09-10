@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -65,6 +66,7 @@ public class WatchersFragment extends Fragment {
     private Location locationUser = null;
 
     private Snackbar snackbar;
+    private boolean snackbarForPermission = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,14 +104,16 @@ public class WatchersFragment extends Fragment {
 
         binding.fab.setOnClickListener(view1 -> startActivity(new Intent(getContext(), WatcherActivity.class)));
 
-        if(settings.getInt("prefAutomagicLocation", -1) == -1) {
+        int automagicPref = settings.getInt("prefAutomagicLocation", -1);
+        if(automagicPref == -1 || (automagicPref == 1 && getContext() != null
+                && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             binding.automagicSuggestion.setOnClickListener(view2 -> askForLocation());
             binding.automagicSuggestionCancel.setOnClickListener(view3 -> {
                 settings.edit().putInt("prefAutomagicLocation", 0).apply();
                 binding.automagicSuggestion.setVisibility(View.GONE);
             });
         } else {
-            if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
+            if(automagicPref == 1 && settings.getInt("listSort", 0) == 0) {
                 startLocation();
             }
         }
@@ -120,9 +124,10 @@ public class WatchersFragment extends Fragment {
         super.onResume();
         settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
 
-        if(snackbar != null && snackbar.isShown()) {
+        if(snackbar != null && snackbar.isShown() && !snackbarForPermission) {
             snackbar.dismiss();
         }
+        snackbarForPermission = false;
 
         refreshList(false, true);
         if(settings.getInt("prefAutomagicLocation", -1) == 1 && settings.getInt("listSort", 0) == 0) {
@@ -322,7 +327,9 @@ public class WatchersFragment extends Fragment {
             binding.emptyView.setVisibility(View.GONE);
             binding.listRecycler.setVisibility(View.VISIBLE);
 
-            if(sort == 0 && settings.getInt("prefAutomagicLocation", -1) == -1) {
+            int automagicPref = settings.getInt("prefAutomagicLocation", -1);
+            if(sort == 0 && (automagicPref == -1 || (automagicPref == 1 && getContext() != null
+                    && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED))) {
                 binding.automagicSuggestion.setVisibility(View.VISIBLE);
             } else {
                 binding.automagicSuggestion.setVisibility(View.GONE);
@@ -455,13 +462,23 @@ public class WatchersFragment extends Fragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 settings.edit().putInt("prefAutomagicLocation", 1).apply();
                 startLocation();
+                binding.automagicSuggestion.setVisibility(View.GONE);
             } else {
+                snackbarForPermission = true;
                 snackbar = Snackbar.make(binding.coordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
                 snackbar.setAnchorView(binding.fab);
+                if(getActivity() != null) {
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION_AUTOMAGIC));
+                    } else {
+                        Intent settingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()));
+                        settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> startActivity(settingsIntent));
+                    }
+                }
                 snackbar.show();
-                settings.edit().putInt("prefAutomagicLocation", 0).apply();
+                binding.automagicSuggestion.setVisibility(settings.getInt("prefAutomagicLocation", -1) == 0 ? View.GONE : View.VISIBLE);
             }
-            binding.automagicSuggestion.setVisibility(View.GONE);
         }
     }
 }

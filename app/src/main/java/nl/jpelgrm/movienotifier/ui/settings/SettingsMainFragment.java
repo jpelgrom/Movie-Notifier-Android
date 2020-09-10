@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -222,12 +224,6 @@ public class SettingsMainFragment extends Fragment {
         }
 
         boolean granted = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        if(settings.getInt("prefAutocompleteLocation", -1) == 1 && !granted) {
-            settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // Turn off, we won't get the location anyway
-        }
-        if(settings.getInt("prefAutomagicLocation", -1) == 1 && !granted) {
-            settings.edit().putInt("prefAutomagicLocation", 0).apply(); // Turn off, we won't get the location anyway
-        }
         binding.autocomplete.setChecked(settings.getInt("prefAutocompleteLocation", -1) == 1 && granted);
         binding.automagic.setChecked(settings.getInt("prefAutomagicLocation", -1) == 1 && granted);
 
@@ -333,6 +329,20 @@ public class SettingsMainFragment extends Fragment {
         }
     }
 
+    private void showLocationDeniedError(final int requestCode) {
+        Snackbar snackbar = Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG);
+        if(getActivity() != null) {
+            if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode));
+            } else {
+                Intent settingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()));
+                settingsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                snackbar.setAction(R.string.settings_general_location_permission_systemsettings, view -> startActivity(settingsIntent));
+            }
+        }
+        snackbar.show();
+    }
+
     private void updateAccountsList() {
         AsyncTask.execute(() -> {
             AppDatabase db = AppDatabase.getInstance(getContext());
@@ -371,18 +381,14 @@ public class SettingsMainFragment extends Fragment {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutocompleteLocation", 1).apply();
                 } else {
-                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
-                    settings.edit().putInt("prefAutocompleteLocation", 0).apply();
-                    settings.edit().putInt("prefAutomagicLocation", 0).apply(); // The other one also won't be possible now
+                    showLocationDeniedError(requestCode);
                 }
                 break;
             case PERMISSION_LOCATION_AUTOMAGIC:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     settings.edit().putInt("prefAutomagicLocation", 1).apply();
                 } else {
-                    Snackbar.make(binding.settingsCoordinator, R.string.settings_general_location_permission_denied, Snackbar.LENGTH_LONG).show();
-                    settings.edit().putInt("prefAutomagicLocation", 0).apply();
-                    settings.edit().putInt("prefAutocompleteLocation", 0).apply(); // The other one also won't be possible now
+                    showLocationDeniedError(requestCode);
                 }
                 break;
         }
