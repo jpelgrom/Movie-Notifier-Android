@@ -3,25 +3,23 @@ package nl.jpelgrm.movienotifier;
 import android.app.Application;
 import android.os.Build;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
-import androidx.core.provider.FontRequest;
-import androidx.appcompat.app.AppCompatDelegate;
-
-import java.util.concurrent.TimeUnit;
-
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
+
+import java.util.concurrent.TimeUnit;
+
 import nl.jpelgrm.movienotifier.service.CinemaUpdateWorker;
-import nl.jpelgrm.movienotifier.util.StethoUtil;
 
 public class MovieNotifierApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        StethoUtil.install(this);
 
         AppCompatDelegate.setDefaultNightMode(getSharedPreferences("settings", MODE_PRIVATE)
                 .getInt("prefDarkTheme", Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM : AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY));
