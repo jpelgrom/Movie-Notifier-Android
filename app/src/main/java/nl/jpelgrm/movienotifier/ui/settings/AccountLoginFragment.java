@@ -138,14 +138,14 @@ public class AccountLoginFragment extends Fragment {
         setFieldsEnabled(false);
         setProgressVisible(true);
 
-        Call<User> call = APIHelper.getInstance().login(user);
+        Call<User> call = APIHelper.INSTANCE.getInstance().login(user);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     AsyncTask.execute(() -> {
-                        AppDatabase.getInstance(getContext()).users().add(received);
+                        AppDatabase.Companion.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         if(getActivity() != null && !getActivity().isFinishing() && getContext() != null) {
                             SharedPreferences notificationSettings = getActivity().getSharedPreferences("notifications", Context.MODE_PRIVATE);

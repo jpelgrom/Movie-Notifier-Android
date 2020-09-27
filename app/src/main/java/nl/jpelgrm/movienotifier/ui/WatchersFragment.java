@@ -72,7 +72,7 @@ public class WatchersFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppDatabase.getInstance(getContext()).cinemas().getCinemas()
+        AppDatabase.Companion.getInstance(getContext()).cinemas().getCinemas()
                 .observe(this, cinemas -> this.cinemas = cinemas);
 
         settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
@@ -151,7 +151,7 @@ public class WatchersFragment extends Fragment {
             binding.listSwiper.setRefreshing(true);
 
             if(!settings.getString("userID", "").equals("")) {
-                Call<List<Watcher>> call = APIHelper.getInstance().getWatchers(settings.getString("userAPIKey", ""));
+                Call<List<Watcher>> call = APIHelper.INSTANCE.getInstance().getWatchers(settings.getString("userAPIKey", ""));
                 call.enqueue(new Callback<List<Watcher>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<Watcher>> call, @NonNull Response<List<Watcher>> response) {
@@ -363,7 +363,7 @@ public class WatchersFragment extends Fragment {
                 binding.progress.setVisibility(View.VISIBLE);
                 binding.listRecycler.setClickable(false);
 
-                Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
+                Call<ResponseBody> call = APIHelper.INSTANCE.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {

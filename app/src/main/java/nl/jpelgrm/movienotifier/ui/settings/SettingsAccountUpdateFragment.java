@@ -87,7 +87,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
             ViewCompat.requestApplyInsets(binding.main);
         }
 
-        AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
+        AppDatabase.Companion.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
             this.user = user;
             updateDefaultTextValue();
         });
@@ -251,7 +251,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
         binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
+        Call<User> call = APIHelper.INSTANCE.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -260,7 +260,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
                 if(response.code() == 200) {
                     User received = response.body();
-                    AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
+                    AsyncTask.execute(() -> AppDatabase.Companion.getInstance(getContext()).users().update(received));
                     if(!user.getName().equals(received.getName())) {
                         NotificationUtil.createUserGroup(getContext(), received);
                     }

@@ -95,7 +95,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
             ViewCompat.requestApplyInsets(binding.main);
         }
 
-        AppDatabase.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
+        AppDatabase.Companion.getInstance(getContext()).users().getUserById(id).observe(this, user -> {
             if(user != null) {
                 this.user = user;
                 updateValues();
@@ -245,7 +245,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
+        Call<User> call = APIHelper.INSTANCE.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -254,7 +254,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
                 if(response.code() == 200) {
                     User received = response.body();
-                    AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
+                    AsyncTask.execute(() -> AppDatabase.Companion.getInstance(getContext()).users().update(received));
                     user = received;
 
                     Snackbar.make(binding.accountCoordinator, R.string.user_settings_general_success, Snackbar.LENGTH_SHORT).show();
@@ -296,7 +296,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         binding.progress.setVisibility(View.VISIBLE);
         setFieldsEnabled(false);
 
-        Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
+        Call<User> call = APIHelper.INSTANCE.getInstance().getUser(user.getApikey(), user.getId());
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -306,7 +306,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                 if(response.code() == 200 && response.body() != null) {
                     User received = response.body();
                     if(received != null) {
-                        AsyncTask.execute(() -> AppDatabase.getInstance(getContext()).users().update(received));
+                        AsyncTask.execute(() -> AppDatabase.Companion.getInstance(getContext()).users().update(received));
                         if(!user.getName().equals(received.getName())) {
                             NotificationUtil.createUserGroup(getContext(), received);
                         }
@@ -357,7 +357,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         if(toUpdate.getFcmTokens().contains(token)) {
             toUpdate.getFcmTokens().remove(token);
 
-            Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
+            Call<User> call = APIHelper.INSTANCE.getInstance().updateUser(user.getApikey(), user.getId(), toUpdate);
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -399,7 +399,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         }
 
         AsyncTask.execute(() -> {
-            AppDatabase.getInstance(getContext()).users().delete(user);
+            AppDatabase.Companion.getInstance(getContext()).users().delete(user);
             NotificationUtil.cleanupPreferencesForUser(getContext(), user.getId());
 
             if(getActivity() != null && !getActivity().isFinishing()) {
@@ -436,7 +436,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
             final boolean isThisUser = user.getId().equals(settings.getString("userID", ""));
 
-            Call<ResponseBody> call = APIHelper.getInstance().deleteUser(user.getApikey(), user.getId());
+            Call<ResponseBody> call = APIHelper.INSTANCE.getInstance().deleteUser(user.getApikey(), user.getId());
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -450,7 +450,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
                             settings.edit().putString("userID", "").putString("userAPIKey", "").apply();
                         }
                         AsyncTask.execute(() -> {
-                            AppDatabase.getInstance(getContext()).users().delete(user);
+                            AppDatabase.Companion.getInstance(getContext()).users().delete(user);
                             NotificationUtil.cleanupPreferencesForUser(getContext(), user.getId());
 
                             if(getActivity() != null && !getActivity().isFinishing()) {

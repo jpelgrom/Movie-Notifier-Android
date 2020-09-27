@@ -34,7 +34,7 @@ public class FcmRefreshWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        AppDatabase db = AppDatabase.Companion.getInstance(getApplicationContext());
         SharedPreferences settings = getApplicationContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
 
         // 1. Update data for existing users before starting.
@@ -43,7 +43,7 @@ public class FcmRefreshWorker extends Worker {
         if(userToUpdate == null) {
             users = db.users().getUsersSynchronous();
             for(User user: users) {
-                Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
+                Call<User> call = APIHelper.INSTANCE.getInstance().getUser(user.getApikey(), user.getId());
                 try {
                     Response<User> response = call.execute();
                     if(response.code() == 200) {
@@ -94,7 +94,7 @@ public class FcmRefreshWorker extends Worker {
 
             if(changed) {
                 user.setFcmTokens(userFcmTokens);
-                Call<User> call = APIHelper.getInstance().updateUser(user.getApikey(), user.getId(), user);
+                Call<User> call = APIHelper.INSTANCE.getInstance().updateUser(user.getApikey(), user.getId(), user);
                 try {
                     Response<User> response = call.execute();
                     if(response.code() == 200) {

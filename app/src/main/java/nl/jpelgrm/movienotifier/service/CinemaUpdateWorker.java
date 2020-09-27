@@ -36,8 +36,8 @@ public class CinemaUpdateWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
-        update = APIHelper.getInstance().getCinemas();
+        AppDatabase db = AppDatabase.Companion.getInstance(getApplicationContext());
+        update = APIHelper.INSTANCE.getInstance().getCinemas();
 
         try {
             Response<List<Cinema>> response = update.execute();

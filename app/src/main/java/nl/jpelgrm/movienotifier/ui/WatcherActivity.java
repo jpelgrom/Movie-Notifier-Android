@@ -152,7 +152,7 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         setupSharedInfo();
-        AppDatabase.getInstance(this).cinemas().getCinemas().observe(this, cinemas -> {
+        AppDatabase.Companion.getInstance(this).cinemas().getCinemas().observe(this, cinemas -> {
             this.cinemas = cinemas;
 
             if(cinemaIDAdapter != null) {
@@ -432,7 +432,7 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void getWatcher() {
-        Call<Watcher> call = APIHelper.getInstance().getWatcher(settings.getString("userAPIKey", ""), id);
+        Call<Watcher> call = APIHelper.INSTANCE.getInstance().getWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<Watcher>() {
             @Override
             public void onResponse(@NonNull Call<Watcher> call, @NonNull Response<Watcher> response) {
@@ -497,7 +497,7 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void clearNotifications() {
         AsyncTask.execute(() -> {
-            List<Notification> notifications = AppDatabase.getInstance(WatcherActivity.this).notifications().getNotificationsForWatcher(id);
+            List<Notification> notifications = AppDatabase.Companion.getInstance(WatcherActivity.this).notifications().getNotificationsForWatcher(id);
             if(notifications != null && notifications.size() > 0) {
                 NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 if(manager == null) { return; }
@@ -990,9 +990,9 @@ public class WatcherActivity extends AppCompatActivity {
 
             if(id == null || id.equals("") || !watcher.getUserID().equals(settings.getString("userID", ""))) { // Create
                 toSave.setUserID(settings.getString("userID", ""));
-                call = APIHelper.getInstance().addWatcher(settings.getString("userAPIKey", ""), toSave);
+                call = APIHelper.INSTANCE.getInstance().addWatcher(settings.getString("userAPIKey", ""), toSave);
             } else { // Update
-                call = APIHelper.getInstance().updateWatcher(settings.getString("userAPIKey", ""), id, toSave);
+                call = APIHelper.INSTANCE.getInstance().updateWatcher(settings.getString("userAPIKey", ""), id, toSave);
             }
 
             call.enqueue(new Callback<Watcher>() {
@@ -1047,7 +1047,7 @@ public class WatcherActivity extends AppCompatActivity {
         binding.watcherError.setVisibility(View.GONE);
         setFieldsEnabled(false);
 
-        Call<ResponseBody> call = APIHelper.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
+        Call<ResponseBody> call = APIHelper.INSTANCE.getInstance().deleteWatcher(settings.getString("userAPIKey", ""), id);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {

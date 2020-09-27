@@ -78,7 +78,7 @@ public class SettingsMainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppDatabase db = AppDatabase.getInstance(getContext());
+        AppDatabase db = AppDatabase.Companion.getInstance(getContext());
         db.cinemas().getCinemas().observe(this, cinemas -> {
             // Data
             Collections.sort(cinemas, (c1, c2) -> c1.getName().compareTo(c2.getName()));
@@ -345,11 +345,11 @@ public class SettingsMainFragment extends Fragment {
 
     private void updateAccountsList() {
         AsyncTask.execute(() -> {
-            AppDatabase db = AppDatabase.getInstance(getContext());
+            AppDatabase db = AppDatabase.Companion.getInstance(getContext());
             users = db.users().getUsersSynchronous();
 
             for(final User user : users) {
-                Call<User> call = APIHelper.getInstance().getUser(user.getApikey(), user.getId());
+                Call<User> call = APIHelper.INSTANCE.getInstance().getUser(user.getApikey(), user.getId());
                 try {
                     Response<User> response = call.execute();
                     if(response.code() == 200) {

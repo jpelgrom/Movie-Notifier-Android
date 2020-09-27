@@ -48,7 +48,7 @@ public class MessagingService extends FirebaseMessagingService {
             movieID = Integer.parseInt(sMovieID);
             matches = Integer.parseInt(sMatches);
 
-            List<User> dbUsers = AppDatabase.getInstance(getApplicationContext()).users().getUsersSynchronous();
+            List<User> dbUsers = AppDatabase.Companion.getInstance(getApplicationContext()).users().getUsersSynchronous();
             User foundUser = null;
             for(User dbUser: dbUsers) {
                 if(dbUser.getId().equals(userID)) {
@@ -58,7 +58,7 @@ public class MessagingService extends FirebaseMessagingService {
             }
             if(foundUser != null) {
                 Notification dbNotification = new Notification(remoteMessage.getSentTime(), userID, watcherID, watcherName, movieID, matches, body);
-                AppDatabase.getInstance(getApplicationContext()).notifications().add(dbNotification);
+                AppDatabase.Companion.getInstance(getApplicationContext()).notifications().add(dbNotification);
 
                 // Notify the user
                 sendNotification(dbNotification, foundUser, dbUsers.size() > 1);

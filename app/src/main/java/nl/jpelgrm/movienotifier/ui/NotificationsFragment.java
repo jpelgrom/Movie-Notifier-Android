@@ -39,7 +39,7 @@ public class NotificationsFragment extends Fragment {
 
         settings = getContext().getSharedPreferences("settings", MODE_PRIVATE);
 
-        db = AppDatabase.getInstance(getContext());
+        db = AppDatabase.Companion.getInstance(getContext());
         notifications = Transformations.switchMap(userId, input -> {
             PagedList.Config config = new PagedList.Config.Builder().setPageSize(10).setEnablePlaceholders(false).build();
             return new LivePagedListBuilder<>(db.notifications().getNotificationsForUser(input), config).build();

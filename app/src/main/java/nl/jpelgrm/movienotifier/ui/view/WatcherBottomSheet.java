@@ -47,7 +47,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppDatabase.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
+        AppDatabase.Companion.getInstance(getContext()).cinemas().getCinemas().observe(this, cinemas -> {
             this.cinemas = cinemas;
             setupViews(true);
         });

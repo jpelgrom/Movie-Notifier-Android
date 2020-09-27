@@ -76,7 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         lastUser = Transformations.switchMap(lastUserID, newID -> {
             if(newID != null && !newID.equals("")) {
-                return AppDatabase.getInstance(this).users().getUserById(newID);
+                return AppDatabase.Companion.getInstance(this).users().getUserById(newID);
             } else {
                 return EmptyLiveData.create();
             }
@@ -189,13 +189,13 @@ public class SettingsActivity extends AppCompatActivity {
             User switchTo = getNextInactiveUser(exclude);
 
             if(switchTo != null) {
-                Call<User> call = APIHelper.getInstance().getUser(switchTo.getApikey(), switchTo.getId());
+                Call<User> call = APIHelper.INSTANCE.getInstance().getUser(switchTo.getApikey(), switchTo.getId());
                 try {
                     Response<User> response = call.execute();
                     if(response.code() == 200 && response.body() != null) {
                         User received = response.body();
                         if(received != null) {
-                            AppDatabase.getInstance(SettingsActivity.this).users().update(received);
+                            AppDatabase.Companion.getInstance(SettingsActivity.this).users().update(received);
                             settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         }
                     }
@@ -207,7 +207,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private User getNextInactiveUser(String exclude) {
-        for(User user : AppDatabase.getInstance(this).users().getUsersSynchronous()) {
+        for(User user : AppDatabase.Companion.getInstance(this).users().getUsersSynchronous()) {
             if(!user.getId().equals(settings.getString("userID", "")) && !user.getId().equals(exclude)) {
                 return user;
             }

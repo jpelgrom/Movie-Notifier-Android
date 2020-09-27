@@ -199,14 +199,14 @@ public class AccountAddFragment extends Fragment {
         setFieldsEnabled(false);
         setProgressVisible(true);
 
-        Call<User> call = APIHelper.getInstance().addUser(user);
+        Call<User> call = APIHelper.INSTANCE.getInstance().addUser(user);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if(response.isSuccessful()) {
                     User received = response.body();
                     AsyncTask.execute(() -> {
-                        AppDatabase.getInstance(getContext()).users().add(received);
+                        AppDatabase.Companion.getInstance(getContext()).users().add(received);
                         settings.edit().putString("userID", received.getId()).putString("userAPIKey", received.getApikey()).apply();
                         notificationSettings.edit().putBoolean("disabled-" + received.getId(), false).apply();
                         if(getActivity() != null && !getActivity().isFinishing()) {
