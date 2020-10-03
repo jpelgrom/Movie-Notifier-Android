@@ -42,6 +42,6 @@ interface APIClient {
     fun deleteWatcher(@Header("APIKEY") apikey: String, @Path("watcherid") watcherid: String): Call<ResponseBody>
 
     // Cinemas
-    @get:GET("/cinemas")
-    val cinemas: Call<List<Cinema>>
+    @GET("/cinemas")
+    suspend fun getCinemas(): List<Cinema>
 }

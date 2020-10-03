@@ -19,7 +19,7 @@ interface DaoUsers {
     fun getUserById(id: String): LiveData<User>
 
     @Query("SELECT * FROM Users WHERE ID = :id")
-    fun getUserByIdSynchronous(id: String): User
+    fun getUserByIdSynchronous(id: String): User?
 
     @Update
     fun update(user: User)

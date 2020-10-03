@@ -7,7 +7,7 @@ import nl.jpelgrm.movienotifier.models.Cinema
 @Dao
 interface DaoCinemas {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(cinema: Cinema)
+    suspend fun add(cinemas: List<Cinema>)
 
     @get:Query("SELECT * FROM Cinemas")
     val cinemas: LiveData<List<Cinema>>
@@ -16,11 +16,11 @@ interface DaoCinemas {
     val cinemasSynchronous: List<Cinema>
 
     @Query("SELECT * FROM Cinemas WHERE ID = :id")
-    fun getCinemaById(id: Int): Cinema
+    fun getCinemaById(id: Int): Cinema?
 
     @Update
     fun update(cinema: Cinema)
 
     @Delete
-    fun delete(cinema: Cinema)
+    suspend fun delete(cinema: List<Cinema>)
 }
