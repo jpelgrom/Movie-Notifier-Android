@@ -225,43 +225,43 @@ public class WatcherActivity extends AppCompatActivity {
         }
 
         binding.watcherStart.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(false);
         });
         binding.startAfterDate.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(false);
         });
         binding.startAfterTime.setOnClickListener(v -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showTimePicker(false, true, watcher.getFilters().getStartAfter());
         });
         binding.startBeforeDate.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(false);
         });
         binding.startBeforeTime.setOnClickListener(v -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showTimePicker(false, false, watcher.getFilters().getStartBefore());
         });
         binding.active.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(true);
         });
         binding.beginDate.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(true);
         });
         binding.beginTime.setOnClickListener(v -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showTimePicker(true, true, watcher.getBegin());
         });
         binding.endDate.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showDatePicker(true);
         });
         binding.endTime.setOnClickListener(v -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
             showTimePicker(true, false, watcher.getEnd());
         });
 
@@ -1114,7 +1114,7 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void setOnPropClickListener(final View click, final PropResultListener callback) {
         click.setOnClickListener(view -> {
-            InterfaceUtil.clearForcus(WatcherActivity.this); // Prevent scroll after menu close due to focusing again
+            InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after menu close due to focusing again
 
             PopupMenu popupMenu = new PopupMenu(WatcherActivity.this, click);
             popupMenu.getMenuInflater().inflate(R.menu.menu_prop, popupMenu.getMenu());
@@ -1217,7 +1217,6 @@ public class WatcherActivity extends AppCompatActivity {
 
     private void startLocation() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationUtil.setupLocationClient(this);
             locationUtil.getLocation(this, new LocationUtil.LocationUtilRequest() {
                 @Override
                 public void onLocationReceived(Location location, boolean isCachedResult) {

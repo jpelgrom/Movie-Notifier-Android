@@ -31,7 +31,6 @@ import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
 import nl.jpelgrm.movienotifier.databinding.ActivitySettingsBinding;
 import nl.jpelgrm.movienotifier.models.User;
-import nl.jpelgrm.movienotifier.util.EmptyLiveData;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -40,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences settings;
     private MutableLiveData<String> lastUserID = new MutableLiveData<>();
-    private LiveData<User> lastUser = EmptyLiveData.create();
+    private LiveData<User> lastUser = new MutableLiveData<>(null);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,7 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
             if(newID != null && !newID.equals("")) {
                 return AppDatabase.Companion.getInstance(this).users().getUserById(newID);
             } else {
-                return EmptyLiveData.create();
+                return new MutableLiveData<>(null);
             }
         });
         lastUserID.setValue(null);

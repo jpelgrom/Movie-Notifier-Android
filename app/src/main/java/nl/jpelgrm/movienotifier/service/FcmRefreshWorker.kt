@@ -24,9 +24,10 @@ class FcmRefreshWorker(context: Context, workerParams: WorkerParameters) : Worke
                     val response = call.execute()
                     if (response.code() == 200) {
                         if (response.body() != null) {
-                            db.users().update(response.body()!!)
-                            if (user.name != response.body()!!.name) {
-                                NotificationUtil.createUserGroup(applicationContext, response.body())
+                            val responseUser = response.body()!!
+                            db.users().update(responseUser)
+                            if (user.name != responseUser.name) {
+                                NotificationUtil.createUserGroup(applicationContext, responseUser)
                             }
                         }
                     } else if (response.code() == 401) {

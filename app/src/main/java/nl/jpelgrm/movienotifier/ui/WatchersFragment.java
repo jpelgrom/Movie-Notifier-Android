@@ -40,6 +40,7 @@ import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Watcher;
 import nl.jpelgrm.movienotifier.ui.adapter.WatchersAdapter;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
+import nl.jpelgrm.movienotifier.util.DistanceUtil;
 import nl.jpelgrm.movienotifier.util.LocationUtil;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -243,8 +244,8 @@ public class WatchersFragment extends Fragment {
                     && locationUser != null
                     && getContext() != null
                     && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                nearby = locationUtil.getClosestCinema(locationUser, cinemas);
-                if(nearby != null && LocationUtil.getDistance(locationUser, nearby.getLat(), nearby.getLon()) < 2000) {
+                nearby = DistanceUtil.getClosestCinema(locationUser, cinemas);
+                if(nearby != null && DistanceUtil.getDistance(locationUser, nearby.getLat(), nearby.getLon()) < 2000) {
                     highlightNearby = true;
                 }
             }
@@ -427,7 +428,6 @@ public class WatchersFragment extends Fragment {
 
     private void startLocation() {
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationUtil.setupLocationClient(getContext());
             locationUtil.getLocation(getContext(), new LocationUtil.LocationUtilRequest() {
                 @Override
                 public void onLocationReceived(Location location, boolean isCachedResult) {

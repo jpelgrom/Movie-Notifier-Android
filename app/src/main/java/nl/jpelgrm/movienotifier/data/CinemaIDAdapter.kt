@@ -10,7 +10,7 @@ import android.widget.Filter
 import android.widget.TextView
 import nl.jpelgrm.movienotifier.R
 import nl.jpelgrm.movienotifier.models.Cinema
-import nl.jpelgrm.movienotifier.util.LocationUtil
+import nl.jpelgrm.movienotifier.util.DistanceUtil
 import java.util.*
 
 class CinemaIDAdapter(context: Context, private val viewResourceID: Int, private val cinemas: MutableList<Cinema>) : ArrayAdapter<Cinema>(context, viewResourceID, cinemas) {
@@ -49,7 +49,7 @@ class CinemaIDAdapter(context: Context, private val viewResourceID: Int, private
                 distance.visibility = View.GONE
             } else {
                 distance.visibility = View.VISIBLE
-                distance.text = LocationUtil.getFormattedDistance(location, cinema.lat, cinema.lon)
+                distance.text = DistanceUtil.getFormattedDistance(location, cinema.lat, cinema.lon)
             }
         }
         return theView
@@ -66,8 +66,7 @@ class CinemaIDAdapter(context: Context, private val viewResourceID: Int, private
         Collections.sort(cinemas, Comparator { c1, c2 ->
             if (location != null) {
                 if (c1.lat != null && c1.lon != null && c2.lat != null && c2.lon != null) {
-                    return@Comparator java.lang.Double.compare(LocationUtil.getDistance(location, c1.lat, c1.lon).toDouble(),
-                            LocationUtil.getDistance(location, c2.lat, c2.lon).toDouble())
+                    return@Comparator DistanceUtil.getDistance(location, c1.lat, c1.lon).toDouble().compareTo(DistanceUtil.getDistance(location, c2.lat, c2.lon).toDouble())
                 } else if (c1.lat != null && c1.lon != null) { // c2 null, and c2 should go to bottom
                     return@Comparator -1
                 } else if (c2.lat != null && c2.lon != null) { // c1 null, and c1 should go to bottom
