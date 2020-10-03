@@ -68,6 +68,7 @@ import nl.jpelgrm.movienotifier.databinding.ActivityWatcherBinding;
 import nl.jpelgrm.movienotifier.models.Cinema;
 import nl.jpelgrm.movienotifier.models.Notification;
 import nl.jpelgrm.movienotifier.models.Watcher;
+import nl.jpelgrm.movienotifier.models.WatcherFilterValue;
 import nl.jpelgrm.movienotifier.models.WatcherFilters;
 import nl.jpelgrm.movienotifier.ui.settings.AccountActivity;
 import nl.jpelgrm.movienotifier.util.ErrorUtil;
@@ -188,7 +189,7 @@ public class WatcherActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 validateMovieID(false);
                 if(watcher != null && !editable.toString().equals("")) {
-                    watcher.setMovieID(Integer.parseInt(editable.toString()));
+                    watcher.setMovieid(Integer.parseInt(editable.toString()));
                 }
             }
         });
@@ -234,7 +235,7 @@ public class WatcherActivity extends AppCompatActivity {
         });
         binding.startAfterTime.setOnClickListener(v -> {
             InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showTimePicker(false, true, watcher.getFilters().getStartAfter());
+            showTimePicker(false, true, watcher.getFilters().getStartafter());
         });
         binding.startBeforeDate.setOnClickListener(view -> {
             InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
@@ -242,7 +243,7 @@ public class WatcherActivity extends AppCompatActivity {
         });
         binding.startBeforeTime.setOnClickListener(v -> {
             InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
-            showTimePicker(false, false, watcher.getFilters().getStartBefore());
+            showTimePicker(false, false, watcher.getFilters().getStartbefore());
         });
         binding.active.setOnClickListener(view -> {
             InterfaceUtil.clearFocus(WatcherActivity.this); // Prevent scroll after popup close due to focusing again
@@ -272,12 +273,12 @@ public class WatcherActivity extends AppCompatActivity {
         binding.filterScreenX.setOnCheckedChangeListener((buttonView, isChecked) -> validateAndUpdateExperiences());
         binding.filter2D.setOnCheckedChangeListener((buttonView, isChecked) -> validateAndUpdate3D());
         binding.filter3D.setOnCheckedChangeListener((buttonView, isChecked) -> validateAndUpdate3D());
-        setOnPropClickListener(binding.filter4K, value -> watcher.getFilters().set4K(value));
+        setOnPropClickListener(binding.filter4K, value -> watcher.getFilters().set_4k(value));
         setOnPropClickListener(binding.filterLaser, value -> watcher.getFilters().setLaser(value));
-        setOnPropClickListener(binding.filterHFR, value -> watcher.getFilters().setHFR(value));
-        setOnPropClickListener(binding.filterDolbyAtmos, value -> watcher.getFilters().setDolbyAtmos(value));
-        setOnPropClickListener(binding.filterOV, value -> watcher.getFilters().setOriginalVersion(value));
-        setOnPropClickListener(binding.filterNL, value -> watcher.getFilters().setDutchVersion(value));
+        setOnPropClickListener(binding.filterHFR, value -> watcher.getFilters().setHfr(value));
+        setOnPropClickListener(binding.filterDolbyAtmos, value -> watcher.getFilters().setDolbyatmos(value));
+        setOnPropClickListener(binding.filterOV, value -> watcher.getFilters().setOv(value));
+        setOnPropClickListener(binding.filterNL, value -> watcher.getFilters().setNl(value));
 
         binding.fab.setOnClickListener(view -> {
             if(mode == Mode.VIEWING) {
@@ -378,7 +379,7 @@ public class WatcherActivity extends AppCompatActivity {
                 watcher.setName(sharedTitle);
             }
             if(sharedMovieID != null && sharedMovieID > 0) {
-                watcher.setMovieID(sharedMovieID);
+                watcher.setMovieid(sharedMovieID);
             }
 
             watcher.setBegin(System.currentTimeMillis());
@@ -386,14 +387,14 @@ public class WatcherActivity extends AppCompatActivity {
             LocalTime ninePm = LocalTime.of(21, 0);
             watcher.setEnd(LocalDateTime.of(nextMonday, ninePm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
 
-            watcher.getFilters().setCinemaID(settings.getInt("prefSelectedCinema", 0));
+            watcher.getFilters().setCinemaid(settings.getInt("prefSelectedCinema", 0));
 
             LocalDate nextWednesday = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
             LocalDate nextNextWednesday = nextWednesday.with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
             LocalTime tenAm = LocalTime.of(10, 0);
             LocalTime elevenPm = LocalTime.of(23, 0);
-            watcher.getFilters().setStartAfter(LocalDateTime.of(nextWednesday, tenAm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
-            watcher.getFilters().setStartBefore(LocalDateTime.of(nextNextWednesday, elevenPm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
+            watcher.getFilters().setStartafter(LocalDateTime.of(nextWednesday, tenAm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
+            watcher.getFilters().setStartbefore(LocalDateTime.of(nextNextWednesday, elevenPm).atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L);
 
             mode = Mode.EDITING;
 
@@ -438,9 +439,9 @@ public class WatcherActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Watcher> call, @NonNull Response<Watcher> response) {
                 if(response.code() == 200) {
                     watcher = response.body();
-                    id = watcher.getID();
+                    id = watcher.getId();
 
-                    if(watcher.getUserID().equals(settings.getString("userID", ""))) {
+                    if(watcher.getUserid().equals(settings.getString("userID", ""))) {
                         mode = Mode.VIEWING;
                     } else {
                         mode = Mode.EDITING;
@@ -518,12 +519,12 @@ public class WatcherActivity extends AppCompatActivity {
         // Input values (cinema ID)
         String foundCinema = "";
         for(Cinema cinema : cinemas) {
-            if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+            if(cinema.getId() == watcher.getFilters().getCinemaid()) {
                 foundCinema = cinema.getName();
             }
         }
-        if(foundCinema.equals("") && watcher.getFilters().getCinemaID() != 0) { // We don't know this cinema ID's display name
-            foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
+        if(foundCinema.equals("") && watcher.getFilters().getCinemaid() != 0) { // We don't know this cinema ID's display name
+            foundCinema = String.valueOf(watcher.getFilters().getCinemaid());
         }
         binding.watcherCinemaID.setText(foundCinema);
         if(cinemaOnly) { return; }
@@ -534,7 +535,7 @@ public class WatcherActivity extends AppCompatActivity {
 
         // Input values
         binding.watcherName.setText(watcher.getName());
-        binding.watcherMovieID.setText(watcher.getMovieID() == null ? "" : String.valueOf(watcher.getMovieID()));
+        binding.watcherMovieID.setText(watcher.getMovieid() == null ? "" : String.valueOf(watcher.getMovieid()));
 
         if(!binding.watcherNameWrapper.isHintAnimationEnabled()) { binding.watcherNameWrapper.setHintAnimationEnabled(true); }
         if(!binding.watcherMovieIDWrapper.isHintAnimationEnabled()) { binding.watcherMovieIDWrapper.setHintAnimationEnabled(true); }
@@ -553,8 +554,8 @@ public class WatcherActivity extends AppCompatActivity {
         binding.beginTime.setText(timeFormat.format(watcherBegin));
         binding.endDate.setText(dateFormat.format(watcherEnd));
         binding.endTime.setText(timeFormat.format(watcherEnd));
-        Date watcherStartAfter = new Date(watcher.getFilters().getStartAfter());
-        Date watcherStartBefore = new Date(watcher.getFilters().getStartBefore());
+        Date watcherStartAfter = new Date(watcher.getFilters().getStartafter());
+        Date watcherStartBefore = new Date(watcher.getFilters().getStartbefore());
         binding.startAfterDate.setText(dateFormat.format(watcherStartAfter));
         binding.startAfterTime.setText(timeFormat.format(watcherStartAfter));
         binding.startBeforeDate.setText(dateFormat.format(watcherStartBefore));
@@ -568,8 +569,8 @@ public class WatcherActivity extends AppCompatActivity {
                 if(binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuShare || binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDuplicate) {
                     binding.toolbar.getMenu().getItem(i).setVisible(mode == Mode.VIEWING && id != null);
                 } else if(binding.toolbar.getMenu().getItem(i).getItemId() == R.id.watcherMenuDelete) {
-                    binding.toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserID() != null
-                        && watcher.getUserID().equals(settings.getString("userID", "")));
+                    binding.toolbar.getMenu().getItem(i).setVisible(id != null && !id.equals("") && watcher.getUserid() != null
+                        && watcher.getUserid().equals(settings.getString("userID", "")));
                 }
             }
         }
@@ -582,35 +583,35 @@ public class WatcherActivity extends AppCompatActivity {
     private void updateViewsFilters() {
         updatingViews = true;
         if(watcher.getFilters() != null) {
-            boolean experienceCheckIfNoPref = watcher.getFilters().isRegularShowing() != WatcherFilters.WatcherFilterValue.YES
-                    && watcher.getFilters().isIMAX() != WatcherFilters.WatcherFilterValue.YES
-                    && watcher.getFilters().isDolbyCinema() != WatcherFilters.WatcherFilterValue.YES
-                    && watcher.getFilters().is4DX() != WatcherFilters.WatcherFilterValue.YES
-                    && watcher.getFilters().isScreenX() != WatcherFilters.WatcherFilterValue.YES;
-            binding.filterRegularShowing.setChecked(watcher.getFilters().isRegularShowing() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
-                    watcher.getFilters().isRegularShowing() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filterIMAX.setChecked(watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
-                    watcher.getFilters().isIMAX() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filterDolbyCinema.setChecked(watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
-                    watcher.getFilters().isDolbyCinema() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filter4DX.setChecked(watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
-                    watcher.getFilters().is4DX() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filterScreenX.setChecked(watcher.getFilters().isScreenX() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
-                    watcher.getFilters().isScreenX() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filter2D.setChecked(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE || watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NO);
-            binding.filter3D.setChecked(watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.NOPREFERENCE || watcher.getFilters().is3D() == WatcherFilters.WatcherFilterValue.YES);
-            binding.filter4K.setValue(watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().is4K() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterLaser.setValue(watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isLaser() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterHFR.setValue(watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isHFR() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterDolbyAtmos.setValue(watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isDolbyAtmos() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterOV.setValue(watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isOriginalVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
-            binding.filterNL.setValue(watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
-                    (watcher.getFilters().isDutchVersion() == WatcherFilters.WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            boolean experienceCheckIfNoPref = watcher.getFilters().getRegularshowing() != WatcherFilterValue.YES
+                    && watcher.getFilters().getImax() != WatcherFilterValue.YES
+                    && watcher.getFilters().getDolbycinema() != WatcherFilterValue.YES
+                    && watcher.getFilters().get_4dx() != WatcherFilterValue.YES
+                    && watcher.getFilters().getScreenx() != WatcherFilterValue.YES;
+            binding.filterRegularShowing.setChecked(watcher.getFilters().getRegularshowing() == WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
+                    watcher.getFilters().getRegularshowing() == WatcherFilterValue.YES);
+            binding.filterIMAX.setChecked(watcher.getFilters().getImax() == WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
+                    watcher.getFilters().getImax() == WatcherFilterValue.YES);
+            binding.filterDolbyCinema.setChecked(watcher.getFilters().getDolbycinema() == WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
+                    watcher.getFilters().getDolbycinema() == WatcherFilterValue.YES);
+            binding.filter4DX.setChecked(watcher.getFilters().get_4dx() == WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
+                    watcher.getFilters().get_4dx() == WatcherFilterValue.YES);
+            binding.filterScreenX.setChecked(watcher.getFilters().getScreenx() == WatcherFilterValue.NOPREFERENCE ? experienceCheckIfNoPref :
+                    watcher.getFilters().getScreenx() == WatcherFilterValue.YES);
+            binding.filter2D.setChecked(watcher.getFilters().get_3d() == WatcherFilterValue.NOPREFERENCE || watcher.getFilters().get_3d() == WatcherFilterValue.NO);
+            binding.filter3D.setChecked(watcher.getFilters().get_3d() == WatcherFilterValue.NOPREFERENCE || watcher.getFilters().get_3d() == WatcherFilterValue.YES);
+            binding.filter4K.setValue(watcher.getFilters().get_4k() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().get_4k() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterLaser.setValue(watcher.getFilters().getLaser() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().getLaser() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterHFR.setValue(watcher.getFilters().getHfr() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().getHfr() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterDolbyAtmos.setValue(watcher.getFilters().getDolbyatmos() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().getDolbyatmos() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterOV.setValue(watcher.getFilters().getOv() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().getOv() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
+            binding.filterNL.setValue(watcher.getFilters().getNl() == WatcherFilterValue.NOPREFERENCE ? R.string.watcher_filter_value_nopreference :
+                    (watcher.getFilters().getNl() == WatcherFilterValue.YES ? R.string.watcher_filter_value_yes : R.string.watcher_filter_value_no));
         } else {
             binding.filterRegularShowing.setChecked(true);
             binding.filterIMAX.setChecked(true);
@@ -702,7 +703,7 @@ public class WatcherActivity extends AppCompatActivity {
         if(checkingValue) {
             selectedRange = new Pair<>(watcher.getBegin(), watcher.getEnd());
         } else {
-            selectedRange = new Pair<>(watcher.getFilters().getStartAfter(), watcher.getFilters().getStartBefore());
+            selectedRange = new Pair<>(watcher.getFilters().getStartafter(), watcher.getFilters().getStartbefore());
         }
 
         long startOfFirstDateInMillis = ZonedDateTime.ofInstant(Instant.ofEpochSecond(selectedRange.first/1000), ZoneId.systemDefault())
@@ -725,8 +726,8 @@ public class WatcherActivity extends AppCompatActivity {
                 startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getBegin()), ZoneId.systemDefault()).toLocalTime();
                 endTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getEnd()), ZoneId.systemDefault()).toLocalTime();
             } else {
-                startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartAfter()), ZoneId.systemDefault()).toLocalTime();
-                endTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartBefore()), ZoneId.systemDefault()).toLocalTime();
+                startTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartafter()), ZoneId.systemDefault()).toLocalTime();
+                endTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(watcher.getFilters().getStartbefore()), ZoneId.systemDefault()).toLocalTime();
             }
 
             Pair<Long, Long> newDates = (Pair<Long, Long>) selection;
@@ -741,8 +742,8 @@ public class WatcherActivity extends AppCompatActivity {
                 watcher.setEnd(newEnd);
                 validateAndFixEnd();
             } else {
-                watcher.getFilters().setStartAfter(newStart);
-                watcher.getFilters().setStartBefore(newEnd);
+                watcher.getFilters().setStartafter(newStart);
+                watcher.getFilters().setStartbefore(newEnd);
                 validateAndFixStartBefore();
             }
 
@@ -769,10 +770,10 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             } else {
                 if(beginValue) {
-                    watcher.getFilters().setStartAfter(setTo.getTimeInMillis());
+                    watcher.getFilters().setStartafter(setTo.getTimeInMillis());
                     validateAndFixStartBefore();
                 } else {
-                    watcher.getFilters().setStartBefore(setTo.getTimeInMillis());
+                    watcher.getFilters().setStartbefore(setTo.getTimeInMillis());
                     validateAndFixStartAfter();
                 }
             }
@@ -830,7 +831,7 @@ public class WatcherActivity extends AppCompatActivity {
                 }
             }
             if(foundID != 0) {
-                watcher.getFilters().setCinemaID(foundID);
+                watcher.getFilters().setCinemaid(foundID);
 
                 binding.watcherCinemaIDWrapper.setErrorEnabled(false);
                 return true;
@@ -839,7 +840,7 @@ public class WatcherActivity extends AppCompatActivity {
                     binding.watcherCinemaIDWrapper.setError(getString(R.string.watcher_validate_cinemaid));
                     binding.watcherCinemaIDWrapper.setErrorEnabled(true);
                 } else {
-                    watcher.getFilters().setCinemaID(0);
+                    watcher.getFilters().setCinemaid(0);
                 }
                 return false;
             }
@@ -893,11 +894,11 @@ public class WatcherActivity extends AppCompatActivity {
     private void validateAndFixStartAfter() {
         boolean updated = false;
 
-        if(watcher.getFilters().getStartAfter() >= watcher.getFilters().getStartBefore()) {
-            watcher.getFilters().setStartAfter(watcher.getFilters().getStartBefore() - oneMinute);
+        if(watcher.getFilters().getStartafter() >= watcher.getFilters().getStartbefore()) {
+            watcher.getFilters().setStartafter(watcher.getFilters().getStartbefore() - oneMinute);
             updated = true;
-        } else if(watcher.getFilters().getStartBefore() - watcher.getFilters().getStartAfter() > (oneWeek + oneWeek)) {
-            watcher.getFilters().setStartAfter(watcher.getFilters().getStartBefore() - oneWeek - oneWeek + oneMinute);
+        } else if(watcher.getFilters().getStartbefore() - watcher.getFilters().getStartafter() > (oneWeek + oneWeek)) {
+            watcher.getFilters().setStartafter(watcher.getFilters().getStartbefore() - oneWeek - oneWeek + oneMinute);
             updated = true;
         }
 
@@ -912,11 +913,11 @@ public class WatcherActivity extends AppCompatActivity {
     private void validateAndFixStartBefore() {
         boolean updated = false;
 
-        if(watcher.getFilters().getStartBefore() <= watcher.getFilters().getStartAfter()) {
-            watcher.getFilters().setStartBefore(watcher.getFilters().getStartAfter() + oneMinute);
+        if(watcher.getFilters().getStartbefore() <= watcher.getFilters().getStartafter()) {
+            watcher.getFilters().setStartbefore(watcher.getFilters().getStartafter() + oneMinute);
             updated = true;
-        } else if(watcher.getFilters().getStartBefore() - watcher.getFilters().getStartAfter() > (oneWeek + oneWeek)) {
-            watcher.getFilters().setStartBefore(watcher.getFilters().getStartAfter() + oneWeek + oneWeek - oneMinute);
+        } else if(watcher.getFilters().getStartbefore() - watcher.getFilters().getStartafter() > (oneWeek + oneWeek)) {
+            watcher.getFilters().setStartbefore(watcher.getFilters().getStartafter() + oneWeek + oneWeek - oneMinute);
             updated = true;
         }
 
@@ -936,11 +937,11 @@ public class WatcherActivity extends AppCompatActivity {
             watcher.setFilters(new WatcherFilters());
         }
         if(binding.filter2D.isChecked() && !binding.filter3D.isChecked()) {
-            watcher.getFilters().set3D(WatcherFilters.WatcherFilterValue.NO);
+            watcher.getFilters().set_3d(WatcherFilterValue.NO);
         } else if(!binding.filter2D.isChecked() && binding.filter3D.isChecked()) {
-            watcher.getFilters().set3D(WatcherFilters.WatcherFilterValue.YES);
+            watcher.getFilters().set_3d(WatcherFilterValue.YES);
         } else {
-            watcher.getFilters().set3D(WatcherFilters.WatcherFilterValue.NOPREFERENCE);
+            watcher.getFilters().set_3d(WatcherFilterValue.NOPREFERENCE);
         }
         return true;
     }
@@ -960,13 +961,13 @@ public class WatcherActivity extends AppCompatActivity {
         if(watcher.getFilters() == null) {
             watcher.setFilters(new WatcherFilters());
         }
-        WatcherFilters.WatcherFilterValue useForChecked = (numberChecked == 1 ? WatcherFilters.WatcherFilterValue.YES : WatcherFilters.WatcherFilterValue.NOPREFERENCE);
-        WatcherFilters.WatcherFilterValue useForNotChecked = (numberChecked <= 1 ? WatcherFilters.WatcherFilterValue.NOPREFERENCE : WatcherFilters.WatcherFilterValue.NO);
-        watcher.getFilters().setRegularShowing(binding.filterRegularShowing.isChecked() ? useForChecked : useForNotChecked);
-        watcher.getFilters().setIMAX(binding.filterIMAX.isChecked() ? useForChecked : useForNotChecked);
-        watcher.getFilters().setDolbyCinema(binding.filterDolbyCinema.isChecked() ? useForChecked : useForNotChecked);
-        watcher.getFilters().set4DX(binding.filter4DX.isChecked() ? useForChecked : useForNotChecked);
-        watcher.getFilters().setScreenX(binding.filterScreenX.isChecked() ? useForChecked : useForNotChecked);
+        WatcherFilterValue useForChecked = (numberChecked == 1 ? WatcherFilterValue.YES : WatcherFilterValue.NOPREFERENCE);
+        WatcherFilterValue useForNotChecked = (numberChecked <= 1 ? WatcherFilterValue.NOPREFERENCE : WatcherFilterValue.NO);
+        watcher.getFilters().setRegularshowing(binding.filterRegularShowing.isChecked() ? useForChecked : useForNotChecked);
+        watcher.getFilters().setImax(binding.filterIMAX.isChecked() ? useForChecked : useForNotChecked);
+        watcher.getFilters().setDolbycinema(binding.filterDolbyCinema.isChecked() ? useForChecked : useForNotChecked);
+        watcher.getFilters().set_4dx(binding.filter4DX.isChecked() ? useForChecked : useForNotChecked);
+        watcher.getFilters().setScreenx(binding.filterScreenX.isChecked() ? useForChecked : useForNotChecked);
         return true;
     }
 
@@ -980,7 +981,7 @@ public class WatcherActivity extends AppCompatActivity {
 
             Watcher toSave = new Watcher();
             toSave.setName(binding.watcherName.getText().toString());
-            toSave.setMovieID(Integer.parseInt(binding.watcherMovieID.getText().toString()));
+            toSave.setMovieid(Integer.parseInt(binding.watcherMovieID.getText().toString()));
             toSave.setBegin(watcher.getBegin());
             toSave.setEnd(watcher.getEnd());
 
@@ -988,8 +989,8 @@ public class WatcherActivity extends AppCompatActivity {
 
             Call<Watcher> call;
 
-            if(id == null || id.equals("") || !watcher.getUserID().equals(settings.getString("userID", ""))) { // Create
-                toSave.setUserID(settings.getString("userID", ""));
+            if(id == null || id.equals("") || !watcher.getUserid().equals(settings.getString("userID", ""))) { // Create
+                toSave.setUserid(settings.getString("userID", ""));
                 call = APIHelper.INSTANCE.getInstance().addWatcher(settings.getString("userAPIKey", ""), toSave);
             } else { // Update
                 call = APIHelper.INSTANCE.getInstance().updateWatcher(settings.getString("userAPIKey", ""), id, toSave);
@@ -1004,7 +1005,7 @@ public class WatcherActivity extends AppCompatActivity {
 
                     if(response.code() == 200) {
                         watcher = response.body();
-                        id = watcher.getID();
+                        id = watcher.getId();
 
                         mode = Mode.VIEWING;
 
@@ -1124,14 +1125,14 @@ public class WatcherActivity extends AppCompatActivity {
                 }
                 switch(item.getItemId()) {
                     case R.id.filter_yes:
-                        callback.gotResult(WatcherFilters.WatcherFilterValue.YES);
+                        callback.gotResult(WatcherFilterValue.YES);
                         break;
                     case R.id.filter_no:
-                        callback.gotResult(WatcherFilters.WatcherFilterValue.NO);
+                        callback.gotResult(WatcherFilterValue.NO);
                         break;
                     case R.id.filter_nopreference:
                     default:
-                        callback.gotResult(WatcherFilters.WatcherFilterValue.NOPREFERENCE);
+                        callback.gotResult(WatcherFilterValue.NOPREFERENCE);
                         break;
                 }
                 updateViews();
@@ -1193,7 +1194,7 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private interface PropResultListener {
-        void gotResult(WatcherFilters.WatcherFilterValue value);
+        void gotResult(WatcherFilterValue value);
     }
 
     private void askForLocation() {

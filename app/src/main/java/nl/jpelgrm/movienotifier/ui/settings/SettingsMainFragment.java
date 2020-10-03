@@ -138,7 +138,7 @@ public class SettingsMainFragment extends Fragment {
             int currentValueIndex = 0;
             if(cinemas != null) {
                 for(int i = 0; i < cinemas.size(); i++) {
-                    if(cinemas.get(i).getId().equals(currentPreference)) {
+                    if(cinemas.get(i).getId() == currentPreference) {
                         currentValueIndex = i + 1;
                     }
                 }
@@ -239,7 +239,7 @@ public class SettingsMainFragment extends Fragment {
             locationPrefText = String.valueOf(locationPreference);
             if(cinemas != null) {
                 for(Cinema cinema : cinemas) {
-                    if(cinema.getId().equals(locationPreference)) {
+                    if(cinema.getId() == locationPreference) {
                         locationPrefText = cinema.getName();
                     }
                 }

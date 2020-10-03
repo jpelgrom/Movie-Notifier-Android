@@ -19,7 +19,7 @@ class FcmRefreshWorker(context: Context, workerParams: WorkerParameters) : Worke
         if (userToUpdate == null) {
             users = db.users().usersSynchronous
             for (user in users) {
-                val call = APIHelper.instance.getUser(user.apikey, user.id)
+                val call = APIHelper.instance.getUser(user.apikey!!, user.id)
                 try {
                     val response = call.execute()
                     if (response.code() == 200) {
@@ -58,20 +58,20 @@ class FcmRefreshWorker(context: Context, workerParams: WorkerParameters) : Worke
             if(dbUser != null) { listOf(dbUser) } else { emptyList() }
         }
         for (user in users) {
-            val userFcmTokens = user.fcmTokens
-            val hasOldToken = userFcmTokens.contains(oldToken)
-            val hasNewToken = userFcmTokens.contains(newToken)
+            val hasOldToken = user.fcmTokens?.contains(oldToken) ?: false
+            val hasNewToken = user.fcmTokens?.contains(newToken) ?: false
+            val userFcmTokens = user.fcmTokens?.toMutableList() ?: mutableListOf()
             val disabledNotifications = notificationSettings.getBoolean("disabled-" + user.id, false)
             var changed = false
             if (oldToken != "" && hasOldToken && oldToken != newToken) {
                 changed = userFcmTokens.remove(oldToken)
             }
             if (!disabledNotifications && !hasNewToken) {
-                changed = userFcmTokens.add(newToken) // always true
+                changed = if(newToken != null) userFcmTokens.add(newToken) else true// always true
             }
             if (changed) {
                 user.fcmTokens = userFcmTokens
-                val call = APIHelper.instance.updateUser(user.apikey, user.id, user)
+                val call = APIHelper.instance.updateUser(user.apikey!!, user.id, user)
                 try {
                     val response = call.execute()
                     if (response.code() == 200) {

@@ -11,7 +11,8 @@ object DistanceUtil {
         for (cinema in cinemas) {
             if (cinema.lat != null && cinema.lon != null) {
                 val distance = getDistance(location, cinema.lat, cinema.lon)
-                if (closest == null || distance < getDistance(location, closest.lat, closest.lon)) {
+                if (closest == null ||
+                        (closest.lat != null && closest.lon != null && distance < getDistance(location, closest.lat!!, closest.lon!!))) {
                     closest = cinema
                 }
             }

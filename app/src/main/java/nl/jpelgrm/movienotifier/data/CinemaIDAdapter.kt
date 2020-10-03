@@ -73,7 +73,11 @@ class CinemaIDAdapter(context: Context, private val viewResourceID: Int, private
                     return@Comparator 1
                 }
             }
-            c1.name.compareTo(c2.name, ignoreCase = true) // Default fallback
+            if(c1.name != null && c2.name != null) {
+                return@Comparator c1.name.compareTo(c2.name, ignoreCase = true) // Default fallback
+            } else {
+                return@Comparator 0;
+            }
         })
         notifyDataSetChanged()
     }
@@ -95,17 +99,19 @@ class CinemaIDAdapter(context: Context, private val viewResourceID: Int, private
                 val newValues: MutableList<Cinema> = ArrayList()
                 for (i in values.indices) {
                     val cinema = values[i]
-                    val valueText = cinema.name.toLowerCase(Locale.getDefault())
+                    if(cinema.name != null) {
+                        val valueText = cinema.name.toLowerCase(Locale.getDefault())
 
-                    // First match against the whole, non-splitted value
-                    if (valueText.startsWith(prefixString)) {
-                        newValues.add(cinema)
-                    } else {
-                        val words = valueText.split(" ").toTypedArray()
-                        for (word in words) {
-                            if (word.startsWith(prefixString)) {
-                                newValues.add(cinema)
-                                break
+                        // First match against the whole, non-splitted value
+                        if (valueText.startsWith(prefixString)) {
+                            newValues.add(cinema)
+                        } else {
+                            val words = valueText.split(" ").toTypedArray()
+                            for (word in words) {
+                                if (word.startsWith(prefixString)) {
+                                    newValues.add(cinema)
+                                    break
+                                }
                             }
                         }
                     }

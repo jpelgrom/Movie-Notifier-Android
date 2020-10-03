@@ -61,11 +61,11 @@ public class WatchersAdapter extends RecyclerView.Adapter<WatchersAdapter.ViewHo
             status = "⏰"; // Alarm Clock ('planned', watcher will become active in the future)
         }
         DateFormat format = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
-        String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
-        String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
+        String startDate = format.format(new Date(watcher.getFilters().getStartafter()));
+        String endDate = format.format(new Date(watcher.getFilters().getStartbefore()));
         holder.binding.watcherSubtext.setText(getContext().getString(R.string.watchers_list_subtitle_date, status, startDate, endDate));
 
-        holder.itemView.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID())));
+        holder.itemView.setOnClickListener(view -> getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getId())));
         holder.itemView.setOnLongClickListener(view -> {
             WatcherBottomSheet sheet = WatcherBottomSheet.newInstance(watcher);
             sheet.show(((AppCompatActivity) getContext()).getSupportFragmentManager(), sheet.getTag());

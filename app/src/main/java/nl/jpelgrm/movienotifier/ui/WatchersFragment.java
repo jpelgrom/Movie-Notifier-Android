@@ -260,19 +260,19 @@ public class WatchersFragment extends Fragment {
             for(int i = 0; i < watchersSorted.size(); i++) {
                 Watcher watcher = watchersSorted.get(i);
                 if(watcher.getBegin() <= System.currentTimeMillis() && watcher.getEnd() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
+                    if(highlightNearby && watcher.getFilters().getCinemaid() == nearby.getId()) {
                         watchersNowNearby.add(watcher);
                     } else {
                         watchersNow.add(watcher);
                     }
                 } else if(watcher.getEnd() < System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
+                    if(highlightNearby && watcher.getFilters().getCinemaid() == nearby.getId()) {
                         watchersPastNearby.add(watcher);
                     } else {
                         watchersPast.add(watcher);
                     }
                 } else if(watcher.getBegin() > System.currentTimeMillis()) {
-                    if(highlightNearby && watcher.getFilters().getCinemaID() == nearby.getId()) {
+                    if(highlightNearby && watcher.getFilters().getCinemaid() == nearby.getId()) {
                         watchersFutureNearby.add(watcher);
                     } else {
                         watchersFuture.add(watcher);
@@ -305,7 +305,7 @@ public class WatchersFragment extends Fragment {
                     comparator = (w1, w2) -> Long.compare(w2.getEnd(), w1.getEnd());
                     break;
                 case 3: // Start after (first showing)
-                    comparator = (w1, w2) -> Long.compare(w2.getFilters().getStartAfter(), w1.getFilters().getStartAfter());
+                    comparator = (w1, w2) -> Long.compare(w2.getFilters().getStartafter(), w1.getFilters().getStartafter());
                     break;
                 case 4: // A-Z
                 default:

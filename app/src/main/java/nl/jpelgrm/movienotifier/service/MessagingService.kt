@@ -46,7 +46,7 @@ class MessagingService : FirebaseMessagingService() {
                 }
             }
             if (foundUser != null) {
-                val dbNotification = Notification(remoteMessage.sentTime, userID, watcherID, watcherName, movieID, matches, body)
+                val dbNotification = Notification(time = remoteMessage.sentTime, userid = userID, watcherid = watcherID, watchername = watcherName, watchermovieid = movieID, matches = matches, body = body)
                 db.notifications().add(dbNotification)
 
                 // Notify the user

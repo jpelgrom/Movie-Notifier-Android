@@ -147,9 +147,10 @@ public class AccountAddFragment extends Fragment {
             }
 
             if((!binding.emailOn.isChecked() || validateEmail())) {
-                User toCreate = new User(binding.name.getText().toString(),
-                        binding.emailOn.isChecked() ? binding.email.getText().toString() : "",
-                        binding.password.getText().toString());
+                User toCreate = new User();
+                toCreate.setName(binding.name.getText().toString());
+                toCreate.setEmail(binding.emailOn.isChecked() ? binding.email.getText().toString() : "");
+                toCreate.setPassword(binding.password.getText().toString());
                 if(binding.push.isChecked() && !notificationSettings.getString("token", "").equals("")) {
                     toCreate.setFcmTokens(Collections.singletonList(notificationSettings.getString("token", "")));
                 } else {

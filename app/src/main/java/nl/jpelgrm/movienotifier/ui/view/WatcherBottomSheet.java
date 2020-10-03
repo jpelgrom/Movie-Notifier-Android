@@ -70,13 +70,13 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
         String foundCinema = "";
         if(cinemas != null) {
             for(Cinema cinema : cinemas) {
-                if(cinema.getId().equals(watcher.getFilters().getCinemaID())) {
+                if(cinema.getId() == watcher.getFilters().getCinemaid()) {
                     foundCinema = cinema.getName();
                 }
             }
         }
         if(foundCinema.equals("")) { // We don't know this cinema ID's display name
-            foundCinema = String.valueOf(watcher.getFilters().getCinemaID());
+            foundCinema = String.valueOf(watcher.getFilters().getCinemaid());
         }
         binding.location.setText(foundCinema);
 
@@ -96,20 +96,20 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             binding.active.setText(getString(R.string.watchers_bottomsheet_watcher_active_future, activeEmoji, format.format(new Date(watcher.getBegin()))));
         }
 
-        String startDate = format.format(new Date(watcher.getFilters().getStartAfter()));
-        String endDate = format.format(new Date(watcher.getFilters().getStartBefore()));
+        String startDate = format.format(new Date(watcher.getFilters().getStartafter()));
+        String endDate = format.format(new Date(watcher.getFilters().getStartbefore()));
         binding.dates.setText(getString(R.string.watchers_bottomsheet_watcher_dates, startDate, endDate));
 
         binding.view.setOnClickListener(view -> {
             dismiss();
-            getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getID()));
+            getContext().startActivity(new Intent(getContext(), WatcherActivity.class).putExtra("id", watcher.getId()));
         });
 
         binding.share.setOnClickListener(view -> {
             dismiss();
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getID());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, BuildConfig.SERVER_BASE_URL + "w/" + watcher.getId());
             sendIntent.putExtra(Intent.EXTRA_TITLE, watcher.getName());
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getString(R.string.watcher_share)));
@@ -119,7 +119,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             dismiss();
             Fragment search = getActivity().getSupportFragmentManager().findFragmentByTag("watchersFragment");
             if(search != null) {
-                ((WatchersFragment) search).deleteWatcher(watcher.getID());
+                ((WatchersFragment) search).deleteWatcher(watcher.getId());
             }
         });
     }
