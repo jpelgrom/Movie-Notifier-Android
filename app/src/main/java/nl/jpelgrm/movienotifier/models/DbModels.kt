@@ -1,16 +1,17 @@
 package nl.jpelgrm.movienotifier.models
 
 import androidx.room.*
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.util.*
 
 @Entity(tableName = "Cinemas")
+@JsonClass(generateAdapter = true)
 data class Cinema(
-        @Expose @PrimaryKey @ColumnInfo(name = "ID") val id: Int = 0,
-        @Expose @ColumnInfo(name = "Name") val name: String? = null,
-        @Expose @ColumnInfo(name = "Lat") val lat: Double? = null,
-        @Expose @ColumnInfo(name = "Lon") val lon: Double? = null
+        @PrimaryKey @ColumnInfo(name = "ID") val id: Int = 0,
+        @ColumnInfo(name = "Name") val name: String? = null,
+        @ColumnInfo(name = "Lat") val lat: Double? = null,
+        @ColumnInfo(name = "Lon") val lon: Double? = null
 ) {
     override fun toString(): String = name!!
 }
@@ -35,11 +36,12 @@ data class Notification(
 )
 
 @Entity(tableName = "Users")
+@JsonClass(generateAdapter = true)
 data class User(
-        @Expose(serialize = false) @PrimaryKey @ColumnInfo(name = "ID") var id: String = "",
-        @Expose @ColumnInfo(name = "Name") var name: String? = null,
-        @Expose @ColumnInfo(name = "Email") var email: String? = null,
-        @Expose @Ignore var password: String? = null,
-        @Expose @SerializedName("fcm-registration-tokens") @ColumnInfo(name = "FCMTokens") var fcmTokens: List<String>? = null,
-        @Expose(serialize = false) @ColumnInfo(name = "APIKey") var apikey: String? = null
+        @PrimaryKey @ColumnInfo(name = "ID") var id: String = "",
+        @ColumnInfo(name = "Name") var name: String? = null,
+        @ColumnInfo(name = "Email") var email: String? = null,
+        @Ignore var password: String? = null,
+        @Json(name = "fcm-registration-tokens") @ColumnInfo(name = "FCMTokens") var fcmTokens: List<String>? = null,
+        @ColumnInfo(name = "APIKey") var apikey: String? = null
 )

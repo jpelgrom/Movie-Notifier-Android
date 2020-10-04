@@ -1,7 +1,5 @@
 package nl.jpelgrm.movienotifier.ui.settings;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,7 +40,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
     private String id;
     private UpdateMode mode;
 
-    private SharedPreferences settings;
     Handler validateTextHandler = new Handler();
     Handler validatePasswordHandler = new Handler();
     Runnable validateNameRunnable = this::validateName;
@@ -64,8 +61,6 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
         id = getArguments().getString("id");
         mode = (UpdateMode) getArguments().getSerializable("mode");
-
-        settings = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -159,6 +154,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
 
             if(validate()) {
                 User toUpdate = new User();
+                toUpdate.setId(user.getId());
                 switch(mode) {
                     case NAME:
                         toUpdate.setName(binding.text.getText().toString());

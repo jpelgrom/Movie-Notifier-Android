@@ -1,7 +1,9 @@
 package nl.jpelgrm.movienotifier.models
 
-import com.google.gson.annotations.Expose
+import com.squareup.moshi.JsonClass
 
-data class Errors(@Expose val errors: List<String>? = null)
+@JsonClass(generateAdapter = true)
+data class Errors(val errors: List<String>? = null)
 
-data class Message(@Expose val message: String? = null)
+@JsonClass(generateAdapter = true)
+data class Message(val message: String? = null)

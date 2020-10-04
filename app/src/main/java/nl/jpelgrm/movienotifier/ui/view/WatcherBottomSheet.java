@@ -1,6 +1,5 @@
 package nl.jpelgrm.movienotifier.ui.view;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,8 +11,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.gson.Gson;
+import com.squareup.moshi.Moshi;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +38,7 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
     public static WatcherBottomSheet newInstance(Watcher watcher) {
         WatcherBottomSheet fragment = new WatcherBottomSheet();
         Bundle args = new Bundle();
-        args.putString("watcher", new Gson().toJson(watcher));
+        args.putString("watcher", new Moshi.Builder().build().adapter(Watcher.class).toJson(watcher));
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +52,11 @@ public class WatcherBottomSheet extends BottomSheetDialogFragment {
             setupViews(true);
         });
 
-        watcher = new Gson().fromJson(getArguments().getString("watcher"), Watcher.class);
+        try {
+            watcher = new Moshi.Builder().build().adapter(Watcher.class).fromJson(getArguments().getString("watcher"));
+        } catch(IOException e) {
+            dismiss();
+        }
     }
 
     @Nullable

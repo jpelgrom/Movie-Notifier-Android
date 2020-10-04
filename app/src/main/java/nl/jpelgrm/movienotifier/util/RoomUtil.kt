@@ -1,18 +1,24 @@
 package nl.jpelgrm.movienotifier.util
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import java.lang.reflect.ParameterizedType
 
 class RoomUtil {
-    @TypeConverter
-    fun fromString(value: String?): List<String> {
-        val listType = object : TypeToken<List<String>>() {}.type
-        return Gson().fromJson(value, listType)
+    private fun getMoshiListAdapter(): JsonAdapter<List<String>> {
+        val type: ParameterizedType = Types.newParameterizedType(List::class.java, String::class.java)
+        return Moshi.Builder().build().adapter(type)
     }
 
     @TypeConverter
-    fun fromList(list: List<String?>?): String {
-        return Gson().toJson(list)
+    fun fromString(value: String): List<String>? {
+        return getMoshiListAdapter().fromJson(value)
+    }
+
+    @TypeConverter
+    fun fromList(list: List<String>?): String {
+        return getMoshiListAdapter().toJson(list)
     }
 }

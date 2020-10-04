@@ -1,7 +1,7 @@
 package nl.jpelgrm.movienotifier.util
 
 import android.content.Context
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Moshi
 import nl.jpelgrm.movienotifier.R
 import nl.jpelgrm.movienotifier.models.Errors
 import nl.jpelgrm.movienotifier.models.Message
@@ -12,15 +12,15 @@ object ErrorUtil {
     @JvmStatic
     fun getErrorMessage(context: Context, response: Response<*>?, login401: Boolean): String {
         return if (response != null) {
-            val gson = GsonBuilder().create()
+            val moshi = Moshi.Builder().build()
             val errorBuilder = StringBuilder()
             if (login401 && response.code() == 401) {
                 context.getString(R.string.error_login_401)
             } else if (response.code() == 400) {
                 if (response.errorBody() != null) {
                     try {
-                        val errors = gson.fromJson(response.errorBody()!!.string(), Errors::class.java)
-                        errors.errors?.forEach {
+                        val errors = moshi.adapter(Errors::class.java).fromJson(response.errorBody()!!.string())
+                        errors?.errors?.forEach {
                             if (errorBuilder.toString() != "") {
                                 errorBuilder.append("\n")
                             }
@@ -36,8 +36,10 @@ object ErrorUtil {
             } else if (response.code() == 500) {
                 if (response.errorBody() != null) {
                     try {
-                        val message = gson.fromJson(response.errorBody()!!.string(), Message::class.java)
-                        errorBuilder.append(message.message)
+                        val message = moshi.adapter(Message::class.java).fromJson(response.errorBody()!!.toString())
+                        if(message != null) {
+                            errorBuilder.append(message.message)
+                        }
                     } catch (e: IOException) {
                         errorBuilder.append("I500")
                     }

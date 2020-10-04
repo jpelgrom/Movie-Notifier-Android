@@ -193,6 +193,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
         if(user == null) { return; }
         String token = notificationSettings.getString("token", "");
         User toUpdate = new User();
+        toUpdate.setId(user.getId());
         toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         boolean changed = false;
         boolean setToEnabled = binding.notificationsPush.isChecked();
@@ -220,6 +221,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
     private void resetPushNotifications() {
         User toUpdate = new User();
+        toUpdate.setId(user.getId());
         toUpdate.setFcmTokens(Collections.emptyList());
         update(toUpdate, success -> {
             if(success) {
@@ -235,6 +237,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
             editDetail(SettingsAccountUpdateFragment.UpdateMode.EMAIL);
         } else {
             User toUpdate = new User();
+            toUpdate.setId(user.getId());
             toUpdate.setEmail("");
             update(toUpdate, null);
         }
@@ -353,6 +356,7 @@ public class SettingsAccountOverviewFragment extends Fragment {
 
         String token = notificationSettings.getString("token", "");
         User toUpdate = new User();
+        toUpdate.setId(user.getId());
         toUpdate.setFcmTokens(new ArrayList<>(user.getFcmTokens()));
         if(toUpdate.getFcmTokens().contains(token)) {
             toUpdate.getFcmTokens().remove(token);
