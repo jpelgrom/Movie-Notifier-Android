@@ -27,7 +27,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Decode google-services.json
+      - name: Copy gradle.properties
+        env:
+          GRADLE_PROPERTIES: ${{ secrets.GRADLE_PROPERTIES }}
+        run: echo $GRADLE_PROPERTIES > gradle.properties
+      - name: Copy google-services.json
         env:
           FIREBASE_CONFIG: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo $FIREBASE_CONFIG > app/google-services.json
