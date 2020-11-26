@@ -1,11 +1,9 @@
 package nl.jpelgrm.movienotifier.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import nl.jpelgrm.movienotifier.models.Cinema;
-import nl.jpelgrm.movienotifier.models.User;
 
 // Helper class for creating DB as in version 1.0 of the app
 // (based on commit c186fb9521b1188511db14d1d5f28d135de78471)
@@ -36,14 +34,15 @@ public class TestSQLiteOpenHelper extends SQLiteOpenHelper {
         // Moving from Room to SQLiteOpenHelper-based setup
         db.execSQL("DROP TABLE IF EXISTS Users");
         db.execSQL("DROP TABLE IF EXISTS Cinemas");
+        db.execSQL("DROP TABLE IF EXISTS Notifications");
         onCreate(db);
     }
 
-    public void addUser(User user) {
+    public void addUser(ContentValues user) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
-            db.insertOrThrow("Users", null, TestSQLiteHelper.toContentValuesUser(user));
+            db.insertOrThrow("Users", null, user);
             db.setTransactionSuccessful();
         } catch(Exception e) {
             e.printStackTrace();
@@ -52,11 +51,11 @@ public class TestSQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void addCinema(Cinema cinema) {
+    public void addCinema() {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
-            db.insertOrThrow("Cinemas", null, TestSQLiteHelper.toContentValuesCinema(cinema));
+            db.insertOrThrow("Cinemas", null, TestSQLiteHelper.getTestCinema(false));
             db.setTransactionSuccessful();
         } catch(Exception e) {
             e.printStackTrace();

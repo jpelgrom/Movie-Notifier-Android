@@ -13,8 +13,8 @@ class RoomUtil {
     }
 
     @TypeConverter
-    fun fromString(value: String): List<String>? {
-        return getMoshiListAdapter().fromJson(value)
+    fun fromString(value: String?): List<String>? {
+        return if (value == null) null else getMoshiListAdapter().fromJson(value)
     }
 
     @TypeConverter

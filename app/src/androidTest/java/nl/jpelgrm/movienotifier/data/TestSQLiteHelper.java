@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -24,49 +25,37 @@ class TestSQLiteHelper {
         db.close();
     }
 
-    static void clearDatabase(TestSQLiteOpenHelper helper) {
+    static void clearDatabase(TestSQLiteOpenHelper helper) throws IOException {
         SQLiteDatabase db = helper.getWritableDatabase();
 
         db.execSQL("DROP TABLE IF EXISTS Users");
         db.execSQL("DROP TABLE IF EXISTS Cinemas");
+        db.execSQL("DROP TABLE IF EXISTS Notifications");
 
         db.close();
     }
 
-    static User getTestUser() {
-        return new User(UUID.randomUUID().toString(),
-                "cinemaenthousia",
-                "enthousiast@example.com",
-                "+31698765432",
-                Collections.singletonList("FBM"),
-                new ApiKeyHelper().randomAPIKey());
-    }
-
-    static Cinema getTestCinema() {
-        return new Cinema("PATHE27",
-                "Pathé Arnhem",
-                51.98422,
-                5.90339);
-    }
-
-    static ContentValues toContentValuesUser(User user) {
+    static ContentValues getTestUser() {
         ContentValues cv = new ContentValues();
-        cv.put("ID", user.getId());
-        cv.put("Name", user.getName());
-        cv.put("Email", user.getEmail());
-        cv.put("Phone", user.getPhonenumber());
-        cv.put("Notifications", new Gson().toJson(user.getNotifications()));
-        cv.put("APIKey", user.getApikey());
+        cv.put("ID", UUID.randomUUID().toString());
+        cv.put("Name", "cinemaenthousia");
+        cv.put("Email", "enthousiast@example.com");
+        cv.put("Phone", "+31698765432");
+        cv.put("Notifications", new Gson().toJson(Collections.singletonList("FBM")));
+        cv.put("APIKey", new ApiKeyHelper().randomAPIKey());
 
         return cv;
     }
 
-    static ContentValues toContentValuesCinema(Cinema cinema) {
+    static ContentValues getTestCinema(boolean includeNewID) {
         ContentValues cv = new ContentValues();
-        cv.put("ID", cinema.getId());
-        cv.put("Name", cinema.getName());
-        cv.put("Lat", cinema.getLat());
-        cv.put("Lon", cinema.getLon());
+        cv.put("ID", "PATHE27");
+        if(includeNewID) {
+            cv.put("NewID", 27);
+        }
+        cv.put("Name", "Pathé Arnhem");
+        cv.put("Lat", 51.98422);
+        cv.put("Lon", 5.90339);
 
         return cv;
     }
