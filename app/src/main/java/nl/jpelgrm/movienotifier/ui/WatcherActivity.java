@@ -719,7 +719,7 @@ public class WatcherActivity extends AppCompatActivity {
                 .setValidator(DateValidatorPointForward.from(Math.min(startOfFirstDateInMillis, startOfTodayInMillis)))
                 .build());
         builder.setTitleText(checkingValue ? R.string.watcher_date_title_dialog : R.string.watcher_filter_title_startafter_dialog);
-        MaterialDatePicker picker = builder.build();
+        MaterialDatePicker<Pair<Long, Long>> picker = builder.build();
         picker.addOnPositiveButtonClickListener(selection -> {
             LocalTime startTime, endTime;
             if(checkingValue) {

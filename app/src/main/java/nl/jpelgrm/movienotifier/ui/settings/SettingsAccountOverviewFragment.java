@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.work.WorkManager;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -489,10 +489,10 @@ public class SettingsAccountOverviewFragment extends Fragment {
     }
 
     private void verifyFCMToken() {
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if(task.isSuccessful() && task.getResult() != null) {
                 String storedToken = notificationSettings.getString("token", "");
-                String receivedToken = task.getResult().getToken();
+                String receivedToken = task.getResult();
                 if(!storedToken.equals(receivedToken) && getContext() != null) {
                     WorkManager.getInstance(getContext()).cancelAllWorkByTag("fcmRefresh");
                     WorkManager.getInstance(getContext()).enqueue(FcmRefreshWorker.getRequestToUpdateImmediately(receivedToken, null));
