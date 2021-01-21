@@ -3,7 +3,6 @@ package nl.jpelgrm.movienotifier.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,6 +38,8 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import org.apache.commons.text.WordUtils;
 
@@ -55,7 +56,6 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -753,34 +753,41 @@ public class WatcherActivity extends AppCompatActivity {
     }
 
     private void showTimePicker(boolean checkingValue, boolean beginValue, long currentValue) {
-        Calendar current = Calendar.getInstance();
-        current.setTimeInMillis(currentValue);
+        ZonedDateTime current = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentValue/1000), ZoneId.systemDefault());
 
-        TimePickerDialog picker = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            Calendar setTo = Calendar.getInstance();
-            setTo.setTimeInMillis(currentValue);
-            setTo.set(current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, 0);
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(android.text.format.DateFormat.is24HourFormat(this) ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H)
+                .setHour(current.getHour())
+                .setMinute(current.getMinute())
+                .build();
+
+        picker.addOnPositiveButtonClickListener(view -> {
+            ZonedDateTime newValue = LocalDateTime.of(current.getYear(), current.getMonth(), current.getDayOfMonth(),
+                    picker.getHour(), picker.getMinute(), 0).atZone(ZoneId.systemDefault());
+            long setTo = newValue.toEpochSecond() * 1000L;
+
             if(checkingValue) {
                 if(beginValue) {
-                    watcher.setBegin(setTo.getTimeInMillis());
+                    watcher.setBegin(setTo);
                     validateAndFixEnd();
                 } else {
-                    watcher.setEnd(setTo.getTimeInMillis());
+                    watcher.setEnd(setTo);
                     validateAndFixBegin();
                 }
             } else {
                 if(beginValue) {
-                    watcher.getFilters().setStartafter(setTo.getTimeInMillis());
+                    watcher.getFilters().setStartafter(setTo);
                     validateAndFixStartBefore();
                 } else {
-                    watcher.getFilters().setStartbefore(setTo.getTimeInMillis());
+                    watcher.getFilters().setStartbefore(setTo);
                     validateAndFixStartAfter();
                 }
             }
 
             updateViews();
-        }, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), android.text.format.DateFormat.is24HourFormat(this));
-        picker.show();
+        });
+
+        picker.show(getSupportFragmentManager(), "timePicker");
     }
 
     private boolean validateName(boolean forced) {
