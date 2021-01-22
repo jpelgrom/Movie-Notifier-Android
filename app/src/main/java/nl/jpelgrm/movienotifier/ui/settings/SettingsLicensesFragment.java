@@ -11,6 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
+import dev.chrisbanes.insetter.Insetter;
+import dev.chrisbanes.insetter.Side;
 import nl.jpelgrm.movienotifier.databinding.FragmentSettingsLicensesBinding;
 
 public class SettingsLicensesFragment extends Fragment {
@@ -26,10 +28,7 @@ public class SettingsLicensesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
-                return insets;
-            });
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.BOTTOM).applyToView(binding.main);
             ViewCompat.requestApplyInsets(binding.main);
         }
     }

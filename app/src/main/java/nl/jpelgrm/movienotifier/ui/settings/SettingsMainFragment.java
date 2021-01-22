@@ -41,6 +41,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import dev.chrisbanes.insetter.Insetter;
+import dev.chrisbanes.insetter.Side;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
@@ -113,10 +115,7 @@ public class SettingsMainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
-                return insets;
-            });
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.BOTTOM).applyToView(binding.main);
             ViewCompat.requestApplyInsets(binding.main);
         }
 
@@ -147,12 +146,9 @@ public class SettingsMainFragment extends Fragment {
                 currentValueIndex = -1; // Don't select anything
             }
 
-            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_location_title).setSingleChoiceItems(cinemaItems, currentValueIndex, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int which) {
-                    dialogInterface.dismiss();
-                    setCinemaPreference(which);
-                }
+            new AlertDialog.Builder(getContext()).setTitle(R.string.settings_general_location_title).setSingleChoiceItems(cinemaItems, currentValueIndex, (dialogInterface, which) -> {
+                dialogInterface.dismiss();
+                setCinemaPreference(which);
             }).setNegativeButton(R.string.cancel, null).show();
         });
         binding.service.setOnClickListener(view5 -> {

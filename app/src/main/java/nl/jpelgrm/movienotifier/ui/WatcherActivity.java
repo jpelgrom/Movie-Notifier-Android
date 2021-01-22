@@ -32,6 +32,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -59,6 +61,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import dev.chrisbanes.insetter.Insetter;
+import dev.chrisbanes.insetter.Side;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
@@ -118,29 +122,26 @@ public class WatcherActivity extends AppCompatActivity {
         binding = ActivityWatcherBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        int systemUiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            systemUiFlags = systemUiFlags | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-        }
-        binding.getRoot().setSystemUiVisibility(systemUiFlags);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
-                v.setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), 0);
-                return insets;
-            });
-            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
-                return insets;
-            });
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.LEFT | Side.RIGHT).applyToView(binding.getRoot());
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.BOTTOM).applyToView(binding.main);
             ViewCompat.setOnApplyWindowInsetsListener(binding.fab, (v, insets) -> {
                 CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) v.getLayoutParams();
                 int margin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
-                params.setMargins(0, 0, margin, margin + insets.getSystemWindowInsetBottom());
+                int bottomInset;
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    bottomInset = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime()).bottom;
+                } else {
+                    //noinspection deprecation
+                    bottomInset = insets.getSystemWindowInsetBottom();
+                }
+                params.setMargins(0, 0, margin, margin + bottomInset);
                 v.setLayoutParams(params);
                 return insets;
             });
+        } else {
+            binding.getRoot().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
 
         settings = getSharedPreferences("settings", MODE_PRIVATE);

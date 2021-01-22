@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
+import dev.chrisbanes.insetter.Insetter;
+import dev.chrisbanes.insetter.Side;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
 import nl.jpelgrm.movienotifier.data.AppDatabase;
@@ -75,10 +77,7 @@ public class SettingsAccountUpdateFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-                v.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
-                return insets;
-            });
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.BOTTOM).applyToView(binding.main);
             ViewCompat.requestApplyInsets(binding.main);
         }
 

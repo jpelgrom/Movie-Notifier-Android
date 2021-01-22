@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -25,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 
+import dev.chrisbanes.insetter.Insetter;
+import dev.chrisbanes.insetter.Side;
 import nl.jpelgrm.movienotifier.BuildConfig;
 import nl.jpelgrm.movienotifier.R;
 import nl.jpelgrm.movienotifier.data.APIHelper;
@@ -47,18 +49,11 @@ public class SettingsActivity extends AppCompatActivity {
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        int systemUiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            systemUiFlags = systemUiFlags | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-        }
-        binding.getRoot().setSystemUiVisibility(systemUiFlags);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
-                v.setPadding(insets.getSystemWindowInsetLeft(), 0, insets.getSystemWindowInsetRight(), 0);
-                return insets;
-            });
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            Insetter.builder().applySystemWindowInsetsToPadding(Side.LEFT | Side.RIGHT).applyToView(binding.getRoot());
+        } else {
+            binding.getRoot().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
 
         setSupportActionBar(binding.toolbar);
@@ -83,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
         lastUserID.setValue(null);
         lastUser.observe(this, user -> updateToolbar());
 
-        getSupportFragmentManager().addOnBackStackChangedListener(() -> updateToolbar());
+        getSupportFragmentManager().addOnBackStackChangedListener(this::updateToolbar);
     }
 
     @Override

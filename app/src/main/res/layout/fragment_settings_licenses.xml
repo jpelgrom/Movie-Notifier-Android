@@ -29,7 +29,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:licenseTitle="Android Open Source Project"
-                app:licenseNotice="Copyright 2016-2019 The Android Open Source Project"
+                app:licenseNotice="Copyright 2016-2020 The Android Open Source Project"
+                app:licenseLicense="@string/license_apache" />
+
+            <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:licenseTitle="Insetter"
+                app:licenseNotice="Copyright 2019 Google LLC."
                 app:licenseLicense="@string/license_apache" />
 
             <nl.jpelgrm.movienotifier.ui.view.LicenseTextView
